@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, follow" />
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>{% block title %}{% endblock title %}</title>
+
+    {% load static %}
+    <!-- Place favicon.png in the root directory -->
+    <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon" />
+    <!-- Font Icons css -->
+    <link rel="stylesheet" href="{% static 'css/font-icons.css' %}">
+    <!-- plugins css -->
+    <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Responsive css -->
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+</head>
+<body>
+
+    <!-- Body main wrapper start -->
+
+    <div class="body-wrapper">
+        {% block content %}{% endblock content %}
+    </div>
+
+    <!-- Body main wrapper end -->
+
+    {% include "components/preloader.html" %}
+
+    <!-- All JS Plugins -->
+    <script src="{% static 'js/plugins.js' %}"></script>
+    <!-- Main JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <!-- Contact Form -->
+    <script src="{% static 'js/contact.js' %}"></script>
+    <!-- Maplace-active -->
+    <script src="{% static 'js/maplace-active.js' %}"></script>
+    <!-- Google Map js -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCeeHDCOXmUMja1CFg96RbtyKgx381yoBU"></script>
+</body>
+</html>
