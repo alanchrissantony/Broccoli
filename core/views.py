@@ -3,49 +3,43 @@ from django.shortcuts import render
 # Create your views here.
 
 def about(request):
-    return render(request, 'public/about.html')
-
-def account(request):
-    return render(request, 'public/account.html')
+    return render(request, 'public/user/about.html')
 
 def cart(request):
-    return render(request, 'public/cart.html')
+    return render(request, 'public/user/cart.html')
 
 def checkout(request):
-    return render(request, 'public/checkout.html')
+    return render(request, 'public/user/checkout.html')
 
 def comingsoon(request):
-    return render(request, 'public/coming-soon.html')
+    return render(request, 'public/user/coming-soon.html')
 
 def contact(request):
-    return render(request, 'public/contact.html')
+    return render(request, 'public/user/contact.html')
 
 def faq(request):
-    return render(request, 'public/faq.html')
+    return render(request, 'public/user/faq.html')
 
 def history(request):
-    return render(request, 'public/history.html')
+    return render(request, 'public/user/history.html')
 
 def index(request):
-    return render(request, 'public/index.html')
+    return render(request, 'public/user/index.html')
 
 def location(request):
-    return render(request, 'public/locations.html')
-
-def signin(request):
-    return render(request, 'public/login.html')
+    return render(request, 'public/user/locations.html')
 
 def order(request):
-    return render(request, 'public/order-tracking.html')
+    return render(request, 'public/user/order.html')
+
+def tracking(request):
+    return render(request, 'public/user/order-tracking.html')
 
 def product_details(request):
-    return render(request, 'public/product-details.html')
-
-def register(request):
-    return render(request, 'public/register.html')
+    return render(request, 'public/user/product-details.html')
 
 def product(request):
-    return render(request, 'public/products.html')
+    return render(request, 'public/user/products.html')
 
 def wishlist(request):
-    return render(request, 'public/wishlist.html')
+    return render(request, 'public/user/wishlist.html')

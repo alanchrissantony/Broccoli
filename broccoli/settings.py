@@ -38,9 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'accounts',
     'product',
+    'category',
     'cart',
     'order',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +75,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'broccoli.wsgi.application'
+
+AUTH_USER_MODEL = 'accounts.Account'
 
 
 # Database

@@ -48,7 +48,7 @@
 (function($) {
   "use strict";
 
-    jQuery(document).ready(function(){
+    $(document).ready(function(){
       
         /* --------------------------------------------------------
             1. Variables

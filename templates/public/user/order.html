@@ -1,0 +1,256 @@
+{% extends "public/user/base.html" %}
+
+{% block title %}Wishlist{% endblock title %}
+
+{% block content %}
+
+{% load static %}
+    
+    {% include "components/header.html" %}
+    {% include "components/cart.html" %}
+    {% include "components/mobile.html" %}
+    {% include "components/breadcrumb.html" with title='My Order' %}
+
+    <style>
+        #progressbar {
+  margin-bottom: 3vh;
+  overflow: hidden;
+  color: #26A541;
+  padding-left: 0px;
+  margin-top: 3vh
+}
+
+#progressbar li {
+  list-style-type: none;
+  font-size: x-small;
+  width: 25%;
+  float: left;
+  position: relative;
+  font-weight: 400;
+  color: rgb(160, 159, 159);
+}
+
+#progressbar #step1:before {
+  content: "";
+  color: #26A541;
+  width: 5px;
+  height: 5px;
+  margin-left: 0px !important;
+  /* padding-left: 11px !important */
+}
+
+#progressbar #step2:before {
+  content: "";
+  color: #fff;
+  width: 5px;
+  height: 5px;
+  margin-left: 32%;
+}
+
+#progressbar #step3:before {
+  content: "";
+  color: #fff;
+  width: 5px;
+  height: 5px;
+  margin-right: 32% ; 
+  /* padding-right: 11px !important */
+}
+
+#progressbar #step4:before {
+  content: "";
+  color: #fff;
+  width: 5px;
+  height: 5px;
+  margin-right: 0px !important;
+  /* padding-right: 11px !important */
+}
+
+#progressbar li:before {
+  line-height: 29px;
+  display: block;
+  font-size: 12px;
+  background: #ddd;
+  border-radius: 50%;
+  margin: auto;
+  z-index: -1;
+  margin-bottom: 1vh;
+}
+
+#progressbar li:after {
+  content: '';
+  height: 2px;
+  background: #ddd;
+  position: absolute;
+  left: 0%;
+  right: 0%;
+  margin-bottom: 2vh;
+  top: 1px;
+  z-index: 1;
+}
+.progress-track{
+  padding: 0 8%;
+}
+#progressbar li:nth-child(2):after {
+  margin-right: auto;
+}
+
+#progressbar li:nth-child(1):after {
+  margin: auto;
+}
+
+#progressbar li:nth-child(3):after {
+  float: left;
+  width: 68%;
+}
+#progressbar li:nth-child(4):after {
+  margin-left: auto;
+  width: 132%;
+}
+
+#progressbar  li.active{
+  color: black;
+}
+
+#progressbar li.active:before,
+#progressbar li.active:after {
+  background: #26A541;
+}
+    </style>
+
+    <!-- WISHLIST AREA START -->
+    <div class="liton__wishlist-area mb-105">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="shoping-cart-inner">
+                        <div class="shoping-cart-table table-responsive">
+                            <table class="table">
+                                <!-- <thead>
+                                    <th class="cart-product-remove">X</th>
+                                    <th class="cart-product-image">Image</th>
+                                    <th class="cart-product-info">Title</th>
+                                    <th class="cart-product-price">Price</th>
+                                    <th class="cart-product-quantity">Quantity</th>
+                                    <th class="cart-product-subtotal">Subtotal</th>
+                                </thead> -->
+                                <tbody>
+                                    <tr>
+                                        <td class="cart-product-remove" rowspan="2" style="border-top: none;">x</td>
+                                        <td class="cart-product-image" rowspan="2" style="border-top: none;">
+                                            <a href="product-details.html"><img src="{% static "img/product/1.png" %}" alt="#"></a>
+                                        </td>
+                                        <td class="cart-product-info" style="padding: 0; border: none;"> <!-- Apply inline styles -->
+                                            <div class="progress-track">
+                                                <ul id="progressbar">
+                                                    <li class="step0 active " id="step1">Order Confirmed</li>
+                                                    <li class="step0 active text-center" id="step2">Shipped</li>
+                                                    <li class="step0 active text-right" id="step3">Out for delivery</li>
+                                                    <li class="step0 text-right" id="step4">Delivered</li>
+                                                </ul>
+                                            </div>
+                                            <table style="width: 100%; border-collapse: collapse; border-top: none; border-bottom: none;"> <!-- Adjust width and border-collapse -->
+                                                <tr>
+                                                    <td class="cart-product-info">
+                                                        <h4><a href="product/details">Vegetables Juices</a></h4>
+                                                        <h6 class="cart-product-price">Quantity: <span style="font-weight: normal; float: right;">2</span></h6>
+                                                        <h6 class="cart-product-price">Price: <span style="font-weight: normal; float: right;">$85.00</span></h6>
+                                                    </td>
+                                                    <td class="cart-product-info">
+                                                        <h4><a href="product/details">Order Id: <span style="font-weight: normal;">#33190374453</span></a></h4>
+                                                        <h6 class="cart-product-price">Order Confirmed On: September 03, 2023</h6>
+                                                        <h6 class="cart-product-price">Expected Delivery On: December 15, 2023</h6>
+                                                    </td>
+                                                    <td class="cart-product-stock">
+                                                        <h4><a href="product/details">Amount Paid:&nbsp;<span style="font-weight: bolder; float: right;">$170</span></a></h4>
+                                                        <h6 class="cart-product-price" style="color: #2874F0;">Cancel</h6>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>                                                                        
+
+                                    <tr>
+                                        <td class="cart-product-remove" rowspan="2" style="border-top: none;">x</td>
+                                        <td class="cart-product-image" rowspan="2" style="border-top: none;">
+                                            <a href="product-details.html"><img src="{% static "img/product/1.png" %}" alt="#"></a>
+                                        </td>
+                                        <td class="cart-product-info" style="padding: 0; border: none;"> <!-- Apply inline styles -->
+                                            <div class="progress-track">
+                                                <ul id="progressbar">
+                                                    <li class="step0 active " id="step1">Order Confirmed</li>
+                                                    <li class="step0 active text-center" id="step2">Shipped</li>
+                                                    <li class="step0 active text-right" id="step3">Out for delivery</li>
+                                                    <li class="step0 text-right" id="step4">Delivered</li>
+                                                </ul>
+                                            </div>
+                                            <table style="width: 100%; border-collapse: collapse; border-top: none; border-bottom: none;"> <!-- Adjust width and border-collapse -->
+                                                <tr>
+                                                    <td class="cart-product-info">
+                                                        <h4><a href="product/details">Vegetables Juices</a></h4>
+                                                        <h6 class="cart-product-price">Quantity: <span style="font-weight: normal; float: right;">2</span></h6>
+                                                        <h6 class="cart-product-price">Price: <span style="font-weight: normal; float: right;">$85.00</span></h6>
+                                                    </td>
+                                                    <td class="cart-product-info">
+                                                        <h4><a href="product/details">Order Id: <span style="font-weight: normal;">#33190374453</span></a></h4>
+                                                        <h6 class="cart-product-price">Order Confirmed On: September 03, 2023</h6>
+                                                        <h6 class="cart-product-price">Expected Delivery On: December 15, 2023</h6>
+                                                    </td>
+                                                    <td class="cart-product-stock">
+                                                        <h4><a href="product/details">Amount Paid:&nbsp;<span style="font-weight: bolder; float: right;">$170</span></a></h4>
+                                                        <h6 class="cart-product-price" style="color: #2874F0;">Cancel</h6>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>                                                                        
+                                    
+                                    <tr>
+                                        <td class="cart-product-remove" rowspan="2" style="border-top: none;">x</td>
+                                        <td class="cart-product-image" rowspan="2" style="border-top: none;">
+                                            <a href="product-details.html"><img src="{% static "img/product/1.png" %}" alt="#"></a>
+                                        </td>
+                                        <td class="cart-product-info" style="padding: 0; border: none;"> <!-- Apply inline styles -->
+                                            <div class="progress-track">
+                                                <ul id="progressbar">
+                                                    <li class="step0 active " id="step1">Order Confirmed</li>
+                                                    <li class="step0 active text-center" id="step2">Shipped</li>
+                                                    <li class="step0 active text-right" id="step3">Out for delivery</li>
+                                                    <li class="step0 text-right" id="step4">Delivered</li>
+                                                </ul>
+                                            </div>
+                                            <table style="width: 100%; border-collapse: collapse; border-top: none; border-bottom: none;"> <!-- Adjust width and border-collapse -->
+                                                <tr>
+                                                    <td class="cart-product-info">
+                                                        <h4><a href="product/details">Vegetables Juices</a></h4>
+                                                        <h6 class="cart-product-price">Quantity: <span style="font-weight: normal; float: right;">2</span></h6>
+                                                        <h6 class="cart-product-price">Price: <span style="font-weight: normal; float: right;">$85.00</span></h6>
+                                                    </td>
+                                                    <td class="cart-product-info">
+                                                        <h4><a href="product/details">Order Id: <span style="font-weight: normal;">#33190374453</span></a></h4>
+                                                        <h6 class="cart-product-price">Order Confirmed On: September 03, 2023</h6>
+                                                        <h6 class="cart-product-price">Expected Delivery On: December 15, 2023</h6>
+                                                    </td>
+                                                    <td class="cart-product-stock">
+                                                        <h4><a href="product/details">Amount Paid:&nbsp;<span style="font-weight: bolder; float: right;">$170</span></a></h4>
+                                                        <h6 class="cart-product-price" style="color: #2874F0;">Cancel</h6>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>                                    
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- WISHLIST AREA START -->
+
+    {% include "components/feature.html" %}
+    {% include "components/footer.html" %}
+
+{% endblock content %}
+

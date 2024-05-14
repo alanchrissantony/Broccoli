@@ -1,0 +1,48 @@
+{% extends "public/user/base.html" %}
+
+{% block title %}Verification{% endblock title %}
+
+{% block content %}
+    
+    {% include "components/breadcrumb.html" with title='Verification' %}
+
+    <!-- LOGIN AREA START -->
+    <div class="ltn__login-area pb-65">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title-area text-center">
+                        <h1 class="section-title">Verify <br>Your Account</h1>
+                        <p>Get access to your Orders, Wishlist and Recommendations</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="account-login-inner">
+                        <form action="/alter" class="ltn__form-box contact-form-box">
+                            <div class="searchbox-wrap" style="display: flex;">
+                                <input type="email" name="email" placeholder="Email*">
+                                <button class="theme-btn-1 btn" type="submit" style="
+                                height                            : 65px;
+                                border                            : none;
+                                cursor                            : pointer; 
+                                cursor                            : hand;"><i class="fas fa-arrow-right"></i></button>
+                            </div>
+                            <input type="password" name="password" placeholder="OTP*">
+                            <div class="btn-wrapper mt-0">
+                                <button class="theme-btn-1 btn btn-block" type="submit">VERIFY</button>
+                            </div>
+                            <div class="go-to-btn mt-20">
+                                <a href="/user/register"><small>DON'T HAVE AN ACCOUNT?</small></a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- LOGIN AREA END -->
+
+{% endblock content %}
+
