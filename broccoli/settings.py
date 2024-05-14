@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,6 +45,9 @@ INSTALLED_APPS = [
     'cart',
     'order',
     'user',
+    'wishlists',
+    'promotion',
+    'layout'
 ]
 
 MIDDLEWARE = [
@@ -69,7 +73,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'cart.context_processors.CartCounter',
             ],
+            'libraries':{
+                'custom_filters': 'broccoli.templatetags.custom_filters',
+            
+            }
         },
     },
 ]
@@ -130,11 +139,13 @@ STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
 
+# Media files configuration
+
 MEDIA_URL = 'media/'
 
-MEDIA_ROOT = [
-    BASE_DIR / 'media'
-]
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

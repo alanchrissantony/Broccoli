@@ -7,11 +7,11 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>{% block title %}{% endblock title %}</title>
+    <title>{% block title %}{% endblock title %} - Broccoli</title>
 
     {% load static %}
     <!-- Place favicon.png in the root directory -->
-    <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="{% static "img/favicon.png" %}" type="image/x-icon" />
     <!-- Font Icons css -->
     <link rel="stylesheet" href="{% static 'css/font-icons.css' %}">
     <!-- plugins css -->
@@ -20,6 +20,10 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <!-- Responsive css -->
     <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <!-- Icons. Uncomment required icon fonts -->
+    <link rel="stylesheet" href="{% static "assets/vendor/fonts/boxicons.css" %}" />
 </head>
 <body>
 
@@ -31,7 +35,7 @@
 
     <!-- Body main wrapper end -->
 
-    {% include "components/preloader.html" %}
+    {% include "components/user/preloader.html" %}
 
     <!-- All JS Plugins -->
     <script src="{% static 'js/plugins.js' %}"></script>

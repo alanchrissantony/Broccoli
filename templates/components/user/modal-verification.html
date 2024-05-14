@@ -1,0 +1,35 @@
+{% load static %}
+<!-- MODAL AREA START (Wishlist Modal) -->
+<div class="ltn__modal-area ltn__add-to-cart-modal-area">
+    <div class="modal fade" id="liton_wishlist_modal" tabindex="-1">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="ltn__quick-view-modal-inner">
+                        <div class="modal-product-item">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="account-login-inner">
+                                        <form class="ltn__form-box contact-form-box" method="post">
+                                            {% csrf_token %}
+                                            <div class="searchbox-wrap" style="display: flex;">
+                                                <input type="text" name="otp" placeholder="OTP*">
+                                                <button class="theme-btn-1 btn btn-verification-otp" type="submit" style="height: 65px;"><i class="fas fa-arrow-right"></i></button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODAL AREA END -->

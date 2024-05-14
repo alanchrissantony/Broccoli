@@ -1,0 +1,234 @@
+{% extends "public/admin/base.html" %}
+
+{% block title %}Products{% endblock title %}
+
+{% load static %}
+
+{% block content %}
+{% include "components/admin/aside.html" %}
+
+<style>
+    .product-images-list a i {
+    display: none;
+    }
+    .product-images-list:hover a i {
+    display: block;
+    }
+</style>
+<!-- Layout container -->
+<div class="layout-page">
+
+    {% include "components/admin/searchbar.html" %}
+    <!-- Content wrapper -->
+    <div class="content-wrapper">
+        <!-- Content -->
+
+        <div class="container-xxl flex-grow-1 container-p-y">
+            <h4 class="fw-bold py-3 mb-4">
+                <span class="text-muted fw-light">Product Management / </span>Edit Product
+            </h4>
+
+            <div class="row">
+                <div class="col-md-12">
+                    {% include "components/admin/product_manage_button.html" %}
+                    <div class="card mb-4">
+                        <h5 class="card-header">Product Details</h5>
+                        <!-- Account -->
+                        <form id="formAccountSettings" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% for message in messages %}<p style="text-align: center;" class="{{message.tags}}-message">{{message}}</p>{% endfor %}
+                            <div class="card-body">
+                                <div class="d-flex align-items-start align-items-sm-center gap-4">
+                                    <img src="{{product.images.first.image.url}}" alt="user-avatar" class="d-block rounded"
+                                        height="100" width="100" id="uploadedAvatar">
+                                    <div class="button-wrapper">
+                                        <label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0">
+                                            <span class="d-none d-sm-block">Upload new photo</span>
+                                            <i class="bx bx-upload d-block d-sm-none"></i>
+                                            <input type="file" id="upload" class="account-file-input" hidden
+                                                accept="image/png, image/jpeg" name="image"/>
+                                        </label>
+                                        <button type="button" id="btn-crop"
+                                            class="btn btn-outline-secondary account-image-reset mb-4">
+                                            <i class="bx bx-reset d-block d-sm-none"></i>
+                                            <span class="d-none d-sm-block">Reset</span>
+                                        </button>
+
+                                        <p class="text-muted mb-0">Allowed JPG, GIF or PNG. Max size of 800K</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    {% for image in product.images.all %}
+                                    <div id="image_{{ image.id }}" class="image-container" style="position: relative; display: inline-block; cursor: pointer;">
+                                        <img id="newUploadedAvatar" height="65" width="65" src="{{ image.image.url }}" alt="Image">
+                                        <a href="#" class="delete-link" data-image-id="{{ image.id }}" style="position: absolute; top: 0; right: 0; cursor: pointer; color: #a1acb8; text-decoration: none;">
+                                            <i class="bx bx-x"></i>
+                                        </a>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                           
+                            <hr class="my-0" />
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="mb-3 col-md-6">
+                                        <label for="firstName" class="form-label">Name</label>
+                                        <input class="form-control" type="text" id="firstName" name="name" autofocus
+                                            value="{{product.name}}" />
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label for="lastName" class="form-label">Price</label>
+                                        <input class="form-control" type="number" name="price" id="lastName"
+                                            value="{{product.price}}" />
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label" for="country">Category</label>
+                                        <select id="country" class="select2 form-select" name="category">
+                                            <option value="{{product.category}}">{{product.category}}</option>
+                                            {% for category in categories %}
+                                            <option value="{{category.name}}" {% if product.category == category.name %} selected {% endif %}>{{category.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label for="organization" class="form-label">Quantity</label>
+                                        <input type="number" class="form-control" id="organization" name="stock"
+                                            value="{{product.stock}}" />
+                                    </div>
+                                    <div class="mb-6 col-md-12">
+                                        <label for="address" class="form-label">Description</label>
+                                        <textarea type="text" class="form-control" id="address" name="description"
+                                            placeholder="Description">{{product.description}}</textarea>
+                                    </div>
+                                    <div class="mt-2">
+                                        <input class="form-check-input" type="checkbox" id="defaultCheck1" {% if product.is_available %}checked{% endif %} value="True" name="isAvailable" />
+                                        <label for="address" class="form-label">Availability</label>
+                                    </div>
+                                    <div class="mt-2">
+                                        <button type="submit" class="btn btn-primary me-2">Save</button>
+                                        <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                                    </div>
+                                </div>
+                        </form>
+                        <!-- /Account -->
+                    </div>
+                    <div class="card">
+                        <h5 class="card-header">Delete Product</h5>
+                        <div class="card-body">
+                            <div class="mb-3 col-12 mb-0">
+                                <div class="alert alert-warning">
+                                    <h6 class="alert-heading fw-bold mb-1">Are you sure you want to delete this product?
+                                    </h6>
+                                    <p class="mb-0">Deleted products are removed from the store and can't be recovered.
+                                        Please be certain.</p>
+                                </div>
+                            </div>
+                            <form id="formAccountDeactivation" action="/root/products/delete/{{product.id}}">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="accountActivation"
+                                        id="accountActivation" required />
+                                    <label class="form-check-label" for="accountActivation">I confirm the deletion of
+                                        this product</label>
+                                </div>
+                                <button type="submit" class="btn btn-danger deactivate-account">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- / Content -->
+
+
+        {% include "components/admin/footer.html" %}
+
+        <div class="content-backdrop fade"></div>
+    </div>
+    <!-- Content wrapper -->
+</div>
+<!-- / Layout page -->
+<!-- Initialize Cropper.js -->
+<script>
+    var input = document.getElementById('upload');
+
+    // Listen for the change event on the input element
+    input.addEventListener('change', function(event) {
+        var file = event.target.files[0]; // Get the selected file
+        if (file) {
+            var reader = new FileReader(); // Create a FileReader object
+            reader.onload = function(event) {
+                var img = new Image(); // Create an Image object
+                img.src = event.target.result; // Set the src attribute to the data URL of the selected file
+                img.onload = function() {
+                    // Replace the src attribute of the existing image with the new image's data URL
+                    document.getElementById('uploadedAvatar').src = img.src;
+                };
+            };
+            reader.readAsDataURL(file); // Read the contents of the selected file
+        }
+    });
+
+    // JavaScript to handle the click event
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all delete links
+        var deleteLinks = document.querySelectorAll('.delete-link');
+
+        // Add click event listener to each delete link
+        deleteLinks.forEach(function(link) {
+            link.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default link behavior
+                
+                // Get the image ID from the data attribute
+                var imageId = this.getAttribute('data-image-id');
+                var imageContainer = document.getElementById('image_' + imageId);
+
+                // Send AJAX request
+                $.ajax({
+                    url: '/root/products/delete/images/' + imageId,
+                    type: 'GET', // or 'POST' depending on your server-side implementation
+                    success: function(response) {
+                        // Handle success response
+                        console.log('Image deleted successfully');
+                        // Hide the image container
+                        if (imageContainer) {
+                            imageContainer.style.display = 'none';
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error response
+                        console.error('Error deleting image:', error);
+                    }
+                });
+            });
+        });
+    });
+
+// JavaScript code
+document.addEventListener("DOMContentLoaded", function() {
+    // Get all the images with class 'image-container'
+    const images = document.querySelectorAll('.image-container');
+
+    // Add click event listener to each image
+    images.forEach(function(image) {
+        image.addEventListener('click', function() {
+            // Get the source of the clicked image
+            const src = this.querySelector('img').src;
+
+            // Set the source of uploadedAvatar to the clicked image source
+            document.getElementById('uploadedAvatar').src = src;
+
+            // Blur all images
+            images.forEach(function(imgContainer) {
+                imgContainer.classList.remove('focused');
+            });
+
+            // Focus on the clicked image container
+            this.classList.add('focused');
+        });
+    });
+});
+</script>
+
+
+{% endblock content %}

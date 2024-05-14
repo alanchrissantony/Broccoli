@@ -4,10 +4,10 @@
 
 {% block content %}
     
-    {% include "components/header.html" %}
-    {% include "components/cart.html" %}
-    {% include "components/mobile.html" %}
-    {% include "components/breadcrumb.html" with title='FAQ' %}
+    {% include "components/user/header.html" %}
+    {% include "components/user/cart.html" %}
+    {% include "components/user/mobile.html" %}
+    {% include "components/user/breadcrumb.html" with title='FAQ' %}
 
     <!-- FAQ AREA START (faq-2) (ID > accordion_2) -->
     <div class="ltn__faq-area mb-100">
@@ -172,8 +172,8 @@
     </div>
     <!-- COUNTER UP AREA END -->
 
-    {% include "components/blog.html" %}
-    {% include "components/feature.html" %}
-    {% include "components/footer.html" %}
+    {% include "components/user/blog.html" %}
+    {% include "components/user/feature.html" %}
+    {% include "components/user/footer.html" %}
 
 {% endblock content %}

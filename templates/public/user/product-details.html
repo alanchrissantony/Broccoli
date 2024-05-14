@@ -5,11 +5,12 @@
 {% block content %}
 
 {% load static %}
+{% load custom_filters %}
     
-    {% include "components/header.html" %}
-    {% include "components/cart.html" %}
-    {% include "components/mobile.html" %}
-    {% include "components/breadcrumb.html" with title='Product Details' %}
+    {% include "components/user/header.html" %}
+    {% include "components/user/cart.html" %}
+    {% include "components/user/mobile.html" %}
+    {% include "components/user/breadcrumb.html" with title='Product Details' %}
 
     <!-- SHOP DETAILS AREA START -->
     <div class="ltn__shop-details-area pb-85">
@@ -21,64 +22,20 @@
                             <div class="col-md-6">
                                 <div class="ltn__shop-details-img-gallery">
                                     <div class="ltn__shop-details-large-img">
+                                        {% for image in product.images.all %}
                                         <div class="single-large-img">
-                                            <a href="img/product/1.png" data-rel="lightcase:myCollection">
-                                                <img src="{% static "img/product/1.png" %}" alt="Image">
+                                            <a href="{{ image.image.url }}" data-rel="lightcase:myCollection">
+                                                <img src="{{ image.image.url }}" alt="Image">
                                             </a>
                                         </div>
-                                        <div class="single-large-img">
-                                            <a href="img/product/2.png" data-rel="lightcase:myCollection">
-                                                <img src="{% static "img/product/1.png" %}" alt="Image">
-                                            </a>
-                                        </div>
-                                        <div class="single-large-img">
-                                            <a href="img/product/3.png" data-rel="lightcase:myCollection">
-                                                <img src="{% static "img/product/1.png" %}" alt="Image">
-                                            </a>
-                                        </div>
-                                        <div class="single-large-img">
-                                            <a href="img/product/4.png" data-rel="lightcase:myCollection">
-                                                <img src="{% static "img/product/1.png" %}" alt="Image">
-                                            </a>
-                                        </div>
-                                        <div class="single-large-img">
-                                            <a href="img/product/5.png" data-rel="lightcase:myCollection">
-                                                <img src="{% static "img/product/1.png" %}" alt="Image">
-                                            </a>
-                                        </div>
-                                        <div class="single-large-img">
-                                            <a href="img/product/6.png" data-rel="lightcase:myCollection">
-                                                <img src="{% static "img/product/1.png" %}" alt="Image">
-                                            </a>
-                                        </div>
-                                        <div class="single-large-img">
-                                            <a href="img/product/7.png" data-rel="lightcase:myCollection">
-                                                <img src="{% static "img/product/1.png" %}" alt="Image">
-                                            </a>
-                                        </div>
+                                        {% endfor %}
                                     </div>
                                     <div class="ltn__shop-details-small-img slick-arrow-2">
+                                        {% for image in product.images.all %}
                                         <div class="single-small-img">
-                                            <img src="{% static "img/product/1.png" %}" alt="Image">
+                                            <img src="{{image.image.url}}" alt="Image">
                                         </div>
-                                        <div class="single-small-img">
-                                            <img src="{% static "img/product/1.png" %}" alt="Image">
-                                        </div>
-                                        <div class="single-small-img">
-                                            <img src="{% static "img/product/1.png" %}" alt="Image">
-                                        </div>
-                                        <div class="single-small-img">
-                                            <img src="{% static "img/product/1.png" %}" alt="Image">
-                                        </div>
-                                        <div class="single-small-img">
-                                            <img src="{% static "img/product/1.png" %}" alt="Image">
-                                        </div>
-                                        <div class="single-small-img">
-                                            <img src="{% static "img/product/1.png" %}" alt="Image">
-                                        </div>
-                                        <div class="single-small-img">
-                                            <img src="{% static "img/product/1.png" %}" alt="Image">
-                                        </div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>
@@ -86,46 +43,115 @@
                                 <div class="modal-product-info shop-details-info pl-0">
                                     <div class="product-ratting">
                                         <ul>
-                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                            <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                            <li><a href="#"><i class="far fa-star"></i></a></li>
+                                            {% comment %} Rating {% endcomment %}
+                                            {% if product.rating <= 0 %}
+                                                <li><a href="#"><i class="far fa-star"></i></a></li>
+                                            {% endif %}
+                                            {% if product.rating < 1 and product.rating > 0 %}
+                                                <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
+                                            {% endif %}
+                                            {% if product.rating >= 1 %}
+                                                <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                            {% endif %}
+                                            {% comment %} End {% endcomment %}
+
+                                            {% comment %} Rating {% endcomment %}
+                                            {% if product.rating < 1 %}
+                                                <li><a href="#"><i class="far fa-star"></i></a></li>
+                                            {% endif %}
+                                            {% if product.rating < 2 and product.rating > 1 %}
+                                                <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
+                                            {% endif %}
+                                            {% if product.rating >= 2 %}
+                                                <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                            {% endif %}
+                                            {% comment %} End {% endcomment %}
+                                            
+                                            {% comment %} Rating {% endcomment %}
+                                            {% if product.rating <= 2 %}
+                                                <li><a href="#"><i class="far fa-star"></i></a></li>
+                                            {% endif %}
+                                            {% if product.rating < 3 and product.rating > 2 %}
+                                                <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
+                                            {% endif %}
+                                            {% if product.rating >= 3 %}
+                                                <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                            {% endif %}
+                                            {% comment %} End {% endcomment %}
+
+                                            {% comment %} Rating {% endcomment %}
+                                            {% if product.rating <= 3 %}
+                                                <li><a href="#"><i class="far fa-star"></i></a></li>
+                                            {% endif %}
+                                            {% if product.rating < 4 and product.rating > 3 %}
+                                                <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
+                                            {% endif %}
+                                            {% if product.rating >= 4 %}
+                                                <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                            {% endif %}
+                                            {% comment %} End {% endcomment %}
+
+                                            {% comment %} Rating {% endcomment %}
+                                            {% if product.rating <= 4 %}
+                                                <li><a href="#"><i class="far fa-star"></i></a></li>
+                                            {% endif %}
+                                            {% if product.rating < 5 and product.rating > 4 %}
+                                                <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
+                                            {% endif %}
+                                            {% if product.rating >= 5 %}
+                                                <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                            {% endif %}
+                                            {% comment %} End {% endcomment %}
                                             <li class="review-total"> <a href="#"> ( 95 Reviews )</a></li>
                                         </ul>
                                     </div>
-                                    <h3>Vegetables Juices</h3>
+                                    <h3>{{product.name}}</h3>
                                     <div class="product-price">
-                                        <span>$49.00</span>
-                                        <del>$65.00</del>
+                                        <span>${{ product|calculate_discounted_price }}</span>
+                                        <del>${{product.price}}</del>
                                     </div>
                                     <div class="modal-product-meta ltn__product-details-menu-1">
                                         <ul>
                                             <li>
                                                 <strong>Categories:</strong> 
                                                 <span>
-                                                    <a href="#">Parts</a>
-                                                    <a href="#">Car</a>
-                                                    <a href="#">Seat</a>
-                                                    <a href="#">Cover</a>
+                                                    <a href="#">{{product.category}}</a>
                                                 </span>
                                             </li>
                                         </ul>
                                     </div>
                                     <div class="ltn__product-details-menu-2">
+                                        {% if product.stock > 0 %}
                                         <ul>
                                             <li>
-                                                <div class="cart-plus-minus">
-                                                    <input type="text" value="02" name="qtybutton" class="cart-plus-minus-box">
+                                                <div class="cart-plus-minus" data-product-min="{{ 1 }}" data-product-stock="{{ product.stock }}">
+                                                    <input type="number" value="1" id="quantity" name="qtybutton" class="cart-plus-minus-box">
                                                 </div>
                                             </li>
                                             <li>
-                                                <a href="#" class="theme-btn-1 btn btn-effect-1" title="Add to Cart" data-toggle="modal" data-target="#add_to_cart_modal">
+                                                <a href="#" onclick="addCart(`{{product.id}}`)" class="theme-btn-1 btn btn-effect-1" title="Add to Cart">
                                                     <i class="fas fa-shopping-cart"></i>
                                                     <span>ADD TO CART</span>
                                                 </a>
                                             </li>
                                         </ul>
+                                        <ul>
+                                            {% if product.stock <= 10 %}
+                                            
+                                            <li>
+                                                <h5 style="color: #b12704;">Hurry, Only a few left!</h5>
+                                            </li>
+
+                                            {% endif %}
+                                        </ul>
+                                        {% else %}
+                                        <ul>
+                                            <li>
+                                                <h5 style="color: #007600;">Currently unavailable.</h5>
+                                                <p>We don't know when or if this item will be back in stock.</p>
+                                            </li>
+                                        </ul>
+                                        {% endif %}
                                     </div>
                                     <div class="ltn__product-details-menu-3">
                                         <ul>
@@ -163,6 +189,7 @@
                             </div>
                         </div>
                     </div>
+
                     <!-- Shop Tab Start -->
                     <div class="ltn__shop-details-tab-inner ltn__shop-details-tab-inner-2">
                         <div class="ltn__shop-details-tab-menu">
@@ -174,9 +201,9 @@
                         <div class="tab-content">
                             <div class="tab-pane fade active show" id="liton_tab_details_1_1">
                                 <div class="ltn__shop-details-tab-content-inner">
-                                    <h4 class="title-2">Lorem ipsum dolor sit amet elit.</h4>
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.</p> 
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
+                                    <h4 class="title-2">{{product.name}}</h4>
+                                    <p>{{product.description}}</p> 
+                                    <p>{{product.description}}</p>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="liton_tab_details_1_2">
@@ -311,75 +338,85 @@
                         <div class="widget ltn__top-rated-product-widget">
                             <h4 class="ltn__widget-title ltn__widget-title-border">Top Rated Product</h4>
                             <ul>
+                                {% for product in top_rated %}
                                 <li>
                                     <div class="top-rated-product-item clearfix">
                                         <div class="top-rated-product-img">
-                                            <a href="product-details.html"><img src="{% static "img/product/1.png" %}" alt="#"></a>
+                                            <a href="/products/{{product.id}}"><img src="{{product.images.first.image.url}}" alt="#"></a>
                                         </div>
                                         <div class="top-rated-product-info">
                                             <div class="product-ratting">
                                                 <ul>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                                    {% comment %} Rating {% endcomment %}
+                                                    {% if product.rating <= 0 %}
+                                                        <li><a href="#"><i class="far fa-star"></i></a></li>
+                                                    {% endif %}
+                                                    {% if product.rating < 1 and product.rating > 0 %}
+                                                        <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
+                                                    {% endif %}
+                                                    {% if product.rating >= 1 %}
+                                                        <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                                    {% endif %}
+                                                    {% comment %} End {% endcomment %}
+
+                                                    {% comment %} Rating {% endcomment %}
+                                                    {% if product.rating < 1 %}
+                                                        <li><a href="#"><i class="far fa-star"></i></a></li>
+                                                    {% endif %}
+                                                    {% if product.rating < 2 and product.rating > 1 %}
+                                                        <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
+                                                    {% endif %}
+                                                    {% if product.rating >= 2 %}
+                                                        <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                                    {% endif %}
+                                                    {% comment %} End {% endcomment %}
+                                                    
+                                                    {% comment %} Rating {% endcomment %}
+                                                    {% if product.rating <= 2 %}
+                                                        <li><a href="#"><i class="far fa-star"></i></a></li>
+                                                    {% endif %}
+                                                    {% if product.rating < 3 and product.rating > 2 %}
+                                                        <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
+                                                    {% endif %}
+                                                    {% if product.rating >= 3 %}
+                                                        <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                                    {% endif %}
+                                                    {% comment %} End {% endcomment %}
+
+                                                    {% comment %} Rating {% endcomment %}
+                                                    {% if product.rating <= 3 %}
+                                                        <li><a href="#"><i class="far fa-star"></i></a></li>
+                                                    {% endif %}
+                                                    {% if product.rating < 4 and product.rating > 3 %}
+                                                        <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
+                                                    {% endif %}
+                                                    {% if product.rating >= 4 %}
+                                                        <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                                    {% endif %}
+                                                    {% comment %} End {% endcomment %}
+
+                                                    {% comment %} Rating {% endcomment %}
+                                                    {% if product.rating <= 4 %}
+                                                        <li><a href="#"><i class="far fa-star"></i></a></li>
+                                                    {% endif %}
+                                                    {% if product.rating < 5 and product.rating > 4 %}
+                                                        <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
+                                                    {% endif %}
+                                                    {% if product.rating >= 5 %}
+                                                        <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                                    {% endif %}
+                                                    {% comment %} End {% endcomment %}
                                                 </ul>
                                             </div>
-                                            <h6><a href="product-details.html">Mixel Solid Seat Cover</a></h6>
+                                            <h6><a href="/products/{{product.id}}">{{product.name}}</a></h6>
                                             <div class="product-price">
-                                                <span>$49.00</span>
-                                                <del>$65.00</del>
+                                                <span>${{ product|calculate_discounted_price }}</span>
+                                                <del>${{ product.price }}</del>
                                             </div>
                                         </div>
                                     </div>
                                 </li>
-                                <li>
-                                    <div class="top-rated-product-item clearfix">
-                                        <div class="top-rated-product-img">
-                                            <a href="product-details.html"><img src="{% static "img/product/1.png" %}" alt="#"></a>
-                                        </div>
-                                        <div class="top-rated-product-info">
-                                            <div class="product-ratting">
-                                                <ul>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                </ul>
-                                            </div>
-                                            <h6><a href="product-details.html">Vegetables Juices</a></h6>
-                                            <div class="product-price">
-                                                <span>$49.00</span>
-                                                <del>$65.00</del>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="top-rated-product-item clearfix">
-                                        <div class="top-rated-product-img">
-                                            <a href="product-details.html"><img src="{% static "img/product/1.png" %}" alt="#"></a>
-                                        </div>
-                                        <div class="top-rated-product-info">
-                                            <div class="product-ratting">
-                                                <ul>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                    <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                </ul>
-                                            </div>
-                                            <h6><a href="product-details.html">Coil Spring Conversion</a></h6>
-                                            <div class="product-price">
-                                                <span>$49.00</span>
-                                                <del>$65.00</del>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
+                                {% endfor %}
                             </ul>
                         </div>
                         
@@ -403,10 +440,11 @@
             </div>
             <div class="row ltn__related-product-slider-one-active slick-arrow-1">
                 <!-- ltn__product-item -->
+                {% for product in related_products %}
                 <div class="col-lg-12">
                     <div class="ltn__product-item ltn__product-item-3 text-center">
                         <div class="product-img">
-                            <a href="product-details.html"><img src="{% static "img/product/1.png" %}" alt="#"></a>
+                            <a href="/products/{{product.id}}"><img src="{{product.images.first.image.url}}" alt="#"></a>
                             <div class="product-badge">
                                 <ul>
                                     <li class="sale-badge">New</li>
@@ -441,259 +479,35 @@
                                     <li><a href="#"><i class="far fa-star"></i></a></li>
                                 </ul>
                             </div>
-                            <h2 class="product-title"><a href="product-details.html">Red Hot Tomato</a></h2>
+                            <h2 class="product-title"><a href="/products/{{product.id}}">{{product.name}}</a></h2>
                             <div class="product-price">
-                                <span>$149.00</span>
-                                <del>$162.00</del>
+                                <span>${{product|calculate_discounted_price}}</span>
+                                <del>${{product.price}}</del>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- ltn__product-item -->
-                <div class="col-lg-12">
-                    <div class="ltn__product-item ltn__product-item-3 text-center">
-                        <div class="product-img">
-                            <a href="product-details.html"><img src="{% static "img/product/1.png" %}" alt="#"></a>
-                            <div class="product-badge">
-                                <ul>
-                                    <li class="sale-badge">New</li>
-                                </ul>
-                            </div>
-                            <div class="product-hover-action">
-                                <ul>
-                                    <li>
-                                        <a href="#" title="Quick View" data-toggle="modal" data-target="#quick_view_modal">
-                                            <i class="far fa-eye"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" title="Add to Cart" data-toggle="modal" data-target="#add_to_cart_modal">
-                                            <i class="fas fa-shopping-cart"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
-                                            <i class="far fa-heart"></i></a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="product-info">
-                            <div class="product-ratting">
-                                <ul>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                    <li><a href="#"><i class="far fa-star"></i></a></li>
-                                </ul>
-                            </div>
-                            <h2 class="product-title"><a href="product-details.html">Vegetables Juices</a></h2>
-                            <div class="product-price">
-                                <span>$62.00</span>
-                                <del>$85.00</del>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- ltn__product-item -->
-                <div class="col-lg-12">
-                    <div class="ltn__product-item ltn__product-item-3 text-center">
-                        <div class="product-img">
-                            <a href="product-details.html"><img src="{% static "img/product/1.png" %}" alt="#"></a>
-                            <div class="product-badge">
-                                <ul>
-                                    <li class="sale-badge">New</li>
-                                </ul>
-                            </div>
-                            <div class="product-hover-action">
-                                <ul>
-                                    <li>
-                                        <a href="#" title="Quick View" data-toggle="modal" data-target="#quick_view_modal">
-                                            <i class="far fa-eye"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" title="Add to Cart" data-toggle="modal" data-target="#add_to_cart_modal">
-                                            <i class="fas fa-shopping-cart"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
-                                            <i class="far fa-heart"></i></a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="product-info">
-                            <div class="product-ratting">
-                                <ul>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                    <li><a href="#"><i class="far fa-star"></i></a></li>
-                                </ul>
-                            </div>
-                            <h2 class="product-title"><a href="product-details.html">Orange Fresh Juice</a></h2>
-                            <div class="product-price">
-                                <span>$75.00</span>
-                                <del>$92.00</del>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- ltn__product-item -->
-                <div class="col-lg-12">
-                    <div class="ltn__product-item ltn__product-item-3 text-center">
-                        <div class="product-img">
-                            <a href="product-details.html"><img src="{% static "img/product/1.png" %}"" alt="#"></a>
-                            <div class="product-badge">
-                                <ul>
-                                    <li class="sale-badge">New</li>
-                                </ul>
-                            </div>
-                            <div class="product-hover-action">
-                                <ul>
-                                    <li>
-                                        <a href="#" title="Quick View" data-toggle="modal" data-target="#quick_view_modal">
-                                            <i class="far fa-eye"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" title="Add to Cart" data-toggle="modal" data-target="#add_to_cart_modal">
-                                            <i class="fas fa-shopping-cart"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
-                                            <i class="far fa-heart"></i></a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="product-info">
-                            <div class="product-ratting">
-                                <ul>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                    <li><a href="#"><i class="far fa-star"></i></a></li>
-                                </ul>
-                            </div>
-                            <h2 class="product-title"><a href="product-details.html">Poltry Farm Meat</a></h2>
-                            <div class="product-price">
-                                <span>$78.00</span>
-                                <del>$85.00</del>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- ltn__product-item -->
-                <div class="col-lg-12">
-                    <div class="ltn__product-item ltn__product-item-3 text-center">
-                        <div class="product-img">
-                            <a href="product-details.html"><img src="{% static "img/product/1.png" %}" alt="#"></a>
-                            <div class="product-badge">
-                                <ul>
-                                    <li class="sale-badge">New</li>
-                                </ul>
-                            </div>
-                            <div class="product-hover-action">
-                                <ul>
-                                    <li>
-                                        <a href="#" title="Quick View" data-toggle="modal" data-target="#quick_view_modal">
-                                            <i class="far fa-eye"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" title="Add to Cart" data-toggle="modal" data-target="#add_to_cart_modal">
-                                            <i class="fas fa-shopping-cart"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
-                                            <i class="far fa-heart"></i></a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="product-info">
-                            <div class="product-ratting">
-                                <ul>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                    <li><a href="#"><i class="far fa-star"></i></a></li>
-                                </ul>
-                            </div>
-                            <h2 class="product-title"><a href="product-details.html">Fresh Butter Cake</a></h2>
-                            <div class="product-price">
-                                <span>$150.00</span>
-                                <del>$180.00</del>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- ltn__product-item -->
-                <div class="col-lg-12">
-                    <div class="ltn__product-item ltn__product-item-3 text-center">
-                        <div class="product-img">
-                            <a href="product-details.html"><img src="{% static "img/product/1.png" %}" alt="#"></a>
-                            <div class="product-badge">
-                                <ul>
-                                    <li class="sale-badge">New</li>
-                                </ul>
-                            </div>
-                            <div class="product-hover-action">
-                                <ul>
-                                    <li>
-                                        <a href="#" title="Quick View" data-toggle="modal" data-target="#quick_view_modal">
-                                            <i class="far fa-eye"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" title="Add to Cart" data-toggle="modal" data-target="#add_to_cart_modal">
-                                            <i class="fas fa-shopping-cart"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
-                                            <i class="far fa-heart"></i></a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="product-info">
-                            <div class="product-ratting">
-                                <ul>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                    <li><a href="#"><i class="far fa-star"></i></a></li>
-                                </ul>
-                            </div>
-                            <h2 class="product-title"><a href="product-details.html">Orange Sliced Mix</a></h2>
-                            <div class="product-price">
-                                <span>$150.00</span>
-                                <del>$180.00</del>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--  -->
+                {% endfor %}
             </div>
         </div>
     </div>
     <!-- PRODUCT SLIDER AREA END -->
 
-    {% include "components/feature.html" %}
-    {% include "components/footer.html" %}
-    {% include "components/modal-quick-view.html" %}
-    {% include "components/modal-cart.html" %}
-    {% include "components/modal-wishlist.html" %}
+    {% include "components/user/feature.html" %}
+    {% include "components/user/footer.html" %}
+    {% include "components/user/modal-quick-view.html" %}
+    {% include "components/user/modal-cart.html" %}
+    {% include "components/user/modal-wishlist.html" %}
+
+    <script>
+        const addCart = async (proId) => {
+        const url = window.location.origin
+        const qty = document.getElementById('quantity').value;
+        const response = await fetch(url+'/cart/add/'+proId+'/'+qty)
+        $('#add_to_cart_modal').modal('show');
+  //extract JSON from the http response
+  // do something with myJson
+}
+    </script>
 
 {% endblock content %}

@@ -4,10 +4,10 @@
 
 {% block content %}
     
-    {% include "components/header.html" %}
-    {% include "components/cart.html" %}
-    {% include "components/mobile.html" %}
-    {% include "components/breadcrumb.html" with title='History' %}
+    {% include "components/user/header.html" %}
+    {% include "components/user/cart.html" %}
+    {% include "components/user/mobile.html" %}
+    {% include "components/user/breadcrumb.html" with title='History' %}
 
     <!-- OUR HISTORY AREA START -->
     <div class="ltn__our-history-area pb-100">
@@ -232,8 +232,8 @@
     </div>
     <!-- CALL TO ACTION END -->
 
-    {% include "components/blog.html" %}
-    {% include "components/feature.html" %}
-    {% include "components/footer.html" %}
+    {% include "components/user/blog.html" %}
+    {% include "components/user/feature.html" %}
+    {% include "components/user/footer.html" %}
 
 {% endblock content %}

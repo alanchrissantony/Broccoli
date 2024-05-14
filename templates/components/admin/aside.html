@@ -1,0 +1,98 @@
+{% load static %}
+<!-- Menu -->
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+    <div class="app-brand demo">
+        <a href="index.html" class="app-brand-link">
+            <img src="{% static "assets/img/logo/logo.png" %}" alt="">
+        </a>
+
+        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+            <i class="bx bx-chevron-left bx-sm align-middle"></i>
+        </a>
+    </div>
+
+    <div class="menu-inner-shadow"></div>
+
+    <ul class="menu-inner py-1">
+        <!-- Dashboard -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root" %}active{% endif %}">
+            <a href="/root" class="menu-link">
+                <i class="menu-icon tf-icons bx bxs-dashboard"></i>
+                <div data-i18n="Analytics">Dashboard</div>
+            </a>
+        </li>
+
+        <!-- Cards -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root_products" %}active{% endif %}">
+            <a href="/root/products" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-package"></i>
+                <div data-i18n="Basic">Products</div>
+            </a>
+        </li>
+
+        <!-- Cards -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root_users" %}active{% endif %}">
+            <a href="/root/users" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-group"></i>
+                <div data-i18n="Basic">Users</div>
+            </a>
+        </li>
+
+        <!-- Cards -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root_carts" %}active{% endif %}">
+            <a href="/root/carts" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-cart"></i>
+                <div data-i18n="Basic">Carts</div>
+            </a>
+        </li>
+
+        <!-- Cards -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root_orders" %}active{% endif %}">
+            <a href="/root/orders" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-blanket"></i>
+                <div data-i18n="Basic">Orders</div>
+            </a>
+        </li>
+
+        <!-- Cards -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root_users" %}active{% endif %}">
+            <a href="/root/orders" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-heart"></i>
+                <div data-i18n="Basic">Wishlists</div>
+            </a>
+        </li>
+
+        <!-- Cards -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root" %}active{% endif %}">
+            <a href="/root/orders" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-file"></i>
+                <div data-i18n="Basic">Reviews</div>
+            </a>
+        </li>
+
+        <!-- Cards -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root_categories" %}active{% endif %}">
+            <a href="/root/categories" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-category"></i>
+                <div data-i18n="Basic">Categories</div>
+            </a>
+        </li>
+
+        <!-- Cards -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root_coupons" %}active{% endif %}">
+            <a href="/root/coupons" class="menu-link">
+                <i class="menu-icon tf-icons bx bxs-discount"></i>
+                <div data-i18n="Basic">Coupons</div>
+            </a>
+        </li>
+
+        <!-- Cards -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root_layouts" %}active{% endif %}">
+            <a href="/root/layouts" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-layout"></i>
+                <div data-i18n="Basic">Layout</div>
+            </a>
+        </li>
+    </ul>
+</aside>
+<!-- / Menu -->

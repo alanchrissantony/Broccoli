@@ -1,13 +1,14 @@
 {% extends "public/user/base.html" %}
 
 {% block title %}Cart{% endblock title %}
+{% load static %}
 
 {% block content %}
     
-    {% include "components/header.html" %}
-    {% include "components/cart.html" %}
-    {% include "components/mobile.html" %}
-    {% include "components/breadcrumb.html" with title='Cart' %}
+    {% include "components/user/header.html" %}
+    {% include "components/user/cart.html" %}
+    {% include "components/user/mobile.html" %}
+    {% include "components/user/breadcrumb.html" with title='Cart' %}
 
     <!-- SHOPING CART AREA START -->
     <div class="liton__shoping-cart-area mb-120">
@@ -15,65 +16,32 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="shoping-cart-inner">
+                        {% if cart_items %}
+                        <form action="/cart">
                         <div class="shoping-cart-table table-responsive">
                             <table class="table">
-                                <!-- <thead>
-                                    <th class="cart-product-remove">Remove</th>
-                                    <th class="cart-product-image">Image</th>
-                                    <th class="cart-product-info">Product</th>
-                                    <th class="cart-product-price">Price</th>
-                                    <th class="cart-product-quantity">Quantity</th>
-                                    <th class="cart-product-subtotal">Subtotal</th>
-                                </thead> -->
                                 <tbody>
+                                    {% for cart_item in cart_items %}
                                     <tr>
-                                        <td class="cart-product-remove">x</td>
-                                        <td class="cart-product-image">
-                                            <a href="product-details.html"><img src="img/product/1.png" alt="#"></a>
-                                        </td>
-                                        <td class="cart-product-info">
-                                            <h4><a href="product-details.html">Vegetables Juices</a></h4>
-                                        </td>
-                                        <td class="cart-product-price">$149.00</td>
-                                        <td class="cart-product-quantity">
-                                            <div class="cart-plus-minus">
-                                                <input type="text" value="02" name="qtybutton" class="cart-plus-minus-box">
-                                            </div>
-                                        </td>
-                                        <td class="cart-product-subtotal">$298.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="cart-product-remove">x</td>
-                                        <td class="cart-product-image">
-                                            <a href="product-details.html"><img src="img/product/2.png" alt="#"></a>
-                                        </td>
-                                        <td class="cart-product-info">
-                                            <h4><a href="product-details.html">Orange Sliced Mix</a></h4>
-                                        </td>
-                                        <td class="cart-product-price">$85.00</td>
-                                        <td class="cart-product-quantity">
-                                            <div class="cart-plus-minus">
-                                                <input type="text" value="02" name="qtybutton" class="cart-plus-minus-box">
-                                            </div>
-                                        </td>
-                                        <td class="cart-product-subtotal">$170.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="cart-product-remove">x</td>
-                                        <td class="cart-product-image">
-                                            <a href="product-details.html"><img src="img/product/3.png" alt="#"></a>
-                                        </td>
-                                        <td class="cart-product-info">
-                                            <h4><a href="product-details.html">Red Hot Tomato</a></h4>
-                                        </td>
-                                        <td class="cart-product-price">$75.00</td>
-                                        <td class="cart-product-quantity">
-                                            <div class="cart-plus-minus">
-                                                <input type="text" value="02" name="qtybutton" class="cart-plus-minus-box">
-                                            </div>
-                                        </td>
-                                        <td class="cart-product-subtotal">$150.00</td>
-                                    </tr>
+                                            <td class="cart-product-remove">{{ forloop.counter }}</td>
+                                            <td class="cart-product-image">
+                                                <a href="product-details.html"><img src="{{cart_item.product.images.first.image.url}}" alt="#"></a>
+                                            </td>
+                                            <td class="cart-product-info">
+                                                <h4><a href="product-details.html">{{cart_item.product.name}}</a></h4>
+                                            </td>
+                                            <td class="cart-product-price">${{cart_item.product.price}}</td>
+                                            <td class="cart-product-quantity">
+                                                <div class="cart-plus-minus" data-product-id="{{ cart_item.product.id }}" data-product-stock="{{ cart_item.product.stock }}" data-product-min="{{ 0 }}">
+                                                    <input type="text" value="{{cart_item.quantity}}" name="qtybutton" class="cart-plus-minus-box">
+                                                </div>
+                                            </td>
+                                            <td class="cart-product-subtotal" id="cart-product-subtotal">${{cart_item.sub_total}}</td>
+                                            <td>
+                                                <a href="/cart/delete/{{cart_item.product.id}}"><i class="btn btx bx bx-trash"></i></a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
                                     <tr class="cart-coupon-row">
                                         <td colspan="6">
                                             <div class="cart-coupon">
@@ -88,32 +56,51 @@
                                 </tbody>
                             </table>
                         </div>
+                        </form>
                         <div class="shoping-cart-total mt-50">
                             <h4>Cart Totals</h4>
                             <table class="table">
                                 <tbody>
                                     <tr>
                                         <td>Cart Subtotal</td>
-                                        <td>$618.00</td>
+                                        <td>${{total}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Discount</td>
+                                        <td>-${{discount}}</td>
                                     </tr>
                                     <tr>
                                         <td>Shipping and Handing</td>
-                                        <td>$15.00</td>
+                                        <td>${{shipping}}</td>
                                     </tr>
                                     <tr>
                                         <td>Vat</td>
-                                        <td>$00.00</td>
+                                        <td>${{vat}}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Order Total</strong></td>
-                                        <td><strong>$633.00</strong></td>
+                                        <td><strong>${{price}}</strong></td>
                                     </tr>
                                 </tbody>
                             </table>
                             <div class="btn-wrapper text-right">
-                                <a href="checkout.html" class="theme-btn-1 btn btn-effect-1">Proceed to checkout</a>
+                                <a href="/checkout" class="theme-btn-1 btn btn-effect-1">Proceed to checkout</a>
                             </div>
                         </div>
+                        {% else %}
+                            <div class="shoping-cart-table table-responsive">
+                                <div style="text-align: center;">
+                                    <img style="max-width: 50%;" src="{% static "img/others/cart_empty.png" %}" alt="">
+                                </div>
+                                <div style="text-align: center;">
+                                    <h3>Your cart is empty</h3>
+                                    <p>Looks like you have not added anything to you cart. <br>Go ahead & explore top categories.</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <a href="/" class="theme-btn-1 btn black-btn">Continue Shopping</a>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -121,7 +108,7 @@
     </div>
     <!-- SHOPING CART AREA END -->
 
-    {% include "components/feature.html" %}
-    {% include "components/footer.html" %}
+    {% include "components/user/feature.html" %}
+    {% include "components/user/footer.html" %}
 
     {% endblock content %}

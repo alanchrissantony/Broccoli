@@ -1,0 +1,124 @@
+{% extends "public/user/base.html" %}
+{% load static %}
+
+{% block title %}Checkout{% endblock title %}
+
+{% block content %}
+    
+    {% include "components/user/header.html" %}
+    {% include "components/user/cart.html" %}
+    {% include "components/user/mobile.html" %}
+    {% include "components/user/breadcrumb.html" with title='Checkout' %}
+
+    <!-- WISHLIST AREA START -->
+    <div class="ltn__checkout-area mb-105">
+        <div class="container">
+            <div class="row">
+                <form method="post">
+                {% csrf_token %}
+                <div class="col-lg-12">
+                    <div class="ltn__checkout-inner">
+                        <div class="ltn__checkout-single-content mt-50">
+                            <h4 class="title-2">Billing Details</h4>
+                            <div class="ltn__checkout-single-content-info">
+                                    <h6>Personal Information</h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="input-item input-item-name ltn__custom-icon">
+                                                <input type="text" name="firstname" value="{% if address %}{{address.first_name}}{% else %}{{user.first_name}}{% endif %}" placeholder="First name" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-item input-item-name ltn__custom-icon">
+                                                <input type="text" name="lastname" placeholder="Last name" value="{% if address %}{{address.last_name}}{% else %}{{user.last_name}}{% endif %}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-item input-item-email ltn__custom-icon">
+                                                <input type="email" name="email" placeholder="email address" value="{% if address %}{{address.email}}{% else %}{{user.email}}{% endif %}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-item input-item-phone ltn__custom-icon">
+                                                <input type="text" name="phone" placeholder="phone number" value="{% if address %}{{address.phone_number}}{% endif %}" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6">
+                                            <h6>Country</h6>
+                                            <div class="input-item">
+                                                <select class="nice-select" name="country" required>
+                                                    <option value="" selected disabled>Select Country</option>
+                                                    {% for country in countries %}
+                                                        <option value="{{ country.name }}" {% if address.country == country.name %} selected {% endif %}>{{ country.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12">
+                                            <h6>Address</h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="input-item">
+                                                        <input type="text" placeholder="House number and street name" name="address" value="{% if address %}{{address.address}}{% endif %}" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="input-item">
+                                                        <input type="text" placeholder="Apartment, suite, unit etc. (optional)" name="additional" value="{% if address %}{{address.additional}}{% endif %}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6">
+                                            <h6>Town / City</h6>
+                                            <div class="input-item">
+                                                <select class="nice-select" name="city" required>
+                                                    <option value="" selected disabled>Select City</option>
+                                                    {% for city in cities %}
+                                                        <option value="{{ city.name }}" {% if address.city == city.name %} selected {% endif %}>{{ city.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6">
+                                            <h6>State </h6>
+                                            <div class="input-item">
+                                                <select class="nice-select" name="state" required>
+                                                    <option value="" selected disabled>Select City</option>
+                                                    {% for state in states %}
+                                                        <option value="{{ state.name }}" {% if address.state == state.name %} selected {% endif %}>{{ state.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6">
+                                            <h6>Zip</h6>
+                                            <div class="input-item">
+                                                <input type="text" placeholder="Zip" name="zip_code" value="{% if address %}{{address.zip_code}}{% endif %}" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                
+                                    <h6>Order Notes (optional)</h6>
+                                    <div class="input-item input-item-textarea ltn__custom-icon">
+                                        <textarea name="message" placeholder="Notes about your order, e.g. special notes for delivery."></textarea>
+                                    </div>
+                                    <button class="btn theme-btn-1 btn-effect-1 text-uppercase" type="submit">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    <!-- WISHLIST AREA START -->
+
+    {% include "components/user/feature.html" %}
+    {% include "components/user/footer.html" %}
+
+{% endblock content %}
+

@@ -4,7 +4,7 @@
 
 {% block content %}
     
-    {% include "components/breadcrumb.html" with title='Verification' %}
+    {% include "components/user/breadcrumb.html" with title='Verification' %}
 
     <!-- LOGIN AREA START -->
     <div class="ltn__login-area pb-65">
@@ -20,21 +20,23 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="account-login-inner">
-                        <form action="/alter" class="ltn__form-box contact-form-box">
+                        <form method="post" class="ltn__form-box contact-form-box">
+                            {% csrf_token %}
+                            {% for message in messages %}<p style="text-align: center;" class="{{message.tags}}-message">{{message}}</p>{% endfor %}
                             <div class="searchbox-wrap" style="display: flex;">
-                                <input type="email" name="email" placeholder="Email*">
+                                <input type="email" name="email" placeholder="Email*" value="{{email}}">
                                 <button class="theme-btn-1 btn" type="submit" style="
                                 height                            : 65px;
                                 border                            : none;
                                 cursor                            : pointer; 
                                 cursor                            : hand;"><i class="fas fa-arrow-right"></i></button>
                             </div>
-                            <input type="password" name="password" placeholder="OTP*">
+                            <input type="password" name="otp" placeholder="OTP*">
                             <div class="btn-wrapper mt-0">
                                 <button class="theme-btn-1 btn btn-block" type="submit">VERIFY</button>
                             </div>
                             <div class="go-to-btn mt-20">
-                                <a href="/user/register"><small>DON'T HAVE AN ACCOUNT?</small></a>
+                                <a href="/user/register"><small>Resend OTP?</small></a>
                             </div>
                         </form>
                     </div>

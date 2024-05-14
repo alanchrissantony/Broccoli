@@ -1,0 +1,10 @@
+<ul class="nav nav-pills flex-column flex-md-row mb-3">
+    <li class="nav-item">
+        <a class="nav-link {% if request.resolver_match.url_name == "root_users" %}active{% endif %}" href="/root/users"><i class="bx bx-group"></i>
+            Users</a>
+   
+    <li class="nav-item">
+        <a class="nav-link {% if request.resolver_match.url_name == "root_add_user" %}active{% endif %}" href="/root/users/add"><i class="bx bx-plus me-1"></i>
+            Add User</a>
+    </li>
+</ul>

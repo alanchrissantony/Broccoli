@@ -1,0 +1,92 @@
+{% load static %}
+<!-- BANNER AREA START -->
+<style>
+    .banner-row{
+        flex-wrap: nowrap;
+        overflow-x: scroll;
+        overflow-y: hidden;
+    }
+    .banner-row::-webkit-scrollbar{
+        display: none;
+    }
+</style>
+<div class="ltn__banner-area mt-120">
+    <div class="container">
+        <div class="category_row_post row ltn__custom-gutter--- justify-content-center banner-row">
+            {% for category in categories %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="ltn__banner-item">
+                        <div class="ltn__banner-img">
+                            <a href="/products?category={{category.id}}"><img src="{{category.image.url}}" alt="Banner Image"></a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- BANNER AREA END -->
+
+<!-- BANNER AREA START -->
+<div class="ltn__banner-area mt-120 mt--90 d-none">
+    <div class="container">
+        <div class="row ltn__custom-gutter--- justify-content-center">
+            <div class="col-lg-4 col-md-6">
+                <div class="ltn__banner-item">
+                    <div class="ltn__banner-img">
+                        <a href="shop.html"><img src="{% static 'img/banner/1.jpg' %}" alt="Banner Image"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="ltn__banner-item">
+                    <div class="ltn__banner-img">
+                        <a href="shop.html"><img src="{% static 'img/banner/2.jpg' %}" alt="Banner Image"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="ltn__banner-item">
+                    <div class="ltn__banner-img">
+                        <a href="shop.html"><img src="{% static 'img/banner/1.jpg' %}" alt="Banner Image"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- BANNER AREA END -->
+
+<!-- BANNER AREA START -->
+<div class="ltn__banner-area mt-120  d-none">
+    <div class="container">
+        <div class="row ltn__custom-gutter--- justify-content-center">
+            <div class="col-lg-6 col-md-6">
+                <div class="ltn__banner-item">
+                    <div class="ltn__banner-img">
+                        <a href="shop.html"><img src="{% static 'img/banner/13.png' %}" alt="Banner Image"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="ltn__banner-item">
+                            <div class="ltn__banner-img">
+                                <a href="shop.html"><img src="{% static 'img/banner/14.png' %}" alt="Banner Image"></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="ltn__banner-item">
+                            <div class="ltn__banner-img">
+                                <a href="shop.html"><img src="{% static 'img/banner/15.png' %}" alt="Banner Image"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- BANNER AREA END -->

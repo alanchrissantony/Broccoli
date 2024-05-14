@@ -1,0 +1,50 @@
+{% load static %}
+<!-- Utilize Cart Menu Start -->
+<div id="ltn__utilize-cart-menu" class="ltn__utilize ltn__utilize-cart-menu">
+    <div class="ltn__utilize-menu-inner ltn__scrollbar">
+        <div class="ltn__utilize-menu-head">
+            <span class="ltn__utilize-menu-title">Cart</span>
+            <button class="ltn__utilize-close">×</button>
+        </div>
+        {% if cart_view %}
+        <div class="mini-cart-product-area ltn__scrollbar">
+            {% for cart in cart_view %}
+                <div class="mini-cart-item clearfix">
+                    <div class="mini-cart-img">
+                        <a href="/products/{{cart.product.id}}"><img src="{{cart.product.images.first.image.url}}" alt="Image"></a>
+                        <span class="mini-cart-item-delete"><a href="/cart/delete/{{cart.product.id}}"><i class="icon-cancel"></i></a></span>
+                    </div>
+                    <div class="mini-cart-info">
+                        <h6><a href="#">{{cart.product.name}}</a></h6>
+                        <span class="mini-cart-quantity">{{cart.quantity}} x ${{cart.product.price}}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="mini-cart-footer">
+            <div class="mini-cart-sub-total">
+                <h5>Subtotal: <span>${{cart_total}}</span></h5>
+            </div>
+            <div class="btn-wrapper">
+                <a href="cart.html" class="theme-btn-1 btn btn-effect-1">View Cart</a>
+                <a href="cart.html" class="theme-btn-2 btn btn-effect-2">Checkout</a>
+            </div>
+            <p>Free Shipping on All Orders Over $100!</p>
+        </div>
+        {% else %}
+            <div class="shoping-cart-table table-responsive">
+                <div style="text-align: center;">
+                    <img style="max-width: 50%;" src="{% static "img/others/cart_empty.png" %}" alt="">
+                </div>
+                <div style="text-align: center;">
+                    <h3>Your cart is empty</h3>
+                    <p>Looks like you have not added anything to you cart. <br>Go ahead & explore top categories.</p>
+                </div>
+                <div style="text-align: center;">
+                    <button class="theme-btn-1 btn black-btn ltn__utilize-close">Continue Shopping</button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+<!-- Utilize Cart Menu End -->

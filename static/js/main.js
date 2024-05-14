@@ -1264,15 +1264,26 @@
         $(".qtybutton").on("click", function() {
             var $button = $(this);
             var oldValue = $button.parent().find("input").val();
-            if ($button.text() == "+") {
-                var newVal = parseFloat(oldValue) + 1;
+            var productId =  $button.closest(".cart-plus-minus").data("product-id");
+            var productStock =  $button.closest(".cart-plus-minus").data("product-stock");
+            var min =  $button.closest(".cart-plus-minus").data("product-min");
+
+            if ($button.text() == "+") {// Replace with the actual product ID
+                if (parseFloat(oldValue)<productStock){
+                    var newVal = parseFloat(oldValue) + 1;
+                    $.get("/cart/add/" + productId + '/' + 1);
+                }else{
+                    var newVal = parseFloat(oldValue)
+                }
+                
             } 
             else {
-                if (oldValue > 0) {
+                if (oldValue > min) {
                     var newVal = parseFloat(oldValue) - 1;
+                    $.get("/cart/remove/" + productId);
                 } 
                 else {
-                    newVal = 0;
+                    newVal = min;
                 }
             }
             $button.parent().find("input").val(newVal);
