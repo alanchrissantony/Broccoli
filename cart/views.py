@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 from product.models import Product
 from cart.models import Cart, CartItem
 from category.models import Category
@@ -49,7 +50,7 @@ def add(request, product_id, quantity):
     except CartItem.DoesNotExist:
         cart_item = CartItem.objects.create(product=product, quantity=quantity, cart=cart, user=request.user)
         cart_item.save()
-    return redirect("cart")
+    return JsonResponse(cart_item.sub_total)
     
 @login_required(login_url='signin')
 def remove(request, product_id):

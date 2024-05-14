@@ -1271,6 +1271,15 @@
             if ($button.text() == "+") {// Replace with the actual product ID
                 if (parseFloat(oldValue)<productStock){
                     var newVal = parseFloat(oldValue) + 1;
+                    $.ajax({
+                        url: "/cart/add/" + productId + '/' + 1,
+                        dataType: 'json',
+                        success: function (data) {
+                            console.log(data);
+                            $('#cart-product-subtotal-').html(data);
+                        }
+                    }
+                    )
                     $.get("/cart/add/" + productId + '/' + 1);
                 }else{
                     var newVal = parseFloat(oldValue)
