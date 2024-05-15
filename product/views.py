@@ -34,12 +34,12 @@ def product(request):
     }
     return render(request, 'public/user/products.html', context)
 
-def productDetails(request, id):
+def productDetails(request, uuid):
     if request.method == 'POST':
         response_data = {'message': 'Product added to cart successfully!'}
         return JsonResponse(response_data)
-    product = Product.objects.get(id=id)
-    related_products = Product.objects.filter(category=product.category).exclude(id=product.id)
+    product = Product.objects.get(uuid=uuid)
+    related_products = Product.objects.filter(category=product.category).exclude(uuid=product.uuid)
     top_rated = Product.objects.all().order_by('-rating')[:5]
     
     context = {

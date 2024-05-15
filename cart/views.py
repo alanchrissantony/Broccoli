@@ -5,6 +5,7 @@ from cart.models import Cart, CartItem
 from category.models import Category
 from promotion.models import Promotion, PromotionCategory
 from django.contrib.auth.decorators import login_required
+import json
 
 
 
@@ -50,12 +51,13 @@ def add(request, product_id, quantity):
     except CartItem.DoesNotExist:
         cart_item = CartItem.objects.create(product=product, quantity=quantity, cart=cart, user=request.user)
         cart_item.save()
-    return JsonResponse(cart_item.sub_total)
+
+    return redirect('cart')
     
 @login_required(login_url='signin')
-def remove(request, product_id):
+def remove(request, product_uuid):
     cart = Cart.objects.get(cart_id=cart_id(request))
-    product = get_object_or_404(Product, id=product_id)
+    product = get_object_or_404(Product, uuid=product_uuid)
     cart_item = CartItem.objects.get(product=product, cart=cart)
 
     if cart_item.quantity > 1:
@@ -66,9 +68,9 @@ def remove(request, product_id):
     return redirect('cart')
 
 @login_required(login_url='signin')
-def delete(request, product_id):
+def delete(request, product_uuid):
     cart = Cart.objects.get(cart_id=cart_id(request))
-    product = get_object_or_404(Product, id=product_id)
+    product = get_object_or_404(Product, uuid=product_uuid)
     cart_item = CartItem.objects.get(product=product, cart=cart)
 
     cart_item.delete()

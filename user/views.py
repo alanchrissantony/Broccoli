@@ -149,7 +149,7 @@ class AddressUser:
         }
         return render(request, "public/user/address.html", context)
     
-    def edit(request, id):
+    def edit(request, uuid):
         user = request.user
         if request.method == 'POST':
             form_data = request.POST
@@ -168,7 +168,7 @@ class AddressUser:
                 'country': Country.objects.get(name=form_data.get('country'))
             }
 
-            user_address = UserAddress.objects.filter(address_id=id).first()
+            user_address = UserAddress.objects.filter(address_id=uuid).first()
             if user_address:
                 address_instance = user_address.address_id
                 for key, value in address_data.items():
@@ -180,7 +180,7 @@ class AddressUser:
 
             return redirect('checkout')
         try:
-            address = Address.objects.get(id=id)
+            address = Address.objects.get(uuid=uuid)
         except:
             address=None
 
@@ -196,8 +196,8 @@ class AddressUser:
         }
         return render(request, "public/user/address.html", context)
     
-    def delete(request, id):
+    def delete(request, uuid):
         
-        user_address = UserAddress.objects.filter(address_id=id).first()
+        user_address = UserAddress.objects.filter(address_id=uuid).first()
         user_address.address_id.delete()
         return redirect('checkout')

@@ -60,11 +60,11 @@ class Categories:
         return render(request, 'public/admin/add_category.html', context)
 
     @login_required(login_url='root_signin')
-    def edit(request, id):
+    def edit(request, uuid):
         
         if request.method == 'POST':
             # Fetch the product object
-            category = Category.objects.get(id=id)
+            category = Category.objects.get(uuid=uuid)
 
             # Handle images
             if 'image' in request.FILES:
@@ -87,19 +87,17 @@ class Categories:
             description = request.POST.get('description')
             is_available = bool(request.POST.get('isAvailable'))  # Convert to boolean
 
-            if Validator.validate_discount(int(discount)):
-                messages.error(request, 'Accepts a percentage value that must be less than 100!')
-            else:
-                # Update product fields
-                category.name = name
-                category.description = description
-                category.is_available = is_available
 
-                category.save()
-                return redirect('root_categories')
+
+            # Update product fields
+            category.name = name
+            category.description = description
+            category.is_available = is_available
+            category.save()
+            return redirect('root_categories')
 
         # Fetch product and categories for rendering form
-        category = Category.objects.get(id=id)
+        category = Category.objects.get(uuid=uuid)
         admin = request.user
         context = {
             'admin':admin,
@@ -110,9 +108,9 @@ class Categories:
     
 
     @login_required(login_url='root_signin')
-    def delete(request, id):
+    def delete(request, uuid):
         
-        category = Category.objects.get(id=id)
+        category = Category.objects.get(uuid=uuid)
         category.delete()
         return redirect('root_categories')
     

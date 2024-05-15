@@ -1,6 +1,7 @@
 from django.db import models
 from product.models import Product
 from accounts.models import Account
+import uuid
 
 # Create your models here.
 
@@ -12,6 +13,7 @@ class Cart(models.Model):
         return self.cart_id
     
 class CartItem(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     user = models.ForeignKey(Account , on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)

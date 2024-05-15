@@ -1,11 +1,12 @@
 from django.db import models
 from functools import partial
 from core.models import image_upload_path
-from django.core.validators import MinValueValidator, MaxValueValidator
+import uuid
 
 # Create your models here.
 
 class Category(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
     description = models.CharField(max_length=255)

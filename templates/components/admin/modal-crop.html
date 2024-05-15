@@ -1,0 +1,110 @@
+<!-- MODAL AREA START (Wishlist Modal) -->
+<link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet">
+
+<div class="ltn__modal-area ltn__add-to-cart-modal-area">
+    <div class="modal fade" id="liton_wishlist_modal" tabindex="-1">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <style>
+                        .modal-header .close {
+                            position: absolute;
+                            height: 40px;
+                            width: 40px;
+                            line-height: 40px;
+                            padding: 0;
+                            right: 16px;
+                            left: auto;
+                            top: 16px;
+                            opacity: 1;
+                            z-index: 1;
+                            -webkit-transition: all 0.3s ease 0s;
+                            -o-transition: all 0.3s ease 0s;
+                            transition: all 0.3s ease 0s;
+                            border: 0px;
+                        }
+                        .modal-header .close span {
+                            display: block;
+                            font-size: 25px;
+                        }
+                    </style>
+                    <button type="button" class="close" onclick="closeModal()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                     <div class="ltn__quick-view-modal-inner">
+                         <div class="modal-product-item">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <h5 class="card-header">Crop Image</h5>
+                                        <div class="card-body">
+                                            <div class="container">
+                                                <img id="image" src="#"  alt="Your image">
+                                            </div>
+                                        </div>
+                                        <button id="cropButton" class="btn btn-secondary">Done</button>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.getElementById('upload');
+        const image = document.getElementById('image');
+        const cropButton = document.getElementById('cropButton');
+        let cropper;
+
+        fileInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                image.src = event.target.result;
+                if (cropper) {
+                    cropper.destroy();
+                }
+                cropper = new Cropper(image, {
+                    aspectRatio: NaN,
+                    viewMode: 1,
+                    center: true,
+                    autoCropArea: 0.5,
+                    crop(event) {
+                        console.log('Crop coordinates:', event.detail);
+                    }
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+
+        cropButton.addEventListener('click', function () {
+            const croppedCanvas = cropper.getCroppedCanvas();
+            if (!croppedCanvas) {
+                alert('No crop has been made yet.');
+                return;
+            }
+            const croppedDataURL = croppedCanvas.toDataURL();
+            document.getElementById('uploadedAvatar').src = croppedDataURL;
+            document.getElementById('uploadedAvatar').value = croppedDataURL;
+            $('#liton_wishlist_modal').modal('hide');
+            
+            // Now you can upload `croppedDataURL` to your server using AJAX or submit it with a form
+        });
+    });
+    function closeModal() {
+        $('#liton_wishlist_modal').modal('hide');
+    }
+
+</script>
+<!-- MODAL AREA END -->

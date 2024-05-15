@@ -66,7 +66,7 @@
                 {% for address in address %}
                 <div class="col-lg-4">
                     <div class="ltn__checkout-inner">
-                        <div class="ltn__checkout-single-content mt-50 address-card {% if address.is_default %} active {% endif %}" onclick="selectAddress(this, '{{ address.id }}')">
+                        <div class="ltn__checkout-single-content mt-50 address-card {% if address.is_default %} active {% endif %}" onclick="selectAddress(this, '{{ address.uuid }}')">
                             <div class="ltn__checkout-single-content-info">
                                 {% if address.is_default %}
                                 <i class="bx bxs-check-circle"></i>
@@ -81,9 +81,9 @@
                                     {{ address.address_id.order_instruction }}
                                 </p>
                                 <div class="icons">
-                                    <a href="/user/address/edit/{{address.address_id.id}}"><i
+                                    <a href="/user/address/edit/{{address.address_id.uuid}}"><i
                                             class="bx bxs-pencil action-icons"></i></a>
-                                    <a href="/user/address/delete/{{address.address_id.id}}"><i
+                                    <a href="/user/address/delete/{{address.address_id.uuid}}"><i
                                             class="bx bxs-trash action-icons"></i></a>
                                 </div>
                             </div>

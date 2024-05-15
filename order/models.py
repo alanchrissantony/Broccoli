@@ -2,10 +2,12 @@ from django.db import models
 from accounts.models import Account
 from product.models import Product
 from user.models import Address
+import uuid
 
 # Create your models here.
 
 class Payment(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     payment_id = models.CharField(max_length=255, null=True)
     payment_method = models.CharField(max_length=255, null=True)
@@ -26,7 +28,7 @@ class OrderStatus(models.Model):
         ('Returned', 'Returned'),
         ('Refunded', 'Refunded'), 
     )
-
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=20, choices=STATUS)
 
     class Meta:
@@ -38,7 +40,7 @@ class OrderStatus(models.Model):
         return self.name
 
 class Order(models.Model):
-
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
     order_number = models.CharField(max_length=20)
@@ -59,7 +61,7 @@ class Order(models.Model):
 
 
 class OrderProduct(models.Model):
-
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
     user = models.ForeignKey(Account, on_delete=models.CASCADE)

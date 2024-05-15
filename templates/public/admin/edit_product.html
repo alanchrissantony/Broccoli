@@ -15,6 +15,7 @@
     display: block;
     }
 </style>
+
 <!-- Layout container -->
 <div class="layout-page">
 
@@ -30,6 +31,7 @@
 
             <div class="row">
                 <div class="col-md-12">
+                    
                     {% include "components/admin/product_manage_button.html" %}
                     <div class="card mb-4">
                         <h5 class="card-header">Product Details</h5>
@@ -59,9 +61,9 @@
                                 </div>
                                 <div>
                                     {% for image in product.images.all %}
-                                    <div id="image_{{ image.id }}" class="image-container" style="position: relative; display: inline-block; cursor: pointer;">
+                                    <div id="image_{{ image.uuid }}" class="image-container" style="position: relative; display: inline-block; cursor: pointer;">
                                         <img id="newUploadedAvatar" height="65" width="65" src="{{ image.image.url }}" alt="Image">
-                                        <a href="#" class="delete-link" data-image-id="{{ image.id }}" style="position: absolute; top: 0; right: 0; cursor: pointer; color: #a1acb8; text-decoration: none;">
+                                        <a href="#" class="delete-link" data-image-id="{{ image.uuid }}" style="position: absolute; top: 0; right: 0; cursor: pointer; color: #a1acb8; text-decoration: none;">
                                             <i class="bx bx-x"></i>
                                         </a>
                                     </div>
@@ -108,6 +110,7 @@
                                     <div class="mt-2">
                                         <button type="submit" class="btn btn-primary me-2">Save</button>
                                         <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                                        
                                     </div>
                                 </div>
                         </form>
@@ -124,7 +127,7 @@
                                         Please be certain.</p>
                                 </div>
                             </div>
-                            <form id="formAccountDeactivation" action="/root/products/delete/{{product.id}}">
+                            <form id="formAccountDeactivation" action="/root/products/delete/{{product.uuid}}">
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox" name="accountActivation"
                                         id="accountActivation" required />
@@ -150,6 +153,7 @@
 <!-- / Layout page -->
 <!-- Initialize Cropper.js -->
 <script>
+
     var input = document.getElementById('upload');
 
     // Listen for the change event on the input element
@@ -162,7 +166,11 @@
                 img.src = event.target.result; // Set the src attribute to the data URL of the selected file
                 img.onload = function() {
                     // Replace the src attribute of the existing image with the new image's data URL
-                    document.getElementById('uploadedAvatar').src = img.src;
+                    
+
+                    $(document).ready(function() {
+                        $('#liton_wishlist_modal').modal('show');
+                    });
                 };
             };
             reader.readAsDataURL(file); // Read the contents of the selected file
@@ -217,6 +225,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Set the source of uploadedAvatar to the clicked image source
             document.getElementById('uploadedAvatar').src = src;
+            $('#liton_wishlist_modal').modal('hide');
 
             // Blur all images
             images.forEach(function(imgContainer) {
@@ -229,6 +238,5 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 </script>
-
 
 {% endblock content %}

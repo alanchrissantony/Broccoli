@@ -1,7 +1,4 @@
 from django.core.files.uploadedfile import InMemoryUploadedFile
-
-from PIL import Image
-from io import BytesIO
 from uuid import uuid4
 import os
 

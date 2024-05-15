@@ -2,9 +2,11 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from product.models import Product
 from category.models import Category
+import uuid
 
 # Create your models here.
 class Discount(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=255, blank=True)
     discount = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(100)])
@@ -18,6 +20,7 @@ class Discount(models.Model):
 
 
 class Coupon(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     code = models.CharField(max_length=25, unique=True)
     minimum_price = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(100)])
@@ -32,6 +35,7 @@ class Coupon(models.Model):
 
 
 class Promotion(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     discount = models.ForeignKey(Discount, on_delete=models.CASCADE)
 
@@ -39,6 +43,7 @@ class Promotion(models.Model):
         return self.product.name
 
 class PromotionCategory(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     discount = models.ForeignKey(Discount, on_delete=models.CASCADE)
 

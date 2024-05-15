@@ -1260,43 +1260,35 @@
             33. Quantity plus minus
         -------------------------------------------------------- */
         $(".cart-plus-minus").prepend('<div class="dec qtybutton">-</div>');
-        $(".cart-plus-minus").append('<div class="inc qtybutton">+</div>');
-        $(".qtybutton").on("click", function() {
-            var $button = $(this);
-            var oldValue = $button.parent().find("input").val();
-            var productId =  $button.closest(".cart-plus-minus").data("product-id");
-            var productStock =  $button.closest(".cart-plus-minus").data("product-stock");
-            var min =  $button.closest(".cart-plus-minus").data("product-min");
+$(".cart-plus-minus").append('<div class="inc qtybutton">+</div>');
+$(".qtybutton").on("click", function() {
+    var $button = $(this);
+    var oldValue = parseFloat($button.parent().find("input").val());
+    var productId = $button.closest(".cart-plus-minus").data("product-id");
+    var productStock = $button.closest(".cart-plus-minus").data("product-stock");
+    var min = $button.closest(".cart-plus-minus").data("product-min");
+    var price = parseFloat($button.closest("tr").find(".cart-product-price").text().replace("$", ""));
+    var subtotalElement = $button.closest("tr").find(".cart-product-subtotal");
 
-            if ($button.text() == "+") {// Replace with the actual product ID
-                if (parseFloat(oldValue)<productStock){
-                    var newVal = parseFloat(oldValue) + 1;
-                    $.ajax({
-                        url: "/cart/add/" + productId + '/' + 1,
-                        dataType: 'json',
-                        success: function (data) {
-                            console.log(data);
-                            $('#cart-product-subtotal-').html(data);
-                        }
-                    }
-                    )
-                    $.get("/cart/add/" + productId + '/' + 1);
-                }else{
-                    var newVal = parseFloat(oldValue)
-                }
-                
-            } 
-            else {
-                if (oldValue > min) {
-                    var newVal = parseFloat(oldValue) - 1;
-                    $.get("/cart/remove/" + productId);
-                } 
-                else {
-                    newVal = min;
-                }
-            }
-            $button.parent().find("input").val(newVal);
-        });
+    if ($button.text() == "+") {
+        if (oldValue < productStock) {
+            var newVal = oldValue + 1;
+            $.get("/cart/add/" + productId + '/' + 1);
+            subtotalElement.text("$" + (price * newVal).toFixed(2));
+        } else {
+            var newVal = oldValue;
+        }
+    } else {
+        if (oldValue > min) {
+            var newVal = oldValue - 1;
+            $.get("/cart/remove/" + productId);
+        } else {
+            newVal = min;
+        }
+        subtotalElement.text("$" + (price * newVal).toFixed(2));
+    }
+    $button.parent().find("input").val(newVal);
+});
 
 
 	    /* --------------------------------------------------------

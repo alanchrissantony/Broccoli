@@ -16,9 +16,9 @@ def order(request):
     }
     return render(request, 'public/user/order.html', context)
 
-def delete(request, id):
+def delete(request, uuid):
     try:
-        order = OrderProduct.objects.get(order=id)
+        order = OrderProduct.objects.get(order=uuid)
         order.product.stock += order.quantity
         order.product.save()
         order.delete()

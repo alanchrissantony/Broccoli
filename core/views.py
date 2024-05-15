@@ -43,10 +43,10 @@ def checkout(request):
     if request.method == 'POST':
         addressId = request.POST.get('address')
         if addressId:
-            address = Address.objects.get(id=addressId)
+            address = Address.objects.get(uuid=addressId)
         else:
             address = UserAddress.objects.get(user_id=user, is_default=True)
-            address = Address.objects.get(id=address.id)
+            address = Address.objects.get(uuid=address.uuid)
     
         order = Order.objects.create(
             user=user,
