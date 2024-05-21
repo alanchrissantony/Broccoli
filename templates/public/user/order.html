@@ -1,6 +1,6 @@
 {% extends "public/user/base.html" %}
 
-{% block title %}Wishlist{% endblock title %}
+{% block title %}Orders{% endblock title %}
 
 {% block content %}
 
@@ -18,6 +18,22 @@
         color: #26A541;
         padding-left: 0px;
         margin-top: 3vh
+    }
+
+    #progressbar #step1{
+        text-align: left;
+    }
+
+    #progressbar #step2{
+        text-align: center;
+    }
+
+    #progressbar #step3{
+        text-align: right;
+    }
+
+    #progressbar #step4{
+        text-align: right;
     }
 
     #progressbar li {
@@ -182,11 +198,11 @@
                                         <div class="progress-track">
                                             <ul id="progressbar">
                                                 {% for status in product.order.statuses.all %}
-                                                    <li class="step1 active " id="step1">{{status.name}}</li>
+                                                    <li class="step{{forloop.counter}} active" id="step{{forloop.counter}}">{{status.name}}</li>
                                                 {% endfor %}
-                                                <li class="step0 active text-center" id="step2">Shipped</li>
-                                                <li class="step0 active text-right" id="step3">Out for delivery</li>
-                                                <li class="step0 text-right" id="step4">Delivered</li>
+                                                {% if product.order.statuses.count < 2 %}<li class="step2" id="step2">Shipped</li>{% endif %}
+                                                {% if product.order.statuses.count < 3 %}<li class="step3" id="step3">Out for delivery</li>{% endif %}
+                                                {% if product.order.statuses.count < 4 %}<li class="step4" id="step4">Delivered</li>{% endif %}
                                             </ul>
                                         </div>
                                         <table style="width: 100%;"> <!-- Adjust width and border-collapse -->

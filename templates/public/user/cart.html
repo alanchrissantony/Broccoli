@@ -10,6 +10,12 @@
     {% include "components/user/mobile.html" %}
     {% include "components/user/breadcrumb.html" with title='Cart' %}
 
+    <style>
+        #cart-coupon-row{
+            display: none;
+        }
+    </style>
+
     <!-- SHOPING CART AREA START -->
     <div class="liton__shoping-cart-area mb-120">
         <div class="container">
@@ -32,21 +38,21 @@
                                             </td>
                                             <td class="cart-product-price">${{cart_item.product.price}}</td>
                                             <td class="cart-product-quantity">
-                                                <div class="cart-plus-minus" data-product-id="{{ cart_item.product.uuid }}" data-product-stock="{{ cart_item.product.stock }}" data-product-min="{{ 0 }}">
+                                                <div class="cart-plus-minus" data-product-id="{{ cart_item.product.id }}" data-product-stock="{{ cart_item.product.stock }}" data-product-min="{{ 0 }}">
                                                     <input type="text" value="{{cart_item.quantity}}" name="qtybutton" class="cart-plus-minus-box">
                                                 </div>
                                             </td>
                                             <td class="cart-product-subtotal" id="cart-product-subtotal">${{cart_item.sub_total}}</td>
                                             <td>
-                                                <a href="/cart/delete/{{cart_item.product.uuid}}"><i class="btn btx bx bx-trash"></i></a>
+                                                <a href="/cart/delete/{{cart_item.product.id}}"><i class="btn btx bx bx-trash"></i></a>
                                             </td>
                                         </tr>
                                     {% endfor %}
                                     <tr class="cart-coupon-row">
                                         <td colspan="6">
                                             <div class="cart-coupon">
-                                                <input type="text" name="cart-coupon" placeholder="Coupon code">
-                                                <button type="submit" class="btn theme-btn-2 btn-effect-2">Apply Coupon</button>
+                                                <input type="text" name="cart-coupon" id="coupon" placeholder="Coupon code">
+                                                <button onclick="handle_coupon()" type="button" class="btn theme-btn-2 btn-effect-2" id="coupon-btn">Apply Coupon</button>
                                             </div>
                                         </td>
                                         <td>
@@ -69,6 +75,10 @@
                                         <td>Discount</td>
                                         <td>-${{discount}}</td>
                                     </tr>
+                                    <tr id="cart-coupon-row">
+                                        <td>Coupon</td>
+                                        <td id="cart-coupon"></td>
+                                    </tr>
                                     <tr>
                                         <td>Shipping and Handing</td>
                                         <td>${{shipping}}</td>
@@ -79,7 +89,7 @@
                                     </tr>
                                     <tr>
                                         <td><strong>Order Total</strong></td>
-                                        <td><strong>${{price}}</strong></td>
+                                        <td><strong id="cart-total">${{price}}</strong></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -111,4 +121,34 @@
     {% include "components/user/feature.html" %}
     {% include "components/user/footer.html" %}
 
+    <script>
+        const handle_coupon= async()=>{
+            const code = document.getElementById('coupon').value
+            const domain = window.location.origin
+            $.ajax({
+                url: domain+"/cart", // Replace with your actual URL
+                type: "GET",
+                data: { coupon: code }, // Send data as an object
+                success: function(response) {
+                    // Handle successful response
+                    if (response.coupon) {
+                        $('#cart-coupon-row').show();
+                        $('#cart-coupon').text(`-$${response.coupon}`);
+                        $('#cart-total').text(`$${response.price}`);
+                        $('#coupon-btn').text('Coupon Applied');
+                    } else {
+                        $('#cart-coupon-row').hide();
+                        $('#cart-total').text(`$${response.price}`);
+                        $('#coupon-btn').text('Invalid Coupon');
+                    }
+                    // Update the page content here using the response data
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    // Handle error
+                    console.error(textStatus, errorThrown);
+                    // Display an error message to the user
+                }
+            });
+        }
+    </script>
     {% endblock content %}

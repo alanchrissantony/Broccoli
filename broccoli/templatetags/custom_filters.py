@@ -1,24 +1,41 @@
 # custom_filters.py
 from django import template
-from promotion.models import Promotion, PromotionCategory, Discount
+from promotion.models import Promotion, PromotionCategory
+from wishlists.models import Wishlist
 
 register = template.Library()
 
 @register.filter(name="calculate_discounted_price")
 def calculate_discounted_price(product):
     price = float(product.price)
-    try:
-        product_discount = Promotion.objects.get(product=product).discount.discount
-    except:
-        product_discount = 0.00
-    try:
-        category_discount = PromotionCategory.objects.get(category=product.category).discount.discount
-    except:
-        category_discount = 0
+    discount = 0.00
+    reduction = 0
 
+    # Get active product and category promotions (handle potential absence)
+    product_promotion = Promotion.objects.filter(product=product).first()
+    category_promotion = PromotionCategory.objects.filter(category=product.category).first()
+    
+    # Calculate discount based on promotion type if existing
+    if product_promotion:
+        discount_type = product_promotion.discount.type
+        discount_value = product_promotion.discount.discount
+        
+        if discount_type == 'Percentage Discount':
+            discount += discount_value
+        else:
+            reduction += discount_value # Limit amount discount to product price
+    
+    if category_promotion:
+        category_discount_type = category_promotion.discount.type
+        category_discount_value = category_promotion.discount.discount
 
-    discount = product_discount+category_discount
-    return round(price * (1 - discount / 100), 2)
+        if category_discount_type == 'Percentage Discount':
+            discount += category_discount_value
+        else:
+            reduction += category_discount_value  # Limit amount discount to product price
+
+    # Apply combined discount to price
+    return round(price * (1 - discount / 100) - reduction, 2)
 
 
 @register.filter(name="product_discount")
@@ -27,13 +44,8 @@ def product_discount(product):
         product_discount = Promotion.objects.get(product=product).discount.discount
     except:
         product_discount = 0.00
-    try:
-        category_discount = PromotionCategory.objects.get(category=product.category).discount.discount
-    except:
-        category_discount = 0
 
-
-    discount = product_discount+category_discount
+    discount = product_discount
     return discount
 
 
@@ -59,3 +71,11 @@ def page_number_start(queryset):
 @register.filter
 def page_number_end(queryset):
     return queryset*9
+
+@register.filter
+def in_wishlist(product, user):  # Include user as an argument
+    wishlist = Wishlist.objects.filter(product=product, user=user).first()
+
+    if wishlist:
+        return True
+    return False

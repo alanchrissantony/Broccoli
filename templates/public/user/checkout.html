@@ -61,12 +61,14 @@
 <div class="ltn__checkout-area mb-105">
     <div class="container">
         <div class="row">
+            <div class="col-12">
+            {% for message in messages %}<p style="text-align: center;" class="{{message.tags}}-message">{{message}}</p>{% endfor %}
             <h4 class="title-2">Billing Details</h4>
             <div class="row">
                 {% for address in address %}
                 <div class="col-lg-4">
                     <div class="ltn__checkout-inner">
-                        <div class="ltn__checkout-single-content mt-50 address-card {% if address.is_default %} active {% endif %}" onclick="selectAddress(this, '{{ address.uuid }}')">
+                        <div class="ltn__checkout-single-content mt-50 address-card {% if address.is_default %} active {% endif %}" onclick="selectAddress(this, '{{ address.id }}')">
                             <div class="ltn__checkout-single-content-info">
                                 {% if address.is_default %}
                                 <i class="bx bxs-check-circle"></i>
@@ -81,9 +83,9 @@
                                     {{ address.address_id.order_instruction }}
                                 </p>
                                 <div class="icons">
-                                    <a href="/user/address/edit/{{address.address_id.uuid}}"><i
+                                    <a href="/user/address/edit/{{address.address_id.id}}"><i
                                             class="bx bxs-pencil action-icons"></i></a>
-                                    <a href="/user/address/delete/{{address.address_id.uuid}}"><i
+                                    <a href="/user/address/delete/{{address.address_id.id}}"><i
                                             class="bx bxs-trash action-icons"></i></a>
                                 </div>
                             </div>
@@ -92,30 +94,23 @@
                 </div>
                 {% endfor %}
             </div>
+        </div>
 
-            <a href="/user/address/add"><button class="btn theme-btn-1 btn-effect-1 text-uppercase" type="button"><i
+                <div class="col-12">
+                    <a href="/user/address/add"><button class="btn theme-btn-1 btn-effect-1 text-uppercase" type="button"><i
                         class='bx bx-plus'></i> Add address</button></a>
+                </div>
+                
+            
             <form method="post" class="row">
                 {% csrf_token %}
                 <div class="col-lg-6">
                     <div class="ltn__checkout-payment-method mt-50">
                         <h4 class="title-2">Payment Method</h4>
                         <div id="checkout_accordion_1">
+        
                             <!-- card -->
-                            <div class="card">
-                                <h5 class="collapsed ltn__card-title" data-toggle="collapse" data-target="#faq-item-2-1"
-                                    aria-expanded="false">
-                                    Check payments
-                                </h5>
-                                <div id="faq-item-2-1" class="collapse" data-parent="#checkout_accordion_1">
-                                    <div class="card-body">
-                                        <p>Please send a check to Store Name, Store Street, Store Town, Store State /
-                                            County, Store Postcode.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- card -->
-                            <div class="card">
+                            <div class="card" onclick="selectPaymentMethod('Cash on delivery')">
                                 <h5 class="ltn__card-title" data-toggle="collapse" data-target="#faq-item-2-2"
                                     aria-expanded="true">
                                     Cash on delivery
@@ -126,9 +121,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <input type="hidden" id="selectedAddressId" name="address">
                             <!-- card -->
-                            <div class="card">
+                            <div class="card" onclick="selectPaymentMethod('PayPal')">
                                 <h5 class="collapsed ltn__card-title" data-toggle="collapse" data-target="#faq-item-2-3"
                                     aria-expanded="false">
                                     PayPal <img src="{% static "img/icons/payment-3.png" %}" alt="#">
@@ -140,6 +134,8 @@
                                     </div>
                                 </div>
                             </div>
+                            <input type="hidden" id="selectedPaymentMethod" name="payment_method" value="Cash on delivery">
+                            <input type="hidden" id="selectedAddressId" name="address">
                         </div>
                         <div class="ltn__payment-note mt-30 mb-30">
                             <p>Your personal data will be used to process your order, support your experience throughout
@@ -162,6 +158,12 @@
                                     <td>Discount</td>
                                     <td>-${{discount}}</td>
                                 </tr>
+                                {% if coupon %}
+                                <tr>
+                                    <td>Coupon</td>
+                                    <td>-${{coupon.discount}}</td>
+                                </tr>
+                                {% endif %}
                                 <tr>
                                     <td>Shipping and Handing</td>
                                     <td>${{shipping}}</td>
@@ -197,6 +199,10 @@
         addressCard.classList.add('active');
 
         document.getElementById('selectedAddressId').value = addressId;
+    }
+
+    function selectPaymentMethod(method) {
+        document.getElementById('selectedPaymentMethod').value = method;
     }
 </script>
 

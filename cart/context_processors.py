@@ -1,5 +1,6 @@
 from cart.models import Cart, CartItem
 from cart.views import cart_id
+from wallet.models import Wallet
 
 
 
@@ -23,5 +24,16 @@ def CartCounter(request, total=0, quantity=0):
         'cart_view':cart_items,
         'cart_quantity':quantity,
         'cart_total':total
+    }
+    return context
+
+def WalletProcessor(request, balance=0):
+    user = request.user
+    if user.id:
+        wallet = Wallet.objects.filter(user=user).first()
+        if wallet:
+            balance = wallet.balance
+    context={
+        'wallet_balance':balance
     }
     return context

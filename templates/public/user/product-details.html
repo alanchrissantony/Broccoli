@@ -129,10 +129,10 @@
                                                 </div>
                                             </li>
                                             <li>
-                                                <a href="#" onclick="addCart(`{{product.uuid}}`)" class="theme-btn-1 btn btn-effect-1" title="Add to Cart">
+                                                <button onclick="addToCart(`{{product.id}}`)" class="theme-btn-1 btn btn-effect-1" title="Add to Cart">
                                                     <i class="fas fa-shopping-cart"></i>
                                                     <span>ADD TO CART</span>
-                                                </a>
+                                                </button>
                                             </li>
                                         </ul>
                                         <ul>
@@ -157,7 +157,7 @@
                                         <ul>
                                             <li>
                                                 <a href="#" class="" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
-                                                    <i class="far fa-heart"></i>
+                                                    {% if product|in_wishlist:request.user %}<i class="fa fa-heart" style="color: #FF0000;"></i>{% else %}<i class="far fa-heart"></i>{% endif %}
                                                     <span>Add to Wishlist</span>
                                                 </a>
                                             </li>
@@ -342,7 +342,7 @@
                                 <li>
                                     <div class="top-rated-product-item clearfix">
                                         <div class="top-rated-product-img">
-                                            <a href="/products/{{product.uuid}}"><img src="{{product.images.first.image.url}}" alt="#"></a>
+                                            <a href="/products/{{product.id}}"><img src="{{product.images.first.image.url}}" alt="#"></a>
                                         </div>
                                         <div class="top-rated-product-info">
                                             <div class="product-ratting">
@@ -408,7 +408,7 @@
                                                     {% comment %} End {% endcomment %}
                                                 </ul>
                                             </div>
-                                            <h6><a href="/products/{{product.uuid}}">{{product.name}}</a></h6>
+                                            <h6><a href="/products/{{product.id}}">{{product.name}}</a></h6>
                                             <div class="product-price">
                                                 <span>${{ product|calculate_discounted_price }}</span>
                                                 <del>${{ product.price }}</del>
@@ -444,7 +444,7 @@
                 <div class="col-lg-12">
                     <div class="ltn__product-item ltn__product-item-3 text-center">
                         <div class="product-img">
-                            <a href="/products/{{product.uuid}}"><img src="{{product.images.first.image.url}}" alt="#"></a>
+                            <a href="/products/{{product.id}}"><img src="{{product.images.first.image.url}}" alt="#"></a>
                             <div class="product-badge">
                                 <ul>
                                     <li class="sale-badge">New</li>
@@ -452,17 +452,17 @@
                             </div>
                             <div class="product-hover-action">
                                 <ul>
-                                    <li>
+                                    <li onclick="quickView(`{{product.id}}`, `{{product.name}}`, `{{product.images.first.image.url}}`, `{{product.category}}`, `{{product.price}}`, `{{product.rating}}`)">
                                         <a href="#" title="Quick View" data-toggle="modal" data-target="#quick_view_modal">
                                             <i class="far fa-eye"></i>
                                         </a>
                                     </li>
-                                    <li>
-                                        <a href="#" title="Add to Cart" data-toggle="modal" data-target="#add_to_cart_modal">
-                                            <i class="fas fa-shopping-cart"></i>
+                                    <li onclick="addCart(`{{product.id}}`, `{{product.name}}`, `{{product.images.first.image.url}}`, `{{product.stock}}`)">
+                                        <a href="#" title="Add to Cart" data-toggle="modal" data-target="#add_to_cart_modal" data-product="{{ product }}">
+                                          <i class="fas fa-shopping-cart"></i>
                                         </a>
-                                    </li>
-                                    <li>
+                                      </li>
+                                    <li onclick="addToWishlist(`{{product.id}}`, `{{product.name}}`, `{{product.images.first.image.url}}`)">
                                         <a href="#" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
                                             <i class="far fa-heart"></i></a>
                                     </li>
@@ -479,7 +479,7 @@
                                     <li><a href="#"><i class="far fa-star"></i></a></li>
                                 </ul>
                             </div>
-                            <h2 class="product-title"><a href="/products/{{product.uuid}}">{{product.name}}</a></h2>
+                            <h2 class="product-title"><a href="/products/{{product.id}}">{{product.name}}</a></h2>
                             <div class="product-price">
                                 <span>${{product|calculate_discounted_price}}</span>
                                 <del>${{product.price}}</del>
@@ -500,14 +500,45 @@
     {% include "components/user/modal-wishlist.html" %}
 
     <script>
-        const addCart = async (proId) => {
+        const addToCart = async (proId) => {
         const url = window.location.origin
         const qty = document.getElementById('quantity').value;
         const response = await fetch(url+'/cart/add/'+proId+'/'+qty)
         $('#add_to_cart_modal').modal('show');
-  //extract JSON from the http response
-  // do something with myJson
-}
+        //extract JSON from the http response
+        // do something with myJson
+        }
+
+        const addCart = async (proId, name, image, stock) => {
+        if(stock > 0){
+            const url = window.location.origin
+            const response = await fetch(url+'/cart/add/'+proId+'/'+1)
+        }else{
+            $('#modal-product-status').html('Currently unavailable.');
+        }
+        $('#modal-product-name').html(name);
+        $('#modal-product-image').attr('src',image);
+        //extract JSON from the http response
+        // do something with myJson
+        }
+
+        const addToWishlist = async(proId, name, image)=>{
+            const url = window.location.origin
+            const response = await fetch(url+'/wishlists/add/'+proId)
+            $('#modal-wishlist-product-name').html(name);
+            $('#modal-wishlist-product-image').attr('src',image);
+        }
+
+        const quickView = async(proId, name, image, category, price, rating)=>{
+
+            $('#modal-quick-view-product-id').html(proId);
+            $('#modal-quick-view-product-name').html(name);
+            $('#modal-quick-view-product-image').attr('src',image);
+            $('#modal-quick-view-product-price').html('$'+price);
+            $('#modal-quick-view-product-category').html(category);
+            $('#modal-quick-view-product-stock').attr('product-stock',stock);
+            $('#modal-quick-view-product-rating').attr('src',rating);
+        }
     </script>
 
 {% endblock content %}

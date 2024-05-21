@@ -1,5 +1,4 @@
 from django.urls import path, include
-
 from . import views
 
 urlpatterns = [
@@ -16,5 +15,9 @@ urlpatterns = [
     path('history/', views.history, name="history"),
     path('location/', views.location, name="location"),
     path('orders/', include('order.urls')),
-    path('wishlist/', views.wishlist, name="wishlist"),
+    path('wishlists/', include('wishlists.urls')),
+    path('paypal/payment', views.paypal_payment, name="paypal_payment"),
+    path('paypal/redirect', views.paypal_redirect, name="paypal_redirect"),
+    path('paypal/success', views.paypal_success, name="paypal_success"),
+    path('paypal/cancel', views.paypal_cancel, name="paypal_cancel"),
 ]

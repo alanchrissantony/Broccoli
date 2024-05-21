@@ -60,11 +60,11 @@ class Categories:
         return render(request, 'public/admin/add_category.html', context)
 
     @login_required(login_url='root_signin')
-    def edit(request, uuid):
+    def edit(request, id):
         
         if request.method == 'POST':
             # Fetch the product object
-            category = Category.objects.get(uuid=uuid)
+            category = Category.objects.get(id=id)
 
             # Handle images
             if 'image' in request.FILES:
@@ -97,7 +97,7 @@ class Categories:
             return redirect('root_categories')
 
         # Fetch product and categories for rendering form
-        category = Category.objects.get(uuid=uuid)
+        category = Category.objects.get(id=id)
         admin = request.user
         context = {
             'admin':admin,
@@ -108,9 +108,9 @@ class Categories:
     
 
     @login_required(login_url='root_signin')
-    def delete(request, uuid):
+    def delete(request, id):
         
-        category = Category.objects.get(uuid=uuid)
+        category = Category.objects.get(id=id)
         category.delete()
         return redirect('root_categories')
     

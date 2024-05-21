@@ -2,16 +2,17 @@ from django.db import models
 from accounts.models import Account
 from product.models import Product
 from user.models import Address
-import uuid
+from promotion.models import Coupon
+
 
 # Create your models here.
 
 class Payment(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     payment_id = models.CharField(max_length=255, null=True)
     payment_method = models.CharField(max_length=255, null=True)
-    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=255, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -28,23 +29,23 @@ class OrderStatus(models.Model):
         ('Returned', 'Returned'),
         ('Refunded', 'Refunded'), 
     )
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    
     name = models.CharField(max_length=20, choices=STATUS)
 
     class Meta:
         verbose_name = 'status'
         verbose_name_plural = 'statuses'
-        ordering = ('name',)
 
     def __str__(self):
         return self.name
 
 class Order(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    
     user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
-    order_number = models.CharField(max_length=20)
+    order_number = models.CharField(max_length=50)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
+    coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.FloatField()
     price = models.FloatField()
@@ -56,12 +57,12 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.user.username
+    class Meta:
+        ordering = ('-created_at',)
 
 
 class OrderProduct(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
     user = models.ForeignKey(Account, on_delete=models.CASCADE)

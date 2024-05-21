@@ -1,51 +1,42 @@
-from datetime import datetime, timedelta
-from email.message import EmailMessage
-import pyotp, smtplib
+from django_otp.oath import TOTP
+from django_otp.util import random_hex
+import time
 
 
+class TOTPVerification:
 
-from_mail = 'info.broccoli.smtp@gmail.com'
-pass_key = 'dlop lbuy hwnz asvu'
+    def __init__(self, key=None, number_of_digits=6, token_validity_period=300):  # 5 minutes in seconds
+        self.key = key or bytes(random_hex(20).encode('utf-8'))
+        self.last_verified_counter = -1
+        self.verified = False
+        self.number_of_digits = number_of_digits
+        self.token_validity_period = token_validity_period
+        self._totp = None
 
-def send(request, email):
-    # Generate OTP (Assuming you have a generate function)
-    otp = generate(request)
-    
-    # Format current time
-    time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    def totp_obj(self):
+        if not self._totp:
+            self._totp = TOTP(key=self.key,
+                              step=self.token_validity_period,
+                              digits=self.number_of_digits)
+            self._totp.time = time.time()
+        return self._totp
 
-    # Create EmailMessage object
-    msg = EmailMessage()
-    msg['Subject'] = 'OTP Verification'
-    msg['From'] = from_mail
-    msg['To'] = email
-    msg.set_content(f"{otp} is SECRET One Time Password for your account verification on Broccoli on {time}. OTP valid for 5 mins. Please do not share OTP with anyone.")
+    def generate_token(self):
+        totp = self.totp_obj()
+        return str(totp.token()).zfill(self.number_of_digits)
 
-    # Connect to SMTP server and send message
-    with smtplib.SMTP('smtp.gmail.com', 587) as server:
-        server.starttls()
-        server.login(from_mail, pass_key)
-        server.send_message(msg)
+    def verify_token(self, token, tolerance=0):
+        try:
+            token = int(token)
+        except ValueError:
+            return False
 
-def verify(request, otp):
-    otp_secret_key = request.session['otp_secret_key']
-    valid_date = request.session['otp_valid_date']
-
-    if otp_secret_key and valid_date is not None:
-        valid_date = datetime.fromisoformat(request.session['otp_valid_date'])
-
-        if valid_date > datetime.now():
-            totp = pyotp.TOTP(otp_secret_key, interval=300)
-            return totp.verify(otp)
-
-
-
-
-def generate(request):
-    totp = pyotp.TOTP(pyotp.random_base32(), interval=300)
-    otp = totp.now()
-    request.session['otp_secret_key'] = totp.secret
-    valid_date = datetime.now() + timedelta(minutes=5)
-    request.session['otp_valid_date'] = str(valid_date)
-    return otp
-    
+        totp = self.totp_obj()
+        if ((totp.t() > self.last_verified_counter) and
+                (totp.verify(token, tolerance=tolerance))):
+            self.last_verified_counter = totp.t()
+            self.verified = True
+            return True
+        else:
+            self.verified = False
+            return False

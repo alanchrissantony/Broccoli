@@ -16,7 +16,7 @@
                             <div class="row">
                                 <div class="col-lg-6 col-12">
                                     <div class="modal-product-img">
-                                        <img src="{% static "img/product/4.png" %}" alt="#">
+                                        <img id="modal-quick-view-product-image" src="" alt="#">
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-12">
@@ -31,20 +31,16 @@
                                                 <li class="review-total"> <a href="#"> ( 95 Reviews )</a></li>
                                             </ul>
                                         </div>
-                                        <h3>Vegetables Juices</h3>
+                                        <h3 id="modal-quick-view-product-name"></h3>
                                         <div class="product-price">
-                                            <span>$149.00</span>
-                                            <del>$165.00</del>
+                                            <span id="modal-quick-view-product-price"></span>
                                         </div>
                                         <div class="modal-product-meta ltn__product-details-menu-1">
                                             <ul>
                                                 <li>
                                                     <strong>Categories:</strong> 
                                                     <span>
-                                                        <a href="#">Parts</a>
-                                                        <a href="#">Car</a>
-                                                        <a href="#">Seat</a>
-                                                        <a href="#">Cover</a>
+                                                        <a id="modal-quick-view-product-category" href="#"></a>
                                                     </span>
                                                 </li>
                                             </ul>
@@ -52,8 +48,8 @@
                                         <div class="ltn__product-details-menu-2">
                                             <ul>
                                                 <li>
-                                                    <div class="cart-plus-minus">
-                                                        <input type="text" value="02" name="qtybutton" class="cart-plus-minus-box">
+                                                    <div id="modal-quick-view-product-stock" class="cart-plus-minus" data-product-min="{{ 1 }}" data-product-stock="">
+                                                        <input type="text" value="1" name="qtybutton" class="cart-plus-minus-box">
                                                     </div>
                                                 </li>
                                                 <li>

@@ -17,57 +17,38 @@
                     <div class="shoping-cart-inner">
                         <div class="shoping-cart-table table-responsive">
                             <table class="table">
-                                <!-- <thead>
-                                    <th class="cart-product-remove">X</th>
-                                    <th class="cart-product-image">Image</th>
-                                    <th class="cart-product-info">Title</th>
-                                    <th class="cart-product-price">Price</th>
-                                    <th class="cart-product-quantity">Quantity</th>
-                                    <th class="cart-product-subtotal">Subtotal</th>
-                                </thead> -->
+
                                 <tbody>
+                                    {% for wishlist in wishlists %}
                                     <tr>
-                                        <td class="cart-product-remove">x</td>
+                                        <td class="cart-product-remove">{{forloop.counter}}</td>
                                         <td class="cart-product-image">
-                                            <a href="product-details.html"><img src="img/product/1.png" alt="#"></a>
+                                            <a href="product-details.html"><img src="{{wishlist.product.images.first.image.url}}" alt="#"></a>
                                         </td>
                                         <td class="cart-product-info">
-                                            <h4><a href="product-details.html">Vegetables Juices</a></h4>
+                                            <h4><a href="product-details.html">{{wishlist.product.name}}</a></h4>
                                         </td>
-                                        <td class="cart-product-price">$85.00</td>
-                                        <td class="cart-product-stock">In Stock</td>
+                                        <td class="cart-product-price">${{wishlist.product.price}}</td>
+                                        <td class="cart-product-stock">
+                                            {% if wishlist.product.is_available == True %}
+                                            <i class='bx bxs-check-circle' style="color: #80B500;"></i>
+                                            {% endif %}
+
+                                            {% if wishlist.product.is_available == False %}
+                                            <i class='bx bxs-x-circle' style="color: #FF6161;"></i>
+                                            {% endif %}
+                                        </td>
                                         <td class="cart-product-add-cart">
                                             <a class="submit-button-1" href="#" title="Add to Cart" data-toggle="modal" data-target="#add_to_cart_modal">Add to Cart</a>
                                         </td>
+                                        <td class="cart-product-remove-cart">
+                                            <a href="/wishlists/remove/{{wishlist.product.id}}">
+                                                <i class="btn btx bx bx-trash"></i>
+                                            </a>
+                                        </td>
+                                        
                                     </tr>
-                                    <tr>
-                                        <td class="cart-product-remove">x</td>
-                                        <td class="cart-product-image">
-                                            <a href="product-details.html"><img src="img/product/2.png" alt="#"></a>
-                                        </td>
-                                        <td class="cart-product-info">
-                                            <h4><a href="product-details.html">Orange Fresh Juice</a></h4>
-                                        </td>
-                                        <td class="cart-product-price">$89.00</td>
-                                        <td class="cart-product-stock">In Stock</td>
-                                        <td class="cart-product-add-cart">
-                                            <a class="submit-button-1" href="#" title="Add to Cart" data-toggle="modal" data-target="#add_to_cart_modal">Add to Cart</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="cart-product-remove">x</td>
-                                        <td class="cart-product-image">
-                                            <a href="product-details.html"><img src="img/product/4.png" alt="#"></a>
-                                        </td>
-                                        <td class="cart-product-info">
-                                            <h4><a href="product-details.html">Poltry Farm Meat</a></h4>
-                                        </td>
-                                        <td class="cart-product-price">$149.00</td>
-                                        <td class="cart-product-stock">In Stock</td>
-                                        <td class="cart-product-add-cart">
-                                            <a class="submit-button-1" href="#" title="Add to Cart" data-toggle="modal" data-target="#add_to_cart_modal">Add to Cart</a>
-                                        </td>
-                                    </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>

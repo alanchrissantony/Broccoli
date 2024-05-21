@@ -26,6 +26,7 @@
             <div class="row">
                 <div class="col-md-12">
                     {% include "components/admin/user_manage_button.html" %}
+                    {% include "components/admin/modal-delete-user.html" %}
                     <div class="card">
                         <!-- Notifications -->
             
@@ -43,7 +44,6 @@
                                 </thead>
                                 <tbody>
                                     {% for user in users %}
-                                    {% include "components/admin/modal-delete-user.html" %}
                                         <tr>
                                             <td class="text-nowrap">{{user.first_name}} {{user.last_name}}</td>
                                             <td>
@@ -65,13 +65,15 @@
                                                 {% endif %}
                                             </td>
                                             <td style="text-align: center;">
-                                                    <a href="/root/users/edit/{{user.uuid}}">
+                                                <ul style="display: inline-flex; list-style-type: none; padding: 0;">
+                                                    <li><a href="/root/users/edit/{{user.id}}">
                                                         <i class="btn btx bx bx-pencil"></i>
-                                                    </a>    
-                                                    
-                                                    <a href="/root/users/delete/{{user.uuid}}" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
+                                                    </a></li>
+
+                                                    <li onclick="handle_delete(`{{user.id}}`)"><a href="#" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
                                                         <i class="btn btx bx bx-trash"></i>
-                                                    </a>
+                                                    </a></li>
+                                                </ul>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -93,5 +95,12 @@
     <!-- Content wrapper -->
 </div>
 <!-- / Layout page -->
+
+<script>
+    const handle_delete = (id)=>{
+        const url = window.location.origin
+        $('#formAccountDeactivation').attr('action',url+'/root/users/delete/'+id);
+    }
+</script>
 
 {% endblock content %}

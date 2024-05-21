@@ -1,7 +1,5 @@
 from django.shortcuts import render, redirect
 from product.models import Product
-from cart.models import CartItem
-from cart.views import discount_calculator
 from category.models import Category
 from django.http import JsonResponse
 from django.core.paginator import Paginator
@@ -34,14 +32,14 @@ def product(request):
     }
     return render(request, 'public/user/products.html', context)
 
-def productDetails(request, uuid):
+def productDetails(request, id):
     if request.method == 'POST':
         response_data = {'message': 'Product added to cart successfully!'}
         return JsonResponse(response_data)
-    product = Product.objects.get(uuid=uuid)
-    related_products = Product.objects.filter(category=product.category).exclude(uuid=product.uuid)
+    product = Product.objects.get(id=id)
+    related_products = Product.objects.filter(category=product.category).exclude(id=product.id)
     top_rated = Product.objects.all().order_by('-rating')[:5]
-    
+
     context = {
         'product' : product,
         'related_products' : related_products,

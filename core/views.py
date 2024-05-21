@@ -1,5 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.conf import settings
+from django.urls import reverse
 from product.models import Product
 from category.models import Category
 from accounts.models import Account
@@ -7,26 +10,62 @@ from user.models import Address, UserAddress, Country, State, City
 from cart.views import discount_calculator, cart_id
 from cart.models import CartItem, Cart
 from order.models import Order, Payment, OrderProduct, OrderStatus
-import datetime
+from promotion.models import Coupon
+from user.views import verification_required
+import datetime, paypalrestsdk
 from django.db import transaction
-import json
+from accounts.utils import send_mail
+from uuid import uuid4
 
 # Create your views here.
 
+paypalrestsdk.configure({
+    'mode': 'sandbox',
+    'client_id': "Abdh1FLUse82UfYoSfm3AmKWzYOpqbf46UW2E9y9bkW1LHraKhj2WKJoWhrHU7VMMZ3nGm4OsU1ai9O-",
+    'client_secret': "EBURDNztUHjMcqiTukkZIPMkVnvf6f7gdZlzjifACW3mrye185tQqDFOTslpG5qFbCE63khmjRCvQBmt"
+})
+
+def order_product(request, cart_items, order, user, payment):
+    for cart_item in cart_items:
+        order_product = OrderProduct.objects.create(
+            order=order,
+            user=user,
+            product=cart_item.product,
+            quantity=cart_item.quantity,
+            price=cart_item.product.price * cart_item.quantity,
+            payment=payment,
+            ordered=True
+        )
+        cart_item.product.stock -= order_product.quantity
+        cart_item.product.save()
+
+    cart_items.delete()
+    email = request.user.email
+    subject = f"Your order #{order.order_number}"
+    content = "Thank you for your order! We’re excited to prepare your selection. You will receive a confirmation email with tracking information once your order ships. In the meantime, feel free to explore more delicious options on our app. If you have any questions, our support team is here to help. Happy dining!"
+    send_mail(email, subject, content)
+
+    return redirect('invoice')
+
 def about(request):
-    return render(request, 'public/user/address.html')
+    return render(request, 'public/user/about.html')
+
 
 @login_required(login_url='signin')
+@verification_required
 @transaction.atomic
 def checkout(request):
     user = request.user
     cart = None
     cart_items = None
     address = None
-
+    coupon = None
     try:
-        cart = Cart.objects.get(cart_id=cart_id(request))
-        cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+        if user.id:
+            cart_items = CartItem.objects.filter(user=user, is_active=True)
+        else:
+            cart = Cart.objects.get(cart_id=cart_id(request))
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
 
         total = sum(cart_item.product.price * cart_item.quantity for cart_item in cart_items)
         discount = sum(discount_calculator(cart_item.product, cart_item.quantity) for cart_item in cart_items)
@@ -40,13 +79,28 @@ def checkout(request):
         shipping = 0
         price = 0
 
+    if 'coupon' in request.session:
+        coupon = Coupon.objects.filter(code=request.session.get('coupon')).first()
+        
+        if coupon and price >= coupon.minimum_price:
+            coupon_type = coupon.type
+            coupon_discount = coupon.discount
+            if coupon_type == 'Percentage Discount':
+                price = round(price * (1 - coupon_discount / 100), 2)
+            else:
+                price = round(price - coupon_discount, 2)
+        else:
+            del request.session['coupon']
+
     if request.method == 'POST':
         addressId = request.POST.get('address')
+        payment_metod = request.POST.get('payment_method')
+
         if addressId:
-            address = Address.objects.get(uuid=addressId)
+            address = Address.objects.get(id=addressId)
         else:
             address = UserAddress.objects.get(user_id=user, is_default=True)
-            address = Address.objects.get(uuid=address.uuid)
+            address = Address.objects.get(id=address.id)
     
         order = Order.objects.create(
             user=user,
@@ -59,25 +113,29 @@ def checkout(request):
             ip=request.META.get('REMOTE_ADDR'),
             order_number=generate_order_number()
         )
+        if coupon:
+            order.coupon = coupon
+            order.save()
+            del request.session['coupon']
 
-        status, _ = OrderStatus.objects.get_or_create(name="Order Confirmed")
-        order.statuses.add(status)
-
-        for cart_item in cart_items:
-            order_product = OrderProduct.objects.create(
-                order=order,
-                user=user,
-                product=cart_item.product,
-                quantity=cart_item.quantity,
-                price=cart_item.product.price * cart_item.quantity,
-                ordered=True
+        request.session['order_id']=order.order_number
+        if payment_metod == 'PayPal':
+            return redirect('paypal_payment')
+        else:
+            payment = Payment.objects.create(
+                user = request.user,
+                payment_id = uuid4(),
+                payment_method = 'Cash On Delivery',
+                amount = order.price,
+                status = 'Not Paid'
             )
-            cart_item.product.stock -= order_product.quantity
-            cart_item.product.save()
+            status, _ = OrderStatus.objects.get_or_create(name="Order Confirmed")
+            order.statuses.add(status)
+            order.is_ordered = True
+            order.payment = payment
+            order.save()
 
-        cart_items.delete()
-
-        return redirect('orders')
+        return order_product(request, cart_items, order, user, payment)
 
     countries = Country.objects.all()
     states = State.objects.all()
@@ -98,14 +156,107 @@ def checkout(request):
         'discount': discount,
         'shipping': shipping,
         'vat': vat,
-        'price': price
+        'price': price,
+        'coupon':coupon
     }
 
     return render(request, 'public/user/checkout.html', context)
 
+def paypal_payment(request):
+    order_id = request.session.get('order_id')
+    order = Order.objects.get(order_number=order_id)
+
+    total = order.price
+
+    paypal_order = {
+        'intent': 'sale',
+        'payer':{
+            'payment_method': 'paypal'
+        },
+        'redirect_urls':{
+            'return_url': request.build_absolute_uri(reverse("paypal_success")),
+            'cancel_url': request.build_absolute_uri(reverse("paypal_cancel"))
+        },
+        'transactions':[{
+            'amount':{
+                'total': str(total),
+                'currency': 'USD',
+            },
+            'description': 'Payment for order #' + str(order_id)
+        }]   
+    }
+    request.session['paypal_order'] = paypal_order
+    return redirect('paypal_redirect')
+
+def paypal_redirect(request):
+    client_id = settings.PAYPAL_CLIENT_ID
+    client_secret = settings.PAYPAL_CLIENT_SECRET
+    paypal_sdk_client = paypalrestsdk.Api({
+        'mode': 'sandbox',
+        'client_id': client_id,
+        'client_secret': client_secret
+    })
+
+    paypal_order = request.session.get('paypal_order')
+    paypal_order['redirect_urls']={
+        'return_url': request.build_absolute_uri(reverse("paypal_success")),
+        'cancel_url': request.build_absolute_uri(reverse("paypal_cancel"))
+    }
+
+    payment = paypalrestsdk.Payment(paypal_order)
+    if payment.create():
+        for link in payment.links:
+            if link.rel == 'approval_url':
+                redirect_url = str(link.href)
+                return redirect(redirect_url)
+    else:
+        messages.error(request, 'Payment processing failed. Please try again later')
+        return redirect('checkout')
+    
+def paypal_success(request):
+    payer_id = request.GET.get('PayerID')
+    order_id = request.session.get('order_id')
+    paypal_sdk_client = paypalrestsdk.Api({
+        'mode': 'sandbox',
+        'client_id': settings.PAYPAL_CLIENT_ID,
+        'client_secret': settings.PAYPAL_CLIENT_SECRET
+    })
+    payment = paypalrestsdk.Payment.find(request.GET['paymentId'])
+    if payment.execute({'payer_id':payer_id}):
+        order = Order.objects.get(order_number=order_id)
+        payment_obj = Payment.objects.create(
+            user = request.user,
+            payment_id = request.GET['paymentId'],
+            payment_method = 'PayPal',
+            amount = order.price,
+            status = 'Paid'
+        )
+        status, _ = OrderStatus.objects.get_or_create(name="Order Confirmed")
+        order.statuses.add(status)
+        order.is_ordered = True
+        order.payment = payment_obj
+
+        order.save()
+
+        del request.session['order_id']
+        del request.session['paypal_order']
+
+        user = Account.objects.get(id=request.user.id)
+        cart_items = CartItem.objects.filter(user=user, is_active=True)
+
+        messages.success(request, 'Payment processed successfully')
+        return order_product(request, cart_items, order, user, payment_obj)
+    else:
+        messages.error(request, 'Payment processing failed. Please try again later')
+        return redirect('checkout')
+
+def paypal_cancel(request):
+    messages.error(request, 'Payment was cancelled')
+    return redirect('checkout')
+
 def generate_order_number():
     today = datetime.date.today()
-    return f"{today.strftime('%Y%m%d')}{today.strftime('%H%M%S')}"
+    return f"{today.strftime('%Y%m%d')}-{uuid4()}"
 
 def comingsoon(request):
     return render(request, 'public/user/coming-soon.html')
@@ -120,13 +271,9 @@ def history(request):
     return render(request, 'public/user/history.html')
 
 @login_required(login_url='signin')
+@verification_required
 def home(request):
     
-    user = request.user
-
-    if not user.is_verified:
-        return redirect('verification')
-
     categories = Category.objects.all()
     products = Product.objects.all()
     context = {
@@ -138,6 +285,3 @@ def home(request):
 
 def location(request):
     return render(request, 'public/user/locations.html')
-
-def wishlist(request):
-    return render(request, 'public/user/wishlist.html')

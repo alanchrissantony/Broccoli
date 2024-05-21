@@ -27,7 +27,7 @@
                     {% include "components/admin/product_manage_button.html" %}
                     <div class="card">
                         <!-- Notifications -->
-
+                        {% include "components/admin/modal-delete-product.html" %}
                         <div class="table-responsive">
                             <table class="table table-striped table-borderless border-bottom">
                                 <thead>
@@ -43,7 +43,6 @@
                                 </thead>
                                 <tbody>
                                     {% for product in products %}
-                                    {% include "components/admin/modal-delete-product.html" %}
                                     <tr>
                                         <td class="text-nowrap">{{product.name}}</td>
                                         <td>
@@ -68,13 +67,15 @@
                                             {% endif %}
                                         </td>
                                         <td style="text-align: center;">
-                                            <a href="/root/products/edit/{{product.uuid}}">
-                                                <i class="btn btx bx bx-pencil"></i>
-                                            </a>
+                                            <ul style="display: inline-flex; list-style-type: none; padding: 0;">
+                                                <li><a href="/root/products/edit/{{product.id}}">
+                                                    <i class="btn btx bx bx-pencil"></i>
+                                                </a></li>
 
-                                            <a href="#" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
-                                                <i class="btn btx bx bx-trash"></i>
-                                            </a>
+                                                <li onclick="handle_delete(`{{product.id}}`)"><a href="#" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
+                                                    <i class="btn btx bx bx-trash"></i>
+                                                </a></li>
+                                            </ul>  
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -95,5 +96,10 @@
     <!-- Content wrapper -->
 </div>
 <!-- / Layout page -->
-
+<script>
+    const handle_delete = (id)=>{
+        const url = window.location.origin
+        $('#formAccountDeactivation').attr('action',url+'/root/products/delete/'+id);
+    }
+</script>
 {% endblock content %}

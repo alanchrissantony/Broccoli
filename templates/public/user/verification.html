@@ -35,8 +35,26 @@
                             <div class="btn-wrapper mt-0">
                                 <button class="theme-btn-1 btn btn-block" type="submit">VERIFY</button>
                             </div>
-                            <div class="go-to-btn mt-20">
-                                <a href="/user/register"><small>Resend OTP?</small></a>
+                                <style>
+                                    #timer {
+                                        font-weight: bold;
+                                        margin-top: 20px;
+                                    }
+
+                                    #resend a {
+                                        pointer-events: none;
+                                        color: gray;
+                                    }
+                                    #resend a.active {
+                                        pointer-events: auto;
+                                        color: black;
+                                    }
+                                    #resend a.active:hover{
+                                        color:#80B500
+                                    }
+                                </style>
+                            <div id="resend" class="go-to-btn mt-20">
+                                <a type="button" onclick="resend()"><small>Resend OTP? <span id="timer">05:00</span></small></a>
                             </div>
                         </form>
                     </div>
@@ -45,6 +63,49 @@
         </div>
     </div>
     <!-- LOGIN AREA END -->
+<script>
 
+    document.addEventListener('DOMContentLoaded', (event) => {
+    let timeLeft = 300; // 5 minutes in seconds
+    const timerElement = document.getElementById('timer');
+    const resendLink = document.querySelector('#resend a');
+    let countdown;
+
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    };
+
+    const startCountdown = () => {
+        countdown = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                timerElement.textContent = '00:00';
+                resendLink.classList.add('active'); // Enable the resend button
+            } else {
+                timerElement.textContent = formatTime(timeLeft);
+                timeLeft--;
+            }
+        }, 1000);
+    };
+
+    const resetTimer = () => {
+        clearInterval(countdown);
+        timeLeft = 300;
+        timerElement.textContent = formatTime(timeLeft);
+        resendLink.classList.remove('active'); // Disable the resend button
+        startCountdown();
+    };
+
+    startCountdown();
+
+     window.resend = ()=>{
+        const url = window.location.origin
+        fetch(url+'/user/verification/resend')
+        resetTimer(); // Restart the timer
+    }
+});
+</script>
 {% endblock content %}
 

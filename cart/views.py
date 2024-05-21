@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from product.models import Product
 from cart.models import Cart, CartItem
-from category.models import Category
+from promotion.models import Coupon
 from promotion.models import Promotion, PromotionCategory
 from django.contrib.auth.decorators import login_required
 import json
@@ -13,18 +13,34 @@ import json
 def discount_calculator(product, quantity):
 
     price = float(product.price)
-    try:
-        product_discount = Promotion.objects.get(product=product).discount.discount
-    except:
-        product_discount = 0.00
-    try:
-        category_discount = PromotionCategory.objects.get(category=product.category).discount.discount
-    except:
-        category_discount = 0
+    discount = 0.00
+    reduction = 0
 
+    # Get active product and category promotions (handle potential absence)
+    product_promotion = Promotion.objects.filter(product=product).first()
+    category_promotion = PromotionCategory.objects.filter(category=product.category).first()
+    
+    # Calculate discount based on promotion type if existing
+    if product_promotion:
+        discount_type = product_promotion.discount.type
+        discount_value = product_promotion.discount.discount
 
-    discount = product_discount+category_discount
-    return round((price * discount / 100)*quantity, 2)
+        if discount_type == 'Percentage Discount':
+            discount += discount_value
+        else:
+            reduction += discount_value # Limit amount discount to product price
+    
+    if category_promotion:
+        category_discount_type = category_promotion.discount.type
+        category_discount_value = category_promotion.discount.discount
+
+        if category_discount_type == 'percentage':
+            discount += category_discount_value
+        else:
+            reduction += category_discount_value  # Limit amount discount to product price
+
+    # Apply combined discount to price
+    return round(((price * discount / 100)+ reduction)*quantity, 2)
 
 
 def cart_id(request):
@@ -55,9 +71,9 @@ def add(request, product_id, quantity):
     return redirect('cart')
     
 @login_required(login_url='signin')
-def remove(request, product_uuid):
+def remove(request, product_id):
     cart = Cart.objects.get(cart_id=cart_id(request))
-    product = get_object_or_404(Product, uuid=product_uuid)
+    product = get_object_or_404(Product, id=product_id)
     cart_item = CartItem.objects.get(product=product, cart=cart)
 
     if cart_item.quantity > 1:
@@ -68,16 +84,17 @@ def remove(request, product_uuid):
     return redirect('cart')
 
 @login_required(login_url='signin')
-def delete(request, product_uuid):
+def delete(request, product_id):
     cart = Cart.objects.get(cart_id=cart_id(request))
-    product = get_object_or_404(Product, uuid=product_uuid)
+    product = get_object_or_404(Product, id=product_id)
     cart_item = CartItem.objects.get(product=product, cart=cart)
 
     cart_item.delete()
     return redirect('cart')
 
 @login_required(login_url='signin')
-def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None):
+def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None, coupon=None):
+    
     try:
         if request.user:
             cart_items = CartItem.objects.filter(user=request.user, is_active=True) 
@@ -89,12 +106,41 @@ def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items
             discount += discount_calculator(cart_item.product, cart_item.quantity)
             quantity += cart_item.quantity
 
-        vat = (total*18)/100
+        vat = round((total*18)/100, 2)
         shipping = 15
+        price = round(float(total+vat+shipping) - discount, 2)
     except:
         
         pass
 
+    coupon_code = request.GET.get('coupon')
+    
+    if coupon_code:
+        coupon = Coupon.objects.filter(code=coupon_code).first()
+        if coupon and price >= coupon.minimum_price:
+            request.session['coupon']=coupon.code
+            
+            coupon_type = coupon.type
+            coupon_discount = coupon.discount
+            if coupon_type == 'Percentage Discount':
+                price = round(price * (1 - coupon_discount / 100), 2)
+            else:
+                price = round(price - coupon_discount, 2)
+
+            context={
+                'coupon':coupon.discount,
+                'price':price
+            }
+            return JsonResponse(context)
+        else:
+            if 'coupon' in request.session:
+                del request.session['coupon']
+
+            context={
+                'coupon':0,
+                'price':price
+            }
+            return JsonResponse(context)
     context={
         'total':total,
         'quantity':quantity,
@@ -102,7 +148,8 @@ def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items
         'cart_items':cart_items,
         'shipping':shipping,
         'vat':vat,
-        'price': round(float(total+vat+shipping) - discount, 2)
+        'price': price
 
     }
+
     return render(request, 'public/user/cart.html', context)

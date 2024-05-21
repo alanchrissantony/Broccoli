@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+PAYPAL_CLIENT_ID = "Abdh1FLUse82UfYoSfm3AmKWzYOpqbf46UW2E9y9bkW1LHraKhj2WKJoWhrHU7VMMZ3nGm4OsU1ai9O-"
+PAYPAL_CLIENT_SECRET = "EBURDNztUHjMcqiTukkZIPMkVnvf6f7gdZlzjifACW3mrye185tQqDFOTslpG5qFbCE63khmjRCvQBmt"
 
 # Application definition
 
@@ -47,7 +49,8 @@ INSTALLED_APPS = [
     'user',
     'wishlists',
     'promotion',
-    'layout'
+    'layout',
+    'wallet'
 ]
 
 MIDDLEWARE = [
@@ -74,6 +77,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.CartCounter',
+                'cart.context_processors.WalletProcessor',
             ],
             'libraries':{
                 'custom_filters': 'broccoli.templatetags.custom_filters',
@@ -93,8 +97,12 @@ AUTH_USER_MODEL = 'accounts.Account'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'broccoli',
+        'USER': 'postgres',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT': '5432'
     }
 }
 

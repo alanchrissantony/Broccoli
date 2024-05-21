@@ -140,11 +140,11 @@ class Products:
     
 
     @login_required(login_url='root_signin')
-    def edit(request, uuid):
+    def edit(request, id):
 
         if request.method == 'POST':
             # Fetch the product object
-            product = Product.objects.get(uuid=uuid)
+            product = Product.objects.get(id=id)
 
             # Handle images
             images = request.FILES.getlist('image')  # Get list of uploaded images
@@ -175,7 +175,7 @@ class Products:
             return redirect('root_products')
 
         # Fetch product and categories for rendering form
-        product = Product.objects.get(uuid=uuid)
+        product = Product.objects.get(id=id)
         categories = Category.objects.all()
         admin = request.user
         context = {
@@ -186,16 +186,16 @@ class Products:
         return render(request, 'public/admin/edit_product.html', context)
     
     @login_required(login_url='root_signin')
-    def delete(request, uuid):
+    def delete(request, id):
         
-        product = Product.objects.get(uuid=uuid)
+        product = Product.objects.get(id=id)
         product.delete()
         return redirect('root_products')
     
     @login_required(login_url='root_signin')
-    def delete_image(request, uuid):
+    def delete_image(request, id):
         
-        image = Image.objects.get(uuid=uuid)
+        image = Image.objects.get(id=id)
         image.delete()
     
 class Users:
@@ -241,7 +241,7 @@ class Users:
         return render(request, 'public/admin/add_user.html')
 
     @login_required(login_url='root_signin')
-    def edit(request, uuid):
+    def edit(request, id):
 
         
         if request.method == 'POST':
@@ -253,7 +253,7 @@ class Users:
             else:
                 is_active =True
 
-            user = Account.objects.get(uuid=uuid)
+            user = Account.objects.get(id=id)
 
             user.is_active = is_active
 
@@ -261,7 +261,7 @@ class Users:
             return redirect('root_users')
 
         try:
-            user = Account.objects.get(uuid=uuid)
+            user = Account.objects.get(id=id)
             if not user:
                 raise ValueError
             admin = request.user
@@ -275,9 +275,9 @@ class Users:
     
 
     @login_required(login_url='root_signin')
-    def delete(request, uuid):
+    def delete(request, id):
         
-        user = Account.objects.get(uuid=uuid)
+        user = Account.objects.get(id=id)
         user.delete()
         return redirect('/root/users')
 
@@ -307,8 +307,8 @@ class Orders:
         return render(request, 'public/admin/orders.html', context)
     
     @login_required(login_url='root_signin')
-    def edit(request, uuid):
-        item = OrderProduct.objects.get(uuid=uuid)
+    def edit(request, id):
+        item = OrderProduct.objects.get(id=id)
         if request.method == "POST":
             status = request.POST['status']
             status, _ = OrderStatus.objects.get_or_create(name=status)
@@ -322,7 +322,7 @@ class Orders:
         }
         return render(request, 'public/admin/edit_order.html', context)
     
-    def delete(request, uuid):
+    def delete(request, id):
         try:
             order = OrderProduct.objects.get(order=id)
             order.product.stock += order.quantity
