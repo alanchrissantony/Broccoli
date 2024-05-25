@@ -15,7 +15,10 @@ from user.views import verification_required
 import datetime, paypalrestsdk
 from django.db import transaction
 from accounts.utils import send_mail
+from django.http import JsonResponse
+from wallet.models import Wallet, Transaction
 from uuid import uuid4
+from decimal import Decimal
 
 # Create your views here.
 
@@ -45,10 +48,127 @@ def order_product(request, cart_items, order, user, payment):
     content = "Thank you for your order! We’re excited to prepare your selection. You will receive a confirmation email with tracking information once your order ships. In the meantime, feel free to explore more delicious options on our app. If you have any questions, our support team is here to help. Happy dining!"
     send_mail(email, subject, content)
 
-    return redirect('invoice')
+    return redirect('/orders/invoice/'+str(order.id))
 
 def about(request):
     return render(request, 'public/user/about.html')
+
+def coupon(request, wallet_pay=0, coupon=None, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None):
+    coupon_code = request.GET.get('coupon')
+
+    try:
+        if request.user:
+            cart_items = CartItem.objects.filter(user=request.user, is_active=True) 
+        else: 
+            cart = Cart.objects.get(cart_id=cart_id(request))
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+        for cart_item in cart_items:
+            total += (cart_item.product.price * cart_item.quantity)
+            discount += discount_calculator(cart_item.product, cart_item.quantity)
+            quantity += cart_item.quantity
+
+        vat = round((total*18)/100, 2)
+        shipping = 15
+        price = round(float(total+vat+shipping) - discount, 2)
+    except:       
+        pass
+
+
+    if coupon_code:
+        coupon = Coupon.objects.filter(code=coupon_code).first()
+        if coupon and price >= coupon.minimum_price:
+            request.session['coupon']=coupon.code
+            
+            coupon_type = coupon.type
+            coupon_discount = coupon.discount
+            if coupon_type == 'Percentage Discount':
+                price = round(price * (1 - coupon_discount / 100), 2)
+            else:
+                price = round(price - coupon_discount, 2)
+
+            if 'wallet' in request.session:
+                wallet = Wallet.objects.filter(user=request.user).first()
+
+                if wallet:
+                    if wallet.balance > price:           
+                        price = 0
+                    else:
+                        price -= float(wallet.balance)
+
+            context={
+                'coupon':coupon.discount,
+                'price':price,
+            }
+            return JsonResponse(context)
+        else:
+            if 'coupon' in request.session:
+                del request.session['coupon']
+
+    context={
+        'coupon':None,
+        'price':price,
+        'wallet':wallet_pay,
+    }
+    return JsonResponse(context)
+        
+        
+
+def wallet(request, wallet_pay=0, coupon_code=None, coupon=None, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None):
+    status = request.GET.get('status')
+    if 'coupon' in request.session:
+        coupon_code = request.session['coupon']
+
+
+    try:
+        if request.user:
+            cart_items = CartItem.objects.filter(user=request.user, is_active=True) 
+        else: 
+            cart = Cart.objects.get(cart_id=cart_id(request))
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+        for cart_item in cart_items:
+            total += (cart_item.product.price * cart_item.quantity)
+            discount += discount_calculator(cart_item.product, cart_item.quantity)
+            quantity += cart_item.quantity
+
+        vat = round((total*18)/100, 2)
+        shipping = 15
+        price = round(float(total+vat+shipping) - discount, 2)
+    except:       
+        pass
+
+    if coupon_code:
+        coupon = Coupon.objects.filter(code=coupon_code).first()
+        if coupon and price >= coupon.minimum_price:
+            
+            coupon_type = coupon.type
+            coupon_discount = coupon.discount
+            if coupon_type == 'Percentage Discount':
+                price = round(price * (1 - coupon_discount / 100), 2)
+            else:
+                price = round(price - coupon_discount, 2)
+
+    wallet = Wallet.objects.filter(user=request.user).first()
+
+    if wallet:
+        if status == 'true':
+            request.session['wallet']=True
+        else:
+            del request.session['wallet']
+
+        if wallet.balance > price:           
+            wallet_pay = price
+            if status == 'true':
+                price = 0
+        else:
+            wallet_pay = wallet.balance
+            if status == 'true':
+                price -= float(wallet_pay)
+    context={
+        'wallet':wallet_pay,
+        'price':price,
+    }
+    
+    return JsonResponse(context)
 
 
 @login_required(login_url='signin')
@@ -60,6 +180,8 @@ def checkout(request):
     cart_items = None
     address = None
     coupon = None
+    wallet = None
+    wallet_pay = None
     try:
         if user.id:
             cart_items = CartItem.objects.filter(user=user, is_active=True)
@@ -92,6 +214,9 @@ def checkout(request):
         else:
             del request.session['coupon']
 
+    if 'wallet' in request.session:
+            wallet = Wallet.objects.filter(user=request.user).first()
+
     if request.method == 'POST':
         addressId = request.POST.get('address')
         payment_metod = request.POST.get('payment_method')
@@ -110,6 +235,7 @@ def checkout(request):
             shipping=shipping,
             vat=vat,
             price=price,
+            current_price=price,
             ip=request.META.get('REMOTE_ADDR'),
             order_number=generate_order_number()
         )
@@ -117,6 +243,25 @@ def checkout(request):
             order.coupon = coupon
             order.save()
             del request.session['coupon']
+        
+        if wallet:
+            if wallet.balance > price:           
+                order.wallet = order.price
+                wallet.balance -= Decimal(order.price)
+            else:
+                order.wallet = wallet.balance
+                wallet.balance = 0
+            del request.session['wallet']
+            order.current_price = order.price - order.wallet
+            Transaction.objects.create(
+                transaction = uuid4(),
+                user = wallet.user,
+                amount = order.price,
+                balance = wallet.balance,
+                status = 'Debit'
+            )
+            wallet.save()
+            order.save()
 
         request.session['order_id']=order.order_number
         if payment_metod == 'PayPal':
@@ -146,6 +291,15 @@ def checkout(request):
     if user_address:
         address = user_address
 
+    if wallet:
+        if wallet.balance > price:           
+            wallet_pay = price
+            price = 0
+        else:
+            wallet_pay = wallet.balance
+            price -= float(wallet_pay)
+        
+
     context = {
         'address': address,
         'user': user,
@@ -157,7 +311,8 @@ def checkout(request):
         'shipping': shipping,
         'vat': vat,
         'price': price,
-        'coupon':coupon
+        'coupon':coupon,
+        'wallet':wallet_pay
     }
 
     return render(request, 'public/user/checkout.html', context)
@@ -166,7 +321,7 @@ def paypal_payment(request):
     order_id = request.session.get('order_id')
     order = Order.objects.get(order_number=order_id)
 
-    total = order.price
+    total = order.current_price
 
     paypal_order = {
         'intent': 'sale',

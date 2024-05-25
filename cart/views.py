@@ -1,11 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
 from product.models import Product
 from cart.models import Cart, CartItem
-from promotion.models import Coupon
 from promotion.models import Promotion, PromotionCategory
 from django.contrib.auth.decorators import login_required
-import json
+from wallet.models import Wallet
 
 
 
@@ -93,11 +91,12 @@ def delete(request, product_id):
     return redirect('cart')
 
 @login_required(login_url='signin')
-def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None, coupon=None):
+def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None):
     
     try:
         if request.user:
             cart_items = CartItem.objects.filter(user=request.user, is_active=True) 
+            wallet = Wallet.objects.filter(user=request.user).first()
         else: 
             cart = Cart.objects.get(cart_id=cart_id(request))
             cart_items = CartItem.objects.filter(cart=cart, is_active=True)
@@ -109,38 +108,17 @@ def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items
         vat = round((total*18)/100, 2)
         shipping = 15
         price = round(float(total+vat+shipping) - discount, 2)
-    except:
-        
+    except:       
         pass
 
-    coupon_code = request.GET.get('coupon')
-    
-    if coupon_code:
-        coupon = Coupon.objects.filter(code=coupon_code).first()
-        if coupon and price >= coupon.minimum_price:
-            request.session['coupon']=coupon.code
-            
-            coupon_type = coupon.type
-            coupon_discount = coupon.discount
-            if coupon_type == 'Percentage Discount':
-                price = round(price * (1 - coupon_discount / 100), 2)
-            else:
-                price = round(price - coupon_discount, 2)
-
-            context={
-                'coupon':coupon.discount,
-                'price':price
-            }
-            return JsonResponse(context)
+    if wallet:
+        if wallet.balance > price:
+            wallet = price
         else:
-            if 'coupon' in request.session:
-                del request.session['coupon']
-
-            context={
-                'coupon':0,
-                'price':price
-            }
-            return JsonResponse(context)
+            wallet = wallet.balance
+    else:
+        wallet = 0
+        
     context={
         'total':total,
         'quantity':quantity,
@@ -148,7 +126,8 @@ def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items
         'cart_items':cart_items,
         'shipping':shipping,
         'vat':vat,
-        'price': price
+        'price': price,
+        'wallet':wallet
 
     }
 

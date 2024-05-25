@@ -84,66 +84,18 @@
                                             </div>
                                             <div class="product-info">
                                                 <div class="product-ratting">
-                                                    <ul>
-                                                        {% comment %} Rating {% endcomment %}
-                                                        {% if product.rating <= 0 %}
-                                                            <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating < 1 and product.rating > 0 %}
-                                                            <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating >= 1 %}
-                                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% comment %} End {% endcomment %}
-
-                                                        {% comment %} Rating {% endcomment %}
-                                                        {% if product.rating < 1 %}
-                                                            <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating < 2 and product.rating > 1 %}
-                                                            <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating >= 2 %}
-                                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% comment %} End {% endcomment %}
-                                                        
-                                                        {% comment %} Rating {% endcomment %}
-                                                        {% if product.rating <= 2 %}
-                                                            <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating < 3 and product.rating > 2 %}
-                                                            <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating >= 3 %}
-                                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% comment %} End {% endcomment %}
-
-                                                        {% comment %} Rating {% endcomment %}
-                                                        {% if product.rating <= 3 %}
-                                                            <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating < 4 and product.rating > 3 %}
-                                                            <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating >= 4 %}
-                                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% comment %} End {% endcomment %}
-
-                                                        {% comment %} Rating {% endcomment %}
-                                                        {% if product.rating <= 4 %}
-                                                            <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating < 5 and product.rating > 4 %}
-                                                            <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating >= 5 %}
-                                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% comment %} End {% endcomment %}
+                                                    <ul class="star-rating">
+                                                        {% for rating in 5|custom_range %}
+                                                        {% with rating|add:"-0.5" as half_rating %}
+                                                            {% if product.rating >= rating %}
+                                                            <li><i class="fas fa-star"></i></li>
+                                                            {% elif product.rating >= half_rating %}
+                                                            <li><i class="fas fa-star-half-alt"></i></li>
+                                                            {% else %}
+                                                            <li><i class="far fa-star"></i></li>
+                                                            {% endif %}
+                                                        {% endwith %}
+                                                        {% endfor %}
                                                     </ul>
                                                 </div>
                                                 <h2 class="product-title"><a href="/products/{{product.id}}">{{product.name}}</a>
@@ -178,66 +130,19 @@
                                                 <div class="product-info">
                                                     <h2 class="product-title"><a href="/products/{{product.id}}">{{product.name}}</a></h2>
                                                     <div class="product-ratting">
-                                                        <ul>
-                                                            {% comment %} Rating {% endcomment %}
-                                                            {% if product.rating <= 0 %}
-                                                                <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                            {% endif %}
-                                                            {% if product.rating < 1 and product.rating > 0 %}
-                                                                <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                            {% endif %}
-                                                            {% if product.rating >= 1 %}
-                                                                <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                            {% endif %}
-                                                            {% comment %} End {% endcomment %}
-    
-                                                            {% comment %} Rating {% endcomment %}
-                                                            {% if product.rating < 1 %}
-                                                                <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                            {% endif %}
-                                                            {% if product.rating < 2 and product.rating > 1 %}
-                                                                <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                            {% endif %}
-                                                            {% if product.rating >= 2 %}
-                                                                <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                            {% endif %}
-                                                            {% comment %} End {% endcomment %}
-                                                            
-                                                            {% comment %} Rating {% endcomment %}
-                                                            {% if product.rating <= 2 %}
-                                                                <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                            {% endif %}
-                                                            {% if product.rating < 3 and product.rating > 2 %}
-                                                                <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                            {% endif %}
-                                                            {% if product.rating >= 3 %}
-                                                                <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                            {% endif %}
-                                                            {% comment %} End {% endcomment %}
-    
-                                                            {% comment %} Rating {% endcomment %}
-                                                            {% if product.rating <= 3 %}
-                                                                <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                            {% endif %}
-                                                            {% if product.rating < 4 and product.rating > 3 %}
-                                                                <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                            {% endif %}
-                                                            {% if product.rating >= 4 %}
-                                                                <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                            {% endif %}
-                                                            {% comment %} End {% endcomment %}
-    
-                                                            {% comment %} Rating {% endcomment %}
-                                                            {% if product.rating <= 4 %}
-                                                                <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                            {% endif %}
-                                                            {% if product.rating < 5 and product.rating > 4 %}
-                                                                <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                            {% endif %}
-                                                            {% if product.rating >= 5 %}
-                                                                <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                            {% endif %}
-                                                            {% comment %} End {% endcomment %}
+                                                        <ul class="star-rating">
+                                                            {% for rating in 5|custom_range %}
+                                                            {% with rating|add:"-0.5" as half_rating %}
+                                                                {% if product.rating >= rating %}
+                                                                <li><i class="fas fa-star"></i></li>
+                                                                {% elif product.rating >= half_rating %}
+                                                                <li><i class="fas fa-star-half-alt"></i></li>
+                                                                {% else %}
+                                                                <li><i class="far fa-star"></i></li>
+                                                                {% endif %}
+                                                            {% endwith %}
+                                                            {% endfor %}
+                                                            <li class="review-total"><a href="#">({{ review_count }} Reviews)</a></li>
                                                         </ul>
                                                     </div>
                                                     <div class="product-price">
@@ -321,66 +226,18 @@
                                             </div>
                                             <div class="top-rated-product-info">
                                                 <div class="product-ratting">
-                                                    <ul>
-                                                        {% comment %} Rating {% endcomment %}
-                                                        {% if product.rating <= 0 %}
-                                                            <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating < 1 and product.rating > 0 %}
-                                                            <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating >= 1 %}
-                                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% comment %} End {% endcomment %}
-
-                                                        {% comment %} Rating {% endcomment %}
-                                                        {% if product.rating < 1 %}
-                                                            <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating < 2 and product.rating > 1 %}
-                                                            <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating >= 2 %}
-                                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% comment %} End {% endcomment %}
-                                                        
-                                                        {% comment %} Rating {% endcomment %}
-                                                        {% if product.rating <= 2 %}
-                                                            <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating < 3 and product.rating > 2 %}
-                                                            <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating >= 3 %}
-                                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% comment %} End {% endcomment %}
-
-                                                        {% comment %} Rating {% endcomment %}
-                                                        {% if product.rating <= 3 %}
-                                                            <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating < 4 and product.rating > 3 %}
-                                                            <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating >= 4 %}
-                                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% comment %} End {% endcomment %}
-
-                                                        {% comment %} Rating {% endcomment %}
-                                                        {% if product.rating <= 4 %}
-                                                            <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating < 5 and product.rating > 4 %}
-                                                            <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                        {% endif %}
-                                                        {% if product.rating >= 5 %}
-                                                            <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                        {% endif %}
-                                                        {% comment %} End {% endcomment %}
+                                                    <ul class="star-rating">
+                                                        {% for rating in 5|custom_range %}
+                                                        {% with rating|add:"-0.5" as half_rating %}
+                                                            {% if product.rating >= rating %}
+                                                            <li><i class="fas fa-star"></i></li>
+                                                            {% elif product.rating >= half_rating %}
+                                                            <li><i class="fas fa-star-half-alt"></i></li>
+                                                            {% else %}
+                                                            <li><i class="far fa-star"></i></li>
+                                                            {% endif %}
+                                                        {% endwith %}
+                                                        {% endfor %}
                                                     </ul>
                                                 </div>
                                                 <h6><a href="/products/{{product.id}}">{{product.name}}</a></h6>

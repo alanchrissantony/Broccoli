@@ -68,3 +68,4 @@ class UserAddress(models.Model):
     class Meta:
         verbose_name = 'User Address'
         verbose_name_plural = 'User Addresses'
+

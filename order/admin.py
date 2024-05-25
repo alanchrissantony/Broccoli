@@ -1,5 +1,5 @@
 from django.contrib import admin
-from order.models import Order, Payment, OrderProduct, OrderStatus
+from order.models import Order, Payment, OrderProduct, OrderStatus, Review
 
 # Register your models here.
 
@@ -23,4 +23,5 @@ admin.site.register(Order, OrderAdmin)
 admin.site.register(Payment)
 admin.site.register(OrderProduct)
 admin.site.register(OrderStatus)
+admin.site.register(Review)
 

@@ -11,6 +11,8 @@ from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from wallet.views import create_wallet
+from order.models import Order
+from wallet.models import Transaction
 
 
 # Create your views here.
@@ -36,7 +38,50 @@ def send(request):
     return True
 
 def account(request):
-    return render(request, 'public/user/account.html')
+
+    if request.method=='POST':
+        firstname = request.POST.get('firstname')
+        lastname = request.POST.get('lastname')
+        currentpassword = request.POST.get('currentpassword')
+        newpassword = request.POST.get('newpassword')
+        confirmpassword = request.POST.get('confirmpassword')
+
+        user = Account.objects.get(username__exact=request.user.username)
+        success=user.check_password(currentpassword)
+
+        if success:
+            if firstname:
+                if Validator.validate_name(firstname):
+                    messages.error(request, 'Please enter a valid first name.')
+                else:
+                    user.first_name = firstname
+            if lastname:
+                if Validator.validate_name(lastname):
+                    messages.error(request, 'Please enter a valid last name.')
+                else:
+                    user.last_name = lastname
+            if newpassword:
+                if newpassword != confirmpassword:
+                    messages.error(request, "The passwords provided do not match!")
+                elif Validator.validate_password(newpassword):
+                    messages.error(request, 'The password must contain at least 8 characters, including at least one letter, one digit, and one special character (@$!%*?&).')
+                else:
+                    user.set_password(newpassword)
+                    messages.success(request, "Password has been updated!")
+            user.save()
+        else:
+            messages.error(request, "Invalid credentials!")
+        return redirect('account')
+
+    address = UserAddress.objects.filter(user_id=request.user)
+    orders = Order.objects.filter(user=request.user, is_ordered=True)
+    transactions = Transaction.objects.filter(user=request.user).order_by('-created_at')
+    context={
+        'addresses':address,
+        'orders':orders,
+        'transactions':transactions
+    }
+    return render(request, 'public/user/account.html', context)
 
 def password(request):
     return render(request, 'public/user/password.html')

@@ -164,6 +164,12 @@
                                     <td>-${{coupon.discount}}</td>
                                 </tr>
                                 {% endif %}
+                                {% if wallet %}
+                                <tr>
+                                    <td>Coupon</td>
+                                    <td>-${{wallet}}</td>
+                                </tr>
+                                {% endif %}
                                 <tr>
                                     <td>Shipping and Handing</td>
                                     <td>${{shipping}}</td>

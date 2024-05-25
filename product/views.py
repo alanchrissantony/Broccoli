@@ -3,6 +3,7 @@ from product.models import Product
 from category.models import Category
 from django.http import JsonResponse
 from django.core.paginator import Paginator
+from order.models import Review
 
 # Create your views here.
 def product(request):
@@ -10,6 +11,7 @@ def product(request):
     sort_by = request.GET.get('sort_by')
     search = request.GET.get('search')
     category = request.GET.get('category')
+
     if search:
         products = Product.objects.filter(name__icontains=search)
     elif sort_by:
@@ -39,11 +41,14 @@ def productDetails(request, id):
     product = Product.objects.get(id=id)
     related_products = Product.objects.filter(category=product.category).exclude(id=product.id)
     top_rated = Product.objects.all().order_by('-rating')[:5]
+    reviews = Review.objects.filter(product=product)
 
     context = {
         'product' : product,
         'related_products' : related_products,
-        'top_rated':top_rated
+        'top_rated':top_rated,
+        'reviews':reviews,
+        'review_count':len(reviews)
     }
     return render(request, 'public/user/product-details.html', context)
 

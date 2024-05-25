@@ -103,7 +103,6 @@ class Products:
                 return redirect('root/products/add')
             stock = request.POST['stock']
             description = request.POST['description']
-            rating = request.POST['rating']
             slug = name.lower().replace(" ", "_")
 
             if Validator.validate_data(name):
@@ -118,7 +117,6 @@ class Products:
                     price=price,
                     stock=stock,
                     description=description,
-                    rating=rating,
                     slug=slug
                 )
                 # Associate uploaded images with the product

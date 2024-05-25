@@ -38,7 +38,7 @@
             <div class="card" style="margin-top: 10rem; margin-bottom: 2rem;">
                 <div class="card-body">
                     <div class="invoice-title">
-                        <h4 class="float-end font-size-15">Invoice #DS0204 <span class="badge bg-success font-size-12 ms-2">Paid</span></h4>
+                        <h4 class="float-end font-size-15">Invoice #{{order.payment.payment_id}} <span class="badge bg-{% if order.payment.status == "Paid" %}success{% else %}danger{% endif %} font-size-12 ms-2">{{order.payment.status}}</span></h4>
                         <div class="mb-4">
                            <h2 class="mb-1 text-muted">Broccoli</h2>
                         </div>
@@ -55,10 +55,13 @@
                         <div class="col-sm-6">
                             <div class="text-muted">
                                 <h5 class="font-size-16 mb-3">Billed To:</h5>
-                                <h5 class="font-size-15 mb-2">Preston Miller</h5>
-                                <p class="mb-1">4068 Post Avenue Newfolden, MN 56738</p>
-                                <p class="mb-1">PrestonMiller@armyspy.com</p>
-                                <p>001-234-5678</p>
+                                <h5 class="font-size-15 mb-2">{{order.address.first_name}} {{order.address.last_name}}</h5>
+                                <p class="mb-1">{{order.address.address}},</p>
+                                <p class="mb-1">{{order.address.additional}},</p>
+                                <p class="mb-1">{{order.address.city}}, {{order.address.state}},</p>
+                                <p class="mb-1">{{order.address.country}}, {{order.address.zip_code}}</p>
+                                <p class="mb-1">{{order.address.phone_number}}</p>
+                                <p>{{order.address.email}}</p>
                             </div>
                         </div>
                         <!-- end col -->
@@ -66,15 +69,15 @@
                             <div class="text-muted text-sm-end">
                                 <div>
                                     <h5 class="font-size-15 mb-1">Invoice No:</h5>
-                                    <p>#DZ0112</p>
+                                    <p>#{{order.payment.payment_id}}</p>
                                 </div>
                                 <div class="mt-4">
                                     <h5 class="font-size-15 mb-1">Invoice Date:</h5>
-                                    <p>12 Oct, 2020</p>
+                                    <p>{{order.created_at}}</p>
                                 </div>
                                 <div class="mt-4">
                                     <h5 class="font-size-15 mb-1">Order No:</h5>
-                                    <p>#1123456</p>
+                                    <p>#{{order.order_number}}</p>
                                 </div>
                             </div>
                         </div>
@@ -97,58 +100,55 @@
                                     </tr>
                                 </thead><!-- end thead -->
                                 <tbody>
+                                    {% for product in products %}
                                     <tr>
-                                        <th scope="row">01</th>
+                                        <th scope="row">{{forloop.counter}}</th>
                                         <td>
                                             <div>
-                                                <h5 class="text-truncate font-size-14 mb-1">Black Strap A012</h5>
-                                                <p class="text-muted mb-0">Watch, Black</p>
+                                                <h5 class="text-truncate font-size-14 mb-1">{{product.product.name}}</h5>
+                                                <p class="text-muted mb-0">{{product.product.category}}</p>
                                             </div>
                                         </td>
-                                        <td>$ 245.50</td>
-                                        <td>1</td>
-                                        <td class="text-end">$ 245.50</td>
+                                        <td>$ {{product.product.price}}</td>
+                                        <td>{{product.quantity}}</td>
+                                        <td class="text-end">$ {{product.price}}</td>
                                     </tr>
+                                    {% endfor %}
                                     <!-- end tr -->
-                                    <tr>
-                                        <th scope="row">02</th>
-                                        <td>
-                                            <div>
-                                                <h5 class="text-truncate font-size-14 mb-1">Stainless Steel S010</h5>
-                                                <p class="text-muted mb-0">Watch, Gold</p>
-                                            </div>
-                                        </td>
-                                        <td>$ 245.50</td>
-                                        <td>2</td>
-                                        <td class="text-end">$491.00</td>
-                                    </tr>
-                                    <!-- end tr -->
+                    
                                     <tr>
                                         <th scope="row" colspan="4" class="text-end">Sub Total</th>
-                                        <td class="text-end">$732.50</td>
+                                        <td class="text-end">${{order.total}}</td>
                                     </tr>
                                     <!-- end tr -->
                                     <tr>
                                         <th scope="row" colspan="4" class="border-0 text-end">
                                             Discount :</th>
-                                        <td class="border-0 text-end">- $25.50</td>
+                                        <td class="border-0 text-end">- ${{order.discount}}</td>
                                     </tr>
                                     <!-- end tr -->
                                     <tr>
                                         <th scope="row" colspan="4" class="border-0 text-end">
                                             Shipping Charge :</th>
-                                        <td class="border-0 text-end">$20.00</td>
+                                        <td class="border-0 text-end">${{order.shipping}}</td>
                                     </tr>
                                     <!-- end tr -->
                                     <tr>
                                         <th scope="row" colspan="4" class="border-0 text-end">
                                             Tax</th>
-                                        <td class="border-0 text-end">$12.00</td>
+                                        <td class="border-0 text-end">${{order.vat}}</td>
                                     </tr>
                                     <!-- end tr -->
+                                    {% if order.wallet > 0 %}
+                                    <tr>
+                                        <th scope="row" colspan="4" class="border-0 text-end">
+                                            Wallet :</th>
+                                        <td class="border-0 text-end">- ${{order.wallet}}</td>
+                                    </tr>
+                                    {% endif %}
                                     <tr>
                                         <th scope="row" colspan="4" class="border-0 text-end">Total</th>
-                                        <td class="border-0 text-end"><h4 class="m-0 fw-semibold">$739.00</h4></td>
+                                        <td class="border-0 text-end"><h4 class="m-0 fw-semibold">${{order.current_price}}</h4></td>
                                     </tr>
                                     <!-- end tr -->
                                 </tbody><!-- end tbody -->
@@ -157,7 +157,7 @@
                         <div class="d-print-none mt-4">
                             <div class="float-end">
                                 <a href="javascript:window.print()" class="theme-btn-1 btn btn-effect-1"><i class="fa fa-print"></i></a>
-                                <a href="#" class="theme-btn-2 btn btn-effect-1">Back</a>
+                                <a href="/orders/{{order.id}}" class="theme-btn-2 btn btn-effect-2">Back</a>
                             </div>
                         </div>
                     </div>

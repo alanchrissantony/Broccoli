@@ -16,7 +16,7 @@ class Product(models.Model):
     images = models.ManyToManyField('Image', related_name='products')
     stock = models.IntegerField()
     is_available = models.BooleanField(default=True)
-    rating = models.FloatField()
+    rating = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
@@ -26,6 +26,7 @@ class Product(models.Model):
     def __str__(self):
         return self.name
     
+
 
 class Image(models.Model):
     

@@ -20,19 +20,19 @@
         margin-top: 3vh
     }
 
-    #progressbar #step1{
+    #progressbar #step1 {
         text-align: left;
     }
 
-    #progressbar #step2{
+    #progressbar #step2 {
         text-align: center;
     }
 
-    #progressbar #step3{
+    #progressbar #step3 {
         text-align: right;
     }
 
-    #progressbar #step4{
+    #progressbar #step4 {
         text-align: right;
     }
 
@@ -134,21 +134,23 @@
     #progressbar li.active:after {
         background: #26A541;
     }
+
     .dropdown {
         position: relative;
         display: inline-block;
-      }
-      
-      .dropdown-content {
+    }
+
+    .dropdown-content {
         display: none;
         position: absolute;
         background-color: #f3f3f3;
         min-width: 160px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
         z-index: 2;
-      }
-      
-      .dropdown-content .arrow-up {
+        border-radius: 1rem;
+    }
+
+    .dropdown-content .arrow-up {
         width: 0;
         height: 0;
         border-left: 10px solid transparent;
@@ -156,26 +158,35 @@
         border-bottom: 10px solid #f3f3f3;
         margin: 0 auto;
         margin-top: -10px;
-      }
-      
-      .dropdown-content p {
+    }
+
+    .dropdown-content p {
         padding: 10px 12px;
         text-align: left;
         text-decoration: none;
         display: block;
         font-size: small;
-      }
+    }
 
-      .dropdown-content h6 {
+    .dropdown-content h6 {
         padding: 10px 12px;
         text-align: left;
         text-decoration: none;
         display: block;
-      }
-      
-      .dropdown:hover .dropdown-content {
+    }
+
+    .dropdown:hover .dropdown-content {
         display: block;
-      }
+    }
+    .shoping-cart-table thead td{
+        padding: 0px 25px;
+    }
+    .shoping-cart-table thead .head-td{
+        padding: 0px 25px 20px;
+    }
+    .fa-star{
+        font-size: 1.5rem;
+    }
 </style>
 
 <!-- WISHLIST AREA START -->
@@ -185,93 +196,167 @@
             <div class="col-lg-12">
                 <div class="shoping-cart-inner">
                     <div class="shoping-cart-table table-responsive">
-                        <table class="table">
-                            <tbody>
-                                {% for product in products %}
-                                <tr style="border-bottom: 1px solid #dee2e6;">
-                                    <td class="cart-product-remove" rowspan="2" style="border: none;">{{forloop.counter}}</td>
-                                    <td class="cart-product-image" rowspan="2" style="border: none;">
-                                        <a href="product-details.html"><img src="{{product.product.images.first.image.url}}" alt=""></a>
-                                    </td>
-                                    <td class="cart-product-info" style="padding: 0; border: none;">
-                                        <!-- Apply inline styles -->
-                                        <div class="progress-track">
+
+                        <table style="width: 100%;">
+                            <thead style="background-color:#f7f8fa;">
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="progress-track" style="width: 100%;">
                                             <ul id="progressbar">
-                                                {% for status in product.order.statuses.all %}
-                                                    <li class="step{{forloop.counter}} active" id="step{{forloop.counter}}">{{status.name}}</li>
+                                                {% for status in order.statuses.all %}
+                                                <li class="step{{ forloop.counter }} active"
+                                                    id="step{{ forloop.counter }}">{{ status.name }}</li>
                                                 {% endfor %}
-                                                {% if product.order.statuses.count < 2 %}<li class="step2" id="step2">Shipped</li>{% endif %}
-                                                {% if product.order.statuses.count < 3 %}<li class="step3" id="step3">Out for delivery</li>{% endif %}
-                                                {% if product.order.statuses.count < 4 %}<li class="step4" id="step4">Delivered</li>{% endif %}
+                                                {% if order.statuses.count < 2 %}
+                                                    <li class="step2" id="step2">Shipped</li>
+                                                {% endif %}
+                                                {% if order.statuses.count < 3 %}
+                                                    <li class="step3" id="step3">Out for delivery</li>
+                                                {% endif %}
+                                                {% if order.statuses.count < 4 %} 
+                                                    <li class="step4" id="step4">Delivered</li>
+                                                {% endif %}
                                             </ul>
                                         </div>
-                                        <table style="width: 100%;"> <!-- Adjust width and border-collapse -->
-                                            <tbody style="border: none;">
-                                                <tr>
-                                                    <td class="cart-product-info" style="border: none;">
-                                                        <h4><a href="product/details">{{product.product.name}}</a></h4>
-                                                        <h6 class="cart-product-price">Quantity: <span
-                                                                style="font-weight: normal; float: right;">{{product.quantity}}</span></h6>
-                                                        <h6 class="cart-product-price">Price: <span
-                                                                style="font-weight: normal; float: right;">${{product.product.price}}</span>
-                                                        </h6>
-                                                    </td>
-                                                    <td class="cart-product-info" style="border: none;">
-                                                        <div class="dropdown">
-                                                        <h4><a href="product/details">Order Id: <span
-                                                                    style="font-weight: normal;">#{{product.order.order_number}}</span></a>
-                                                        </h4>
-                                                        <div class="dropdown-content">
-                                                            <div class="arrow-up"></div>
-                                                            <h6>{{ product.order.address.first_name }} {{ product.order.address.last_name }}</h6>
-                                                            <p>{{ product.order.address.address }}, {{ product.order.address.additional }}, <br>
-                                                                {{ product.order.address.city }}, {{ product.order.address.state }} 
-                                                                {{ product.order.address.zip_code }}, <br>
-                                                                {{ product.order.address.country }}<br>
-                                                                Phone number: {{ product.order.address.phone_number }}<br>
-                                                                Email: {{ product.order.address.email }}<br>
-                                                                {{ product.order.address.order_instruction }}
-                                                            </p>
-                                                          </div>
-                                                        </div>
-                                                        <h6 class="cart-product-price">Order Confirmed On: {{product.order.created_at}}</h6>
-                                                        <h6 class="cart-product-price">Expected Delivery On: {{product.order.updated_at}}</h6>
-                                                    </td>
-                                                    <td class="cart-product-stock" style="border: none;">
-                                                        <h4>Amount Payable:&nbsp;<span
-                                                                    style="font-weight: bolder; float: right;">${{product.order.price}}</span>
-                                                        </h4>
-                                                        <a href="/orders/delete/{{product.order.id}}"><h6 class="cart-product-price" style="color: #2874F0;">Cancel</h6></a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-
-                                        </table>
                                     </td>
                                 </tr>
-                                {% endfor %}
-                                
-                            </tbody>
-                        </table>
+                                <tr>
+                                    <td>Order Placed</td>
+                                    <td>Total</td>
+                                    <td>Ship To</td>
+                                    <td>Order <span style="font-size: small; font-weight: lighter;">#{{ order.order_number }}</span></td>
+                                </tr>
+                                <tr style="padding-bottom: 20px;">
+                                    <td class="head-td">{{ order.payment.status }}</td>
+                                    <td class="head-td"><span class="math-inline">${{ order.price }}</td>
+                                    <td class="head-td">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                {{ order.address.first_name }} {{ order.address.last_name }}
+                                            </a>
+                                            <div class="dropdown-content">
+                                                <div class="arrow-up"></div>
+                                                <h6>{{ order.address.first_name }} {{ order.address.last_name }}</h6>
+                                                <p>
+                                                    {{ order.address.address }}, 
+                                                    {{ order.address.additional }}, <br>
+                                                    {{ order.address.city }}, {{ order.address.state }}
+                                                    {{ order.address.zip_code }}, <br>
+                                                    {{ order.address.country }}<br>
+                                                    Phone number: {{ order.address.phone_number }}<br>
+                                                    Email: {{ order.address.email }}<br>
+                                                    {{ order.address.order_instruction }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="head-td">
+                                        <a href="/orders/invoice/{{order.id}}">Invoice</a>
+                                    </td>
+                                </tr>
+                            </thead>
 
+                        {% for product in products %}
+
+                        
+                            <tbody>
+                                <tr>
+                                    <td class="cart-product-image" style="border: none;">
+                                        <a href="product-details.html">
+                                            <img src="{{ product.product.images.first.image.url }}" alt="">
+                                        </a>
+                                    </td>
+                                    <td class="cart-product-info" style="border: none;">
+                                        <h4><a href="product/details">{{ product.product.name }}</a></h4>
+                                        <h6 class="cart-product-price">
+                                            Quantity: <span style="font-weight: normal; float: right;">{{ product.quantity }}</span>
+                                        </h6>
+                                        <h6 class="cart-product-price">
+                                            Price: <span style="font-weight: normal; float: right;"></span>{{ product.product.price }}</span>
+                                        </h6>
+                                    </td>
+                                    <td class="cart-product-info" style="border: none;">
+                                        <div>
+                                            <h4>Order Id: <span style="font-weight: normal;">#{{ product.order.order_number }}</span></h4>
+                                            <h6 class="cart-product-price">Order Confirmed On: {{ product.order.created_at }}
+                                            </h6>
+                                            <h6 class="cart-product-price">Expected Delivery On: {{ product.order.updated_at }}
+                                            </h6>
+                                        </div>
+                                    </td>
+                                    <td class="cart-product-stock" style="border: none;">
+                                        <h6>Category: {{ product.product.category }}</h6>
+                                        <h6>Payment Id: <span style="font-weight: normal;">#{{ product.payment.payment_id }}</span></h6>
+                                        <h6>Method: {{ product.payment.payment_method }}</h6>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="ltn__checkout-single-content ltn__returning-customer-wrap">
+                                            <h5>Bought something recently? <a class="ltn__secondary-color" href="#ltn__returning-customer-login-{{forloop.counter}}" data-toggle="collapse">Leave a review!</a></h5>
+                                            <div id="ltn__returning-customer-login-{{forloop.counter}}" class="collapse ltn__checkout-single-content-info">
+                                                <div class="ltn__comment-reply-area ltn__form-box mb-30">
+                                                    <form method="post">
+                                                        {% csrf_token %}
+                                                        <h4 class="title-2">Add a Review</h4>
+                                                        <div class="mb-30">
+                                                            <div class="add-a-review">
+                                                                <h6>Your Ratings:</h6>
+                                                                <div class="product-ratting">
+                                                                    <ul class="star-rating">
+                                                                        <li><a href="#" data-rating="1"><i class="far fa-star"></i></a></li>
+                                                                        <li><a href="#" data-rating="2"><i class="far fa-star"></i></a></li>
+                                                                        <li><a href="#" data-rating="3"><i class="far fa-star"></i></a></li>
+                                                                        <li><a href="#" data-rating="4"><i class="far fa-star"></i></a></li>
+                                                                        <li><a href="#" data-rating="5"><i class="far fa-star"></i></a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="input-item input-item-textarea ltn__custom-icon">
+                                                            <input type="hidden" name="product" value="{{product.product.id}}">
+                                                            <input type="hidden" name="order" value="{{order.id}}">
+                                                            <input type="hidden" name="rating" value="0" id="input-rating">
+                                                            <textarea name="review" placeholder="Type your comments...." required></textarea>
+                                                        </div>
+                                                        <div class="btn-wrapper">
+                                                            <button class="btn theme-btn-1 btn-effect-1 text-uppercase" type="submit">Submit</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        {% endfor %}
+                    </table>
+                    <div class="mt-20 text-right">
+                        <a href="/orders/delete/{{order.id}}" class="theme-btn-1 btn btn-effect-1">Cancel</a>
+                        <a href="/user/account/#liton_tab_1_2" class="theme-btn-2 btn btn-effect-2">Back</a>
+                    </div>
                         <div class="ltn__pagination-area text-center">
                             <div class="ltn__pagination">
                                 <ul>
                                     <!-- Previous page link -->
                                     {% if products.has_previous %}
-                                        <li class="{% if not products.has_previous %} disabled{% endif %}"><a href="?page=1"><i class="fas fa-angle-double-left"></i></a></li>
+                                    <li class="{% if not products.has_previous %} disabled{% endif %}"><a
+                                            href="?page=1"><i class="fas fa-angle-double-left"></i></a></li>
                                     {% endif %}
-                        
+
                                     <!-- Current page link -->
                                     {% for page_num in products.paginator.page_range %}
-                                    <li class="{% if page_num == products.number %} active{% endif %}"><a href="?page={{ page_num }}">{{ page_num }}</a></li>
+                                    <li class="{% if page_num == products.number %} active{% endif %}"><a
+                                            href="?page={{ page_num }}">{{ page_num }}</a></li>
                                     {% endfor %}
 
                                     <!-- Next page link -->
                                     {% if products.has_next %}
-                                        <li class="{% if not products.has_next %} disabled{% endif %}"><a href="?page={{ products.paginator.num_pages }}"><i class="fas fa-angle-double-right"></i></a></li>
+                                    <li class="{% if not products.has_next %} disabled{% endif %}"><a
+                                            href="?page={{ products.paginator.num_pages }}"><i
+                                                class="fas fa-angle-double-right"></i></a></li>
                                     {% endif %}
-                                    
+
                                 </ul>
                             </div>
                         </div>
@@ -286,5 +371,30 @@
 
 {% include "components/user/feature.html" %}
 {% include "components/user/footer.html" %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const stars = document.querySelectorAll('.star-rating li a');
+        const ratingInput = document.getElementById('input-rating');
+        stars.forEach(star => {
+            star.addEventListener('click', function(e) {
+                e.preventDefault();
+                const rating = this.getAttribute('data-rating');
+                // Highlight the stars
+                stars.forEach(s => {
+                    s.querySelector('.fa-star').classList.remove('fas');
+                });
+                this.querySelector('.fa-star').classList.add('fas');
+                let prevSibling = this.parentElement.previousElementSibling;
+                while (prevSibling) {
+                    prevSibling.querySelector('.fa-star').classList.add('fas');
+                    prevSibling = prevSibling.previousElementSibling;
+                }
+                // You can now use the rating value (stored in the variable `rating`)
+                ratingInput.value = rating;
+            });
+        });
+    });
+</script>
 
 {% endblock content %}

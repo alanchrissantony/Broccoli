@@ -22,8 +22,8 @@
                                     <div class="ltn__tab-menu-list mb-50">
                                         <div class="nav">
                                             <a class="active show" data-toggle="tab" href="#liton_tab_1_1">Dashboard <i class="fas fa-home"></i></a>
-                                            <a data-toggle="tab" href="#liton_tab_1_2">Orders <i class="fas fa-file-alt"></i></a>
-                                            <a data-toggle="tab" href="#liton_tab_1_3">Downloads <i class="fas fa-arrow-down"></i></a>
+                                            <a id="a_liton_tab_1_2" data-toggle="tab" href="#liton_tab_1_2">Orders <i class="fas fa-file-alt"></i></a>
+                                            <a data-toggle="tab" href="#liton_tab_1_3">Wallet <i class="fas fa-credit-card"></i></a>
                                             <a data-toggle="tab" href="#liton_tab_1_4">address <i class="fas fa-map-marker-alt"></i></a>
                                             <a data-toggle="tab" href="#liton_tab_1_5">Account Details <i class="fas fa-user"></i></a>
                                             <a href="/user/signout">Logout <i class="fas fa-sign-out-alt"></i></a>
@@ -34,7 +34,8 @@
                                     <div class="tab-content">
                                         <div class="tab-pane fade active show" id="liton_tab_1_1">
                                             <div class="ltn__myaccount-tab-content-inner">
-                                                <p>Hello <strong>UserName</strong> (not <strong>UserName</strong>? <small><a href="/user/signin">Log out</a></small> )</p>
+                                                {% for message in messages %}<p style="text-align: center;" class="{{message.tags}}-message">{{message}}</p>{% endfor %}
+                                                <p>Hello <strong>{{request.user.first_name}} {{request.user.last_name}}</strong> (not <strong>{{request.user.first_name}}</strong>? <small><a href="/user/signout">Log out</a></small> )</p>
                                                 <p>From your account dashboard you can view your <span>recent orders</span>, manage your <span>shipping and billing addresses</span>, and <span>edit your password and account details</span>.</p>
                                             </div>
                                         </div>
@@ -52,27 +53,15 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            {% for order in orders %}
                                                             <tr>
-                                                                <td>1</td>
-                                                                <td>Jun 22, 2019</td>
-                                                                <td>Pending</td>
-                                                                <td>$3000</td>
-                                                                <td><a href="cart.html">View</a></td>
+                                                                <td>{{forloop.counter}}</td>
+                                                                <td>{{order.created_at}}</td>
+                                                                <td>{{order.statuses.last}}</td>
+                                                                <td>${{order.price}}</td>
+                                                                <td><a href="/orders/{{order.id}}">View</a></td>
                                                             </tr>
-                                                            <tr>
-                                                                <td>2</td>
-                                                                <td>Nov 22, 2019</td>
-                                                                <td>Approved</td>
-                                                                <td>$200</td>
-                                                                <td><a href="cart.html">View</a></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>3</td>
-                                                                <td>Jan 12, 2020</td>
-                                                                <td>On Hold</td>
-                                                                <td>$990</td>
-                                                                <td><a href="cart.html">View</a></td>
-                                                            </tr>
+                                                            {% endfor %}
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -84,31 +73,21 @@
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
-                                                                <th>Product</th>
                                                                 <th>Date</th>
-                                                                <th>Expire</th>
-                                                                <th>Download</th>
+                                                                <th>Transaction</th>
+                                                                <th>Balance</th>
+                                                                <th>Amount</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            {% for transaction in transactions %}
                                                             <tr>
-                                                                <td>Carsafe - Car Service PSD Template</td>
-                                                                <td>Nov 22, 2020</td>
-                                                                <td>Yes</td>
-                                                                <td><a href="#"><i class="far fa-arrow-to-bottom mr-1"></i> Download File</a></td>
+                                                                <td>{{transaction.created_at}}</td>
+                                                                <td>{{transaction.transaction}}</td>
+                                                                <td>${{transaction.balance}}</td>
+                                                                <td><span class="text-{% if transaction.status == 'Credit' %}success{% else %}danger{% endif %}">${{transaction.amount}}</span></td>
                                                             </tr>
-                                                            <tr>
-                                                                <td>Carsafe - Car Service HTML Template</td>
-                                                                <td>Nov 10, 2020</td>
-                                                                <td>Yes</td>
-                                                                <td><a href="#"><i class="far fa-arrow-to-bottom mr-1"></i> Download File</a></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Carsafe - Car Service WordPress Theme</td>
-                                                                <td>Nov 12, 2020</td>
-                                                                <td>Yes</td>
-                                                                <td><a href="#"><i class="far fa-arrow-to-bottom mr-1"></i> Download File</a></td>
-                                                            </tr>
+                                                            {% endfor %}
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -118,24 +97,19 @@
                                             <div class="ltn__myaccount-tab-content-inner">
                                                 <p>The following addresses will be used on the checkout page by default.</p>
                                                 <div class="row">
+                                                    {% for address in addresses %}
                                                     <div class="col-md-6 col-12 learts-mb-30">
-                                                        <h4>Billing Address <small><a href="#">edit</a></small></h4>
+                                                        <h4>{% if address.is_default %}Default Address{% else %}Address{% endif %} <small><a href="/user/address/edit/{{address.address_id.id}}">edit</a></small></h4>
                                                         <address>
-                                                            <p><strong>Alex Tuntuni</strong></p>
-                                                            <p>1355 Market St, Suite 900 <br>
-                                                                San Francisco, CA 94103</p>
-                                                            <p>Mobile: (123) 456-7890</p>
+                                                            <p><strong>{{address.address_id.first_name}} {{address.address_id.last_name}}</strong></p>
+                                                            <p>{{address.address_id.address}}, {{address.address_id.additional}}<br>
+                                                                {{address.address_id.city}}, {{address.address_id.state}}, {{address.address_id.zip_code}}<br>
+                                                                {{address.address_id.country}}
+                                                            </p>
+                                                            <p>Mobile: {{address.address_id.phone_number}}</p>
                                                         </address>
                                                     </div>
-                                                    <div class="col-md-6 col-12 learts-mb-30">
-                                                        <h4>Shipping Address <small><a href="#">edit</a></small></h4>
-                                                        <address>
-                                                            <p><strong>Alex Tuntuni</strong></p>
-                                                            <p>1355 Market St, Suite 900 <br>
-                                                                San Francisco, CA 94103</p>
-                                                            <p>Mobile: (123) 456-7890</p>
-                                                        </address>
-                                                    </div>
+                                                    {% endfor %}
                                                 </div>
                                             </div>
                                         </div>
@@ -143,23 +117,16 @@
                                             <div class="ltn__myaccount-tab-content-inner">
                                                 <p>The following addresses will be used on the checkout page by default.</p>
                                                 <div class="ltn__form-box">
-                                                    <form action="#">
+                                                    <form method="post">
+                                                        {% csrf_token %}
                                                         <div class="row mb-50">
                                                             <div class="col-md-6">
                                                                 <label>First name:</label>
-                                                                <input type="text" name="ltn__name">
+                                                                <input type="text" name="firstname">
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label>Last name:</label>
-                                                                <input type="text" name="ltn__lastname">
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label>Display Name:</label>
-                                                                <input type="text" name="ltn__lastname" placeholder="Ethan">
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label>Display Email:</label>
-                                                                <input type="email" name="ltn__lastname" placeholder="example@example.com">
+                                                                <input type="text" name="lastname">
                                                             </div>
                                                         </div>
                                                         <fieldset>
@@ -167,11 +134,11 @@
                                                             <div class="row">
                                                                 <div class="col-md-12">
                                                                     <label>Current password (leave blank to leave unchanged):</label>
-                                                                    <input type="password" name="ltn__name">
+                                                                    <input type="password" name="currentpassword" required>
                                                                     <label>New password (leave blank to leave unchanged):</label>
-                                                                    <input type="password" name="ltn__lastname">
+                                                                    <input type="password" name="newpassword">
                                                                     <label>Confirm new password:</label>
-                                                                    <input type="password" name="ltn__lastname">
+                                                                    <input type="password" name="confirmpassword">
                                                                 </div>
                                                             </div>
                                                         </fieldset>
@@ -196,6 +163,16 @@
 
     {% include "components/user/feature.html" %}
     {% include "components/user/footer.html" %}
+
+    <script>
+        window.onload = function() {
+          if (window.location.hash === "#liton_tab_1_2") {
+            const targetTabContent = document.getElementById("a_liton_tab_1_2");
+            targetTabContent.click();
+            window.scrollTo(0, 0);
+          }
+        };
+      </script>
 
 {% endblock content %}
 

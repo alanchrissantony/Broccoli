@@ -2,6 +2,7 @@
 from django import template
 from promotion.models import Promotion, PromotionCategory
 from wishlists.models import Wishlist
+from order.models import Review
 
 register = template.Library()
 
@@ -79,3 +80,7 @@ def in_wishlist(product, user):  # Include user as an argument
     if wishlist:
         return True
     return False
+
+@register.filter(name='custom_range')
+def custom_range(end):
+    return range(1, end + 1)
