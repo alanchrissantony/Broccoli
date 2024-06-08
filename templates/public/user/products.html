@@ -6,7 +6,7 @@
 
 {% load static %}
 {% load custom_filters %}
-
+    {% include "components/user/toast.html" %}
     {% include "components/user/header.html" %}
     {% include "components/user/cart.html" %}
     {% include "components/user/mobile.html" %}
@@ -16,6 +16,11 @@
     <div class="ltn__product-area ltn__product-gutter">
         <div class="container">
             <div class="row">
+                {% if messages %}
+                    {% for message in messages %}
+                        <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
+                    {% endfor %}
+                {% endif %}
                 <div class="col-lg-8 order-lg-2 mb-120">
                     <div class="ltn__shop-options">
                         <ul>
@@ -88,11 +93,11 @@
                                                         {% for rating in 5|custom_range %}
                                                         {% with rating|add:"-0.5" as half_rating %}
                                                             {% if product.rating >= rating %}
-                                                            <li><i class="fas fa-star"></i></li>
+                                                            <a><li><i class="fas fa-star"></i></li></a>
                                                             {% elif product.rating >= half_rating %}
-                                                            <li><i class="fas fa-star-half-alt"></i></li>
+                                                            <a><li><i class="fas fa-star-half-alt"></i></li></a>
                                                             {% else %}
-                                                            <li><i class="far fa-star"></i></li>
+                                                            <a><li><i class="far fa-star"></i></li></a>
                                                             {% endif %}
                                                         {% endwith %}
                                                         {% endfor %}
@@ -134,11 +139,11 @@
                                                             {% for rating in 5|custom_range %}
                                                             {% with rating|add:"-0.5" as half_rating %}
                                                                 {% if product.rating >= rating %}
-                                                                <li><i class="fas fa-star"></i></li>
+                                                                <a><li><i class="fas fa-star"></i></li></a>
                                                                 {% elif product.rating >= half_rating %}
-                                                                <li><i class="fas fa-star-half-alt"></i></li>
+                                                                <a><li><i class="fas fa-star-half-alt"></i></li></a>
                                                                 {% else %}
-                                                                <li><i class="far fa-star"></i></li>
+                                                                <a><li><i class="far fa-star"></i></li></a>
                                                                 {% endif %}
                                                             {% endwith %}
                                                             {% endfor %}
@@ -230,11 +235,11 @@
                                                         {% for rating in 5|custom_range %}
                                                         {% with rating|add:"-0.5" as half_rating %}
                                                             {% if product.rating >= rating %}
-                                                            <li><i class="fas fa-star"></i></li>
+                                                            <a><li><i class="fas fa-star"></i></li></a>
                                                             {% elif product.rating >= half_rating %}
-                                                            <li><i class="fas fa-star-half-alt"></i></li>
+                                                            <a><li><i class="fas fa-star-half-alt"></i></li></a>
                                                             {% else %}
-                                                            <li><i class="far fa-star"></i></li>
+                                                            <a><li><i class="far fa-star"></i></li></a>
                                                             {% endif %}
                                                         {% endwith %}
                                                         {% endfor %}
@@ -285,6 +290,7 @@
         if(stock > 0){
             const url = window.location.origin
             const response = await fetch(url+'/cart/add/'+proId+'/'+1)
+            $('#modal-product-status').html('Successfully added to your Cart.');
         }else{
             $('#modal-product-status').html('Currently unavailable.');
         }

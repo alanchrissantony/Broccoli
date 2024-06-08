@@ -4,18 +4,30 @@
 
 {% block content %}
 {% include "components/admin/aside.html" %}
+
+<style>
+    .scrollable {
+        /* Set a background color for the scrollable area */
+        background-color: #fff;
+
+        /* Set overflow to auto to enable scrolling */
+        overflow-y: auto;
+
+        /* Optional: Set a width and height for the scrollable area */
+        height: 100px;
+    }
+</style>
 <!-- Layout container -->
 <div class="layout-page">
 
+    {% include "components/admin/searchbar.html" %}
     <!-- Content wrapper -->
     <div class="content-wrapper">
 
         <!-- Content -->
 
         <div class="container-xxl flex-grow-1 container-p-y">
-            <div class="d-flex">
-                <a href="/root/signout" class="btn btn-primary" style="margin-bottom: 1rem; margin-left: auto;">Sign Out</a>
-            </div>
+
             <div class="row">
                 <!-- Total Revenue -->
                 <div class="col-12 col-lg-8 order-2 order-md-3 order-lg-2 mb-4">
@@ -122,7 +134,7 @@
                                         </div>
                                     </div>
                                     <span>Sales</span>
-                                    <h3 class="card-title text-nowrap mb-1">$4,679</h3>
+                                    <h3 class="card-title text-nowrap mb-1">${{sales}}</h3>
                                     <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>
                                         +28.42%</small>
                                 </div>
@@ -325,106 +337,30 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body scrollable">
                             <ul class="p-0 m-0">
+                                {% for transaction in orders %}
                                 <li class="d-flex mb-4 pb-1">
                                     <div class="avatar flex-shrink-0 me-3">
+                                        {% if transaction.payment.payment_method == 'PayPal' %}
                                         <img src="{% static "assets/img/icons/unicons/paypal.png" %}" alt="User" class="rounded" />
-                                    </div>
-                                    <div
-                                        class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                        <div class="me-2">
-                                            <small class="text-muted d-block mb-1">Paypal</small>
-                                            <h6 class="mb-0">Send money</h6>
-                                        </div>
-                                        <div class="user-progress d-flex align-items-center gap-1">
-                                            <h6 class="mb-0">+82.6</h6>
-                                            <span class="text-muted">USD</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="d-flex mb-4 pb-1">
-                                    <div class="avatar flex-shrink-0 me-3">
+                                        {% else %}
                                         <img src="{% static "assets/img/icons/unicons/wallet.png" %}" alt="User" class="rounded" />
+                                        {% endif %}
                                     </div>
                                     <div
                                         class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                         <div class="me-2">
-                                            <small class="text-muted d-block mb-1">Wallet</small>
-                                            <h6 class="mb-0">Mac'D</h6>
+                                            <small class="text-muted d-block mb-1">{{transaction.payment.payment_method}}</small>
+                                            <h6 class="mb-0">{{transaction.user.first_name}} {{transaction.user.last_name}}</h6>
                                         </div>
                                         <div class="user-progress d-flex align-items-center gap-1">
-                                            <h6 class="mb-0">+270.69</h6>
+                                            <h6 class="mb-0">+{{transaction.price}}</h6>
                                             <span class="text-muted">USD</span>
                                         </div>
                                     </div>
                                 </li>
-                                <li class="d-flex mb-4 pb-1">
-                                    <div class="avatar flex-shrink-0 me-3">
-                                        <img src="{% static "assets/img/icons/unicons/chart.png" %}" alt="User" class="rounded" />
-                                    </div>
-                                    <div
-                                        class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                        <div class="me-2">
-                                            <small class="text-muted d-block mb-1">Transfer</small>
-                                            <h6 class="mb-0">Refund</h6>
-                                        </div>
-                                        <div class="user-progress d-flex align-items-center gap-1">
-                                            <h6 class="mb-0">+637.91</h6>
-                                            <span class="text-muted">USD</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="d-flex mb-4 pb-1">
-                                    <div class="avatar flex-shrink-0 me-3">
-                                        <img src="{% static "assets/img/icons/unicons/cc-success.png" %}" alt="User"
-                                            class="rounded" />
-                                    </div>
-                                    <div
-                                        class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                        <div class="me-2">
-                                            <small class="text-muted d-block mb-1">Credit Card</small>
-                                            <h6 class="mb-0">Ordered Food</h6>
-                                        </div>
-                                        <div class="user-progress d-flex align-items-center gap-1">
-                                            <h6 class="mb-0">-838.71</h6>
-                                            <span class="text-muted">USD</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="d-flex mb-4 pb-1">
-                                    <div class="avatar flex-shrink-0 me-3">
-                                        <img src="{% static "assets/img/icons/unicons/wallet.png" %}" alt="User" class="rounded" />
-                                    </div>
-                                    <div
-                                        class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                        <div class="me-2">
-                                            <small class="text-muted d-block mb-1">Wallet</small>
-                                            <h6 class="mb-0">Starbucks</h6>
-                                        </div>
-                                        <div class="user-progress d-flex align-items-center gap-1">
-                                            <h6 class="mb-0">+203.33</h6>
-                                            <span class="text-muted">USD</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="d-flex">
-                                    <div class="avatar flex-shrink-0 me-3">
-                                        <img src="{% static "assets/img/icons/unicons/cc-warning.png" %}" alt="User"
-                                            class="rounded" />
-                                    </div>
-                                    <div
-                                        class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                        <div class="me-2">
-                                            <small class="text-muted d-block mb-1">Mastercard</small>
-                                            <h6 class="mb-0">Ordered Food</h6>
-                                        </div>
-                                        <div class="user-progress d-flex align-items-center gap-1">
-                                            <h6 class="mb-0">-92.45</h6>
-                                            <span class="text-muted">USD</span>
-                                        </div>
-                                    </div>
-                                </li>
+                                {% endfor %}
                             </ul>
                         </div>
                     </div>

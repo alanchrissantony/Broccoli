@@ -26,8 +26,6 @@ class OrderStatus(models.Model):
         ('Out for delivery', 'Out for delivery'),
         ('Delivered', 'Delivered'),
         ('Cancelled', 'Cancelled'),
-        ('Returned', 'Returned'),
-        ('Refunded', 'Refunded'), 
     )
     
     name = models.CharField(max_length=20, choices=STATUS)
@@ -90,3 +88,10 @@ class Review(models.Model):
 
     def __str__(self):
         return self.product.name
+    
+class OrderCancel(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.order.order_number

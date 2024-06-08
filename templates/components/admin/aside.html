@@ -49,8 +49,32 @@
         <!-- Cards -->
         <li class="menu-item {% if request.resolver_match.url_name == "root_orders" %}active{% endif %}">
             <a href="/root/orders" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-blanket"></i>
+                <i class="menu-icon tf-icons bx bxs-shopping-bag"></i>
                 <div data-i18n="Basic">Orders</div>
+            </a>
+        </li>
+
+        <!-- Cards -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root_orders" %}active{% endif %}">
+            <a href="/root/orders" class="menu-link">
+                <i class='menu-icon tf-icons bx bxs-shopping-bag-alt' ></i>
+                <div data-i18n="Basic">Cancellation</div>
+            </a>
+        </li>
+
+        <!-- Cards -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root_wallet" %}active{% endif %}">
+            <a href="/root/orders" class="menu-link">
+                <i class='menu-icon tf-icons bx bxs-credit-card'></i>
+                <div data-i18n="Basic">Wallet</div>
+            </a>
+        </li>
+
+        <!-- Cards -->
+        <li class="menu-item {% if request.resolver_match.url_name == "root_orders" %}active{% endif %}">
+            <a href="/root/orders" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-blanket"></i>
+                <div data-i18n="Basic">Discount</div>
             </a>
         </li>
 

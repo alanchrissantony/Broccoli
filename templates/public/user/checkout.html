@@ -5,56 +5,106 @@
 
 {% block content %}
 
+{% include "components/user/toast.html" %}
 {% include "components/user/header.html" %}
 {% include "components/user/cart.html" %}
 {% include "components/user/mobile.html" %}
 {% include "components/user/breadcrumb.html" with title='Checkout' %}
 
 <style>
-    .active {
-        border: 1px solid #80B500;
-    }
+    /* Active border for selected address */
+.active {
+    border: 1px solid #80B500;
+}
 
-    .ltn__checkout-single-content {
-        position: relative;
-    }
+/* Position elements within the address card */
+.ltn__checkout-single-content {
+    position: relative;
+}
 
-    .bx.bxs-check-circle {
-        position: absolute;
-        top: 0;
-        left: 0;
-        background-color: white;
-        /* adjust as needed */
-        border-radius: 50%;
-        /* to make it a circle */
-        padding: 5px;
-        /* add padding to increase the size of the circle */
-        color: #80B500;
-    }
+/* Style for the check circle icon */
+.bx.bxs-check-circle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: white; /* adjust as needed */
+    border-radius: 50%; /* to make it a circle */
+    padding: 5px; /* add padding to increase the size of the circle */
+    color: #80B500;
+}
 
-    .icons {
-        position: absolute;
-        top: 0;
-        right: 0;
-        display: flex;
-    }
+/* Position the icons in the top right corner */
+.icons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+}
 
-    .icons i {
-        margin: 10px;
-        /* Adjust as needed */
-    }
+/* Add margin to the icons */
+.icons i {
+    margin: 10px; /* Adjust as needed */
+}
 
-    .action-icons {
-        cursor: pointer;
-        color: #a1acb8;
-    }
+/* Style for action icons */
+.action-icons {
+    cursor: pointer;
+    color: #a1acb8;
+}
 
-    .action-icons:hover {
-        color: #80B500;
-    }
-    .address-card{
-        cursor: pointer;
-    }
+.action-icons:hover {
+    color: #80B500;
+}
+
+/* Style for address card cursor */
+.address-card {
+    cursor: pointer;
+}
+
+/* Ensure all address cards have the same height */
+.address-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%; /* Make sure the card takes the full height of its parent */
+}
+
+/* Make sure the icons are at the bottom of the card */
+.address-card .ltn__checkout-single-content-info {
+    flex: 1; /* This ensures the content above the icons takes up as much space as possible */
+}
+
+/* Flexbox parent to ensure even height distribution */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.col-4 {
+    display: flex;
+}
+
+.ltn__checkout-inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.ltn__checkout-single-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Add some margin to the icons */
+.icons a {
+    margin-right: 10px;
+}
+
+.icons a:last-child {
+    margin-right: 0;
+}
 
 </style>
 <!-- WISHLIST AREA START -->
@@ -62,53 +112,56 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-            {% for message in messages %}<p style="text-align: center;" class="{{message.tags}}-message">{{message}}</p>{% endfor %}
-            <h4 class="title-2">Billing Details</h4>
-            <div class="row">
-                {% for address in address %}
-                <div class="col-lg-4">
-                    <div class="ltn__checkout-inner">
-                        <div class="ltn__checkout-single-content mt-50 address-card {% if address.is_default %} active {% endif %}" onclick="selectAddress(this, '{{ address.id }}')">
-                            <div class="ltn__checkout-single-content-info">
-                                {% if address.is_default %}
-                                <i class="bx bxs-check-circle"></i>
-                                {% endif %}
-                                <h6>{{ address.address_id.first_name }} {{ address.address_id.last_name }}</h6>
-                                <p>{{ address.address_id.address }}, {{ address.address_id.additional }}, <br>
-                                    {{ address.address_id.city }}, {{ address.address_id.state }} 
-                                    {{ address.address_id.zip_code }}, <br>
-                                    {{ address.address_id.country }}<br>
-                                    Phone number: {{ address.address_id.phone_number }}<br>
-                                    Email: {{ address.address_id.email }}<br>
-                                    {{ address.address_id.order_instruction }}
-                                </p>
-                                <div class="icons">
-                                    <a href="/user/address/edit/{{address.address_id.id}}"><i
-                                            class="bx bxs-pencil action-icons"></i></a>
-                                    <a href="/user/address/delete/{{address.address_id.id}}"><i
-                                            class="bx bxs-trash action-icons"></i></a>
+                {% if messages %}
+                {% for message in messages %}
+                <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
+                {% endfor %}
+                {% endif %}
+
+                <h4 class="title-2">Billing Details</h4>
+                <div class="row">
+                    {% for address in address %}
+                    <div class="col-4">
+                        <div class="ltn__checkout-inner">
+                            <div class="ltn__checkout-single-content mt-50 address-card {% if address.is_default %} active {% endif %}" onclick="selectAddress(this, '{{ address.id }}')">
+                                <div class="ltn__checkout-single-content-info">
+                                    {% if address.is_default %}
+                                    <i class="bx bxs-check-circle"></i>
+                                    {% endif %}
+                                    <h6>{{ address.address_id.first_name }} {{ address.address_id.last_name }}</h6>
+                                    <p>{{ address.address_id.address }}, {{ address.address_id.additional }}, <br>
+                                        {{ address.address_id.city }}, {{ address.address_id.state }}
+                                        {{ address.address_id.zip_code }}, <br>
+                                        {{ address.address_id.country }}<br>
+                                        Phone number: {{ address.address_id.phone_number }}<br>
+                                        Email: {{ address.address_id.email }}<br>
+                                        {{ address.address_id.order_instruction }}
+                                    </p>
+                                    <div class="icons">
+                                        <a href="/user/address/edit/{{address.address_id.id}}"><i class="bx bxs-pencil action-icons"></i></a>
+                                        <a href="/user/address/delete/{{address.address_id.id}}"><i class="bx bxs-trash action-icons"></i></a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
-        </div>
 
-                <div class="col-12">
-                    <a href="/user/address/add"><button class="btn theme-btn-1 btn-effect-1 text-uppercase" type="button"><i
-                        class='bx bx-plus'></i> Add address</button></a>
-                </div>
-                
-            
+            <div class="col-12">
+                <a href="/user/address/add"><button class="btn theme-btn-1 btn-effect-1 text-uppercase" type="button"><i
+                            class='bx bx-plus'></i> Add address</button></a>
+            </div>
+
+
             <form method="post" class="row">
                 {% csrf_token %}
                 <div class="col-lg-6">
                     <div class="ltn__checkout-payment-method mt-50">
                         <h4 class="title-2">Payment Method</h4>
                         <div id="checkout_accordion_1">
-        
+
                             <!-- card -->
                             <div class="card" onclick="selectPaymentMethod('Cash on delivery')">
                                 <h5 class="ltn__card-title" data-toggle="collapse" data-target="#faq-item-2-2"
@@ -134,7 +187,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <input type="hidden" id="selectedPaymentMethod" name="payment_method" value="Cash on delivery">
+                            <input type="hidden" id="selectedPaymentMethod" name="payment_method"
+                                value="Cash on delivery">
                             <input type="hidden" id="selectedAddressId" name="address">
                         </div>
                         <div class="ltn__payment-note mt-30 mb-30">
@@ -154,10 +208,12 @@
                                     <td>Cart Subtotal</td>
                                     <td>${{total}}</td>
                                 </tr>
+                                {% if discount > 0 %}
                                 <tr>
                                     <td>Discount</td>
                                     <td>-${{discount}}</td>
                                 </tr>
+                                {% endif %}
                                 {% if coupon %}
                                 <tr>
                                     <td>Coupon</td>
@@ -166,7 +222,7 @@
                                 {% endif %}
                                 {% if wallet %}
                                 <tr>
-                                    <td>Coupon</td>
+                                    <td>Wallet</td>
                                     <td>-${{wallet}}</td>
                                 </tr>
                                 {% endif %}
@@ -195,6 +251,8 @@
 {% include "components/user/feature.html" %}
 {% include "components/user/footer.html" %}
 
+
+
 <script>
     function selectAddress(addressCard, addressId) {
         // Remove 'active' class from all address cards
@@ -210,6 +268,7 @@
     function selectPaymentMethod(method) {
         document.getElementById('selectedPaymentMethod').value = method;
     }
+
 </script>
 
 {% endblock content %}

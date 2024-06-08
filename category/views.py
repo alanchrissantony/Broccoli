@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from core.models import image_upload_path
 from django.conf import settings
-import os, json
+import os
 
 # Create your views here.
 class Categories:

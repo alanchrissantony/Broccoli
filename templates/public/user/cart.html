@@ -5,15 +5,18 @@
 
 {% block content %}
     
+    {% include "components/user/toast.html" %}
     {% include "components/user/header.html" %}
     {% include "components/user/cart.html" %}
     {% include "components/user/mobile.html" %}
     {% include "components/user/breadcrumb.html" with title='Cart' %}
 
     <style>
+        {% if not coupon %}
         #cart-coupon-row{
             display: none;
         }
+        {% endif %}
         #cart-wallet-row{
             display: none;
         }
@@ -85,6 +88,11 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
+                        {% endfor %}
+                    {% endif %}
                     <div class="shoping-cart-inner">
                         {% if cart_items %}
                         <form action="/cart">
@@ -103,10 +111,14 @@
                                             <td class="cart-product-price">${{cart_item.product.price}}</td>
                                             <td class="cart-product-quantity">
                                                 <div class="cart-plus-minus" data-product-id="{{ cart_item.product.id }}" data-product-stock="{{ cart_item.product.stock }}" data-product-min="{{ 0 }}">
-                                                    <input type="text" value="{{cart_item.quantity}}" name="qtybutton" class="cart-plus-minus-box">
+                                                    <input type="text" value="{{cart_item.quantity}}" name="qtybutton" class="cart-plus-minus-box" readonly>
                                                 </div>
                                             </td>
+                                            {% if cart_item.quantity > cart_item.product.stock %}
+                                            <td class=".text-danger">Out of Stock</td>
+                                            {% else %}
                                             <td class="cart-product-subtotal" id="cart-product-subtotal">${{cart_item.sub_total}}</td>
+                                            {% endif %}
                                             <td>
                                                 <a href="/cart/delete/{{cart_item.product.id}}"><i class="btn btx bx bx-trash"></i></a>
                                             </td>
@@ -115,10 +127,11 @@
                                     <tr class="cart-coupon-row">
                                         <td colspan="6">
                                             <div class="cart-coupon">
-                                                <input type="text" name="cart-coupon" id="coupon" placeholder="Coupon code" required>
+                                                <input type="text" name="cart-coupon" id="coupon" placeholder="Coupon code" {% if coupon %}value="{{coupon}}"{% endif %} required>
                                                 <button onclick="handle_coupon()" type="button" class="btn theme-btn-2 btn-effect-2" id="coupon-btn">Apply Coupon</button>
                                             </div>
                                         </td>
+                                        {% if wallet > 0 %}
                                         <td>
                                             <label class="switch">
                                                 <input type="checkbox" id="wallet-input" name="wallet-input" value="1" onchange="handle_wallet()">
@@ -126,6 +139,7 @@
                                             </label>
                                             <label>Pay <span id="cart-total-wallet">${{wallet}}</span> from wallet</label>
                                         </td>
+                                        {% endif %}
                                     </tr>
                                 </tbody>
                             </table>
@@ -137,15 +151,17 @@
                                 <tbody>
                                     <tr>
                                         <td>Cart Subtotal</td>
-                                        <td>${{total}}</td>
+                                        <td id="cart-total-ajax">${{total}}</td>
                                     </tr>
+                                    {% if discount > 0 %}
                                     <tr>
                                         <td>Discount</td>
-                                        <td>-${{discount}}</td>
+                                        <td id="cart-discount-ajax">-${{discount}}</td>
                                     </tr>
+                                    {% endif %}
                                     <tr id="cart-coupon-row">
                                         <td>Coupon</td>
-                                        <td id="cart-coupon"></td>
+                                        <td id="cart-coupon">-${{coupon.discount}}</td>
                                     </tr>
                                     <tr id="cart-wallet-row">
                                         <td>Wallet</td>
@@ -153,11 +169,11 @@
                                     </tr>
                                     <tr>
                                         <td>Shipping and Handing</td>
-                                        <td>${{shipping}}</td>
+                                        <td id="cart-shipping-ajax">${{shipping}}</td>
                                     </tr>
                                     <tr>
                                         <td>Vat</td>
-                                        <td>${{vat}}</td>
+                                        <td id="cart-vat-ajax">${{vat}}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Order Total</strong></td>
@@ -206,6 +222,7 @@
                 success: function(response) {
                     // Handle successful response
                     if (isChecked) {
+                        console.log(response);
                         $('#cart-wallet-row').show();
                         $('#cart-wallet').text(`-$${response.wallet}`);
                         $('#cart-total').text(`$${response.price}`);
@@ -239,10 +256,12 @@
                         $('#cart-coupon-row').show();
                         $('#cart-coupon').text(`-$${response.coupon}`);
                         $('#cart-total').text(`$${response.price}`);
+                        $('#cart-total-wallet').text(`$${response.wallet}`);
                         $('#coupon-btn').text('Coupon Applied');
                     } else {
                         $('#cart-coupon-row').hide();
                         $('#cart-total').text(`$${response.price}`);
+                        $('#cart-total-wallet').text(`$${response.wallet}`);
                         $('#coupon-btn').text('Invalid Coupon');
                     }
                     // Update the page content here using the response data

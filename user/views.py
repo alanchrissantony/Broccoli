@@ -13,6 +13,7 @@ from django.urls import reverse
 from wallet.views import create_wallet
 from order.models import Order
 from wallet.models import Transaction
+from django.core.paginator import Paginator
 
 
 # Create your views here.
@@ -31,9 +32,12 @@ def verification_required(function):
   return wrapper
 
 def send(request):
-    user = request.user
+    email = request.GET.get('email')
+    if email is None:
+        email = request.user.email
     otp = otp_verification.generate_token()
-    send_otp(user.email, otp)
+    print(otp)
+    send_otp(email, otp)
     messages.success(request, "Verification code sent to your email address.")
     return True
 
@@ -131,9 +135,9 @@ def register(request):
 
     # Handle POST request for user registration
     if request.method == 'POST':
-        first_name = request.POST.get('firstname')
-        last_name = request.POST.get('lastname')
-        email = request.POST.get('email')
+        first_name = request.POST.get('firstname').strip(' ')
+        last_name = request.POST.get('lastname').strip(' ')
+        email = request.POST.get('email').strip(' ')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirmpassword')
         username = email.split('@')[0].lower()
@@ -172,6 +176,7 @@ def register(request):
                     auth.login(request, user)
                     create_wallet(user)
                 otp = otp_verification.generate_token()
+                print(otp)
                 send_otp(email, otp)  # Send OTP to the user's email
                 messages.success(request, "Verification code sent to your email address.")
                 return redirect('verification')
@@ -215,6 +220,49 @@ def verification(request):
         }         
         return render(request, 'public/user/verification.html', context)
     return redirect('signin')
+
+
+
+
+def verify(request):
+    
+    if request.method == 'POST':
+        if 'user_id' in request.session:
+            password = request.POST.get('password')
+            confirm_password = request.POST.get('confirmpassword')
+
+            if password != confirm_password:
+                messages.error(request, "The passwords provided do not match!")
+            elif Validator.validate_password(password):
+                messages.error(request, 'The password must contain at least 8 characters, including at least one letter, one digit, and one special character (@$!%*?&).')
+            else:
+                user_id = request.session.get('user_id')
+                user = Account.objects.get(id=user_id)
+
+                user.set_password(password)
+                user.save()
+                del request.session['user_id']
+                messages.success(request, "Password has been successfully updated.")
+                return redirect('signin')
+            return redirect('otp')
+
+
+        otp_secret = request.POST['otp']
+        email = request.POST['email']
+        if otp_verification.verify_token(otp_secret):
+            try:
+                user = Account.objects.get(email=email)
+                request.session['user_id'] = user.id
+                # Update only relevant field
+                return render(request, 'public/user/password.html')
+            except Account.DoesNotExist:
+                
+                messages.error(request, 'User not found!')
+        else:
+            messages.error(request, 'Invalid OTP')
+            
+    return render(request, 'public/user/otp.html')
+
 
 class AddressUser:
 

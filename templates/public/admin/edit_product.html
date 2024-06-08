@@ -32,6 +32,7 @@
             <div class="row">
                 <div class="col-md-12">
                     {% include "components/admin/product_manage_button.html" %}
+                    {% include "components/admin/modal-crop.html" %}
                     <div class="card mb-4">
                         <h5 class="card-header">Product Details</h5>
                         <!-- Account -->
@@ -162,15 +163,8 @@
             var reader = new FileReader(); // Create a FileReader object
             reader.onload = function(event) {
                 var img = new Image(); // Create an Image object
-                img.src = event.target.result; // Set the src attribute to the data URL of the selected file
-                img.onload = function() {
-                    // Replace the src attribute of the existing image with the new image's data URL
-                    
+                document.getElementById('uploadedAvatar').src = event.target.result; // Set the src attribute to the data URL of the selected file
 
-                    $(document).ready(function() {
-                        $('#liton_wishlist_modal').modal('show');
-                    });
-                };
             };
             reader.readAsDataURL(file); // Read the contents of the selected file
         }
@@ -212,30 +206,7 @@
     });
 
 // JavaScript code
-document.addEventListener("DOMContentLoaded", function() {
-    // Get all the images with class 'image-container'
-    const images = document.querySelectorAll('.image-container');
 
-    // Add click event listener to each image
-    images.forEach(function(image) {
-        image.addEventListener('click', function() {
-            // Get the source of the clicked image
-            const src = this.querySelector('img').src;
-
-            // Set the source of uploadedAvatar to the clicked image source
-            document.getElementById('uploadedAvatar').src = src;
-            $('#liton_wishlist_modal').modal('hide');
-
-            // Blur all images
-            images.forEach(function(imgContainer) {
-                imgContainer.classList.remove('focused');
-            });
-
-            // Focus on the clicked image container
-            this.classList.add('focused');
-        });
-    });
-});
 </script>
 
 {% endblock content %}

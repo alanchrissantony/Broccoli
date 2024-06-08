@@ -3,7 +3,36 @@
 {% block title %}Account{% endblock title %}
 
 {% block content %}
+
+<style>
+    .table-wrapper {
+        max-height: 500px; /* Adjust the height as needed */
+        overflow-y: auto;
+    }
+
+    .table-wrapper::-webkit-scrollbar {
+        display: none;  /* Safari and Chrome */
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table thead {
+        position: sticky;
+        top: 0;
+        background-color: #fff; /* Background color to ensure the header is visible */
+        z-index: 1; /* Ensure the header stays on top of the body rows */
+    }
+
+    .table th, .table td {
+        padding: 8px;
+        text-align: left;
+    }
+</style>
     
+    {% include "components/user/toast.html" %}
     {% include "components/user/header.html" %}
     {% include "components/user/cart.html" %}
     {% include "components/user/mobile.html" %}
@@ -22,8 +51,8 @@
                                     <div class="ltn__tab-menu-list mb-50">
                                         <div class="nav">
                                             <a class="active show" data-toggle="tab" href="#liton_tab_1_1">Dashboard <i class="fas fa-home"></i></a>
-                                            <a id="a_liton_tab_1_2" data-toggle="tab" href="#liton_tab_1_2">Orders <i class="fas fa-file-alt"></i></a>
-                                            <a data-toggle="tab" href="#liton_tab_1_3">Wallet <i class="fas fa-credit-card"></i></a>
+                                            <a id="#liton_tab_1_2" data-toggle="tab" href="#liton_tab_1_2">Orders <i class="fas fa-file-alt"></i></a>
+                                            <a id="#liton_tab_1_3" data-toggle="tab" href="#liton_tab_1_3">Wallet <i class="fas fa-credit-card"></i></a>
                                             <a data-toggle="tab" href="#liton_tab_1_4">address <i class="fas fa-map-marker-alt"></i></a>
                                             <a data-toggle="tab" href="#liton_tab_1_5">Account Details <i class="fas fa-user"></i></a>
                                             <a href="/user/signout">Logout <i class="fas fa-sign-out-alt"></i></a>
@@ -34,14 +63,19 @@
                                     <div class="tab-content">
                                         <div class="tab-pane fade active show" id="liton_tab_1_1">
                                             <div class="ltn__myaccount-tab-content-inner">
-                                                {% for message in messages %}<p style="text-align: center;" class="{{message.tags}}-message">{{message}}</p>{% endfor %}
+                                                {% if messages %}
+                                                    {% for message in messages %}
+                                                        <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
+                                                    {% endfor %}
+                                                {% endif %}
+                
                                                 <p>Hello <strong>{{request.user.first_name}} {{request.user.last_name}}</strong> (not <strong>{{request.user.first_name}}</strong>? <small><a href="/user/signout">Log out</a></small> )</p>
                                                 <p>From your account dashboard you can view your <span>recent orders</span>, manage your <span>shipping and billing addresses</span>, and <span>edit your password and account details</span>.</p>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="liton_tab_1_2">
                                             <div class="ltn__myaccount-tab-content-inner">
-                                                <div class="table-responsive">
+                                                <div class="table-responsive table-wrapper">
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
@@ -64,12 +98,13 @@
                                                             {% endfor %}
                                                         </tbody>
                                                     </table>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="liton_tab_1_3">
                                             <div class="ltn__myaccount-tab-content-inner">
-                                                <div class="table-responsive">
+                                                <div class="table-responsive table-wrapper">
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
@@ -166,12 +201,12 @@
 
     <script>
         window.onload = function() {
-          if (window.location.hash === "#liton_tab_1_2") {
-            const targetTabContent = document.getElementById("a_liton_tab_1_2");
+          const hash = window.location.hash
+            console.log(hash);
+            const targetTabContent = document.getElementById(hash);
             targetTabContent.click();
             window.scrollTo(0, 0);
           }
-        };
       </script>
 
 {% endblock content %}

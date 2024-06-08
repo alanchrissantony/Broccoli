@@ -53,11 +53,12 @@ def order_product(request, cart_items, order, user, payment):
 def about(request):
     return render(request, 'public/user/about.html')
 
-def coupon(request, wallet_pay=0, coupon=None, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None):
+def coupon(request, wallet=None, wallet_pay=0, coupon=None, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None):
     coupon_code = request.GET.get('coupon')
 
     try:
         if request.user:
+            wallet = Wallet.objects.filter(user=request.user).first()
             cart_items = CartItem.objects.filter(user=request.user, is_active=True) 
         else: 
             cart = Cart.objects.get(cart_id=cart_id(request))
@@ -73,6 +74,12 @@ def coupon(request, wallet_pay=0, coupon=None, total=0, quantity=0, discount=0, 
     except:       
         pass
 
+    if wallet:
+        if wallet.balance > price: 
+            wallet_pay = price          
+        else:
+            wallet_pay = wallet.balance
+
 
     if coupon_code:
         coupon = Coupon.objects.filter(code=coupon_code).first()
@@ -87,22 +94,38 @@ def coupon(request, wallet_pay=0, coupon=None, total=0, quantity=0, discount=0, 
                 price = round(price - coupon_discount, 2)
 
             if 'wallet' in request.session:
-                wallet = Wallet.objects.filter(user=request.user).first()
+                
 
                 if wallet:
-                    if wallet.balance > price:           
+                    if wallet.balance > price: 
+                        wallet_pay = price          
                         price = 0
                     else:
+                        wallet_pay = wallet.balance
                         price -= float(wallet.balance)
 
+            price = round(price, 2)
             context={
                 'coupon':coupon.discount,
                 'price':price,
+                'wallet':wallet_pay
             }
             return JsonResponse(context)
         else:
             if 'coupon' in request.session:
                 del request.session['coupon']
+
+            if 'wallet' in request.session:
+                
+
+                if wallet:
+                    if wallet.balance > price: 
+                        wallet_pay = price          
+                        price = 0
+                    else:
+                        wallet_pay = wallet.balance
+                        price -= float(wallet.balance)
+                price = round(price, 2)
 
     context={
         'coupon':None,
@@ -163,9 +186,10 @@ def wallet(request, wallet_pay=0, coupon_code=None, coupon=None, total=0, quanti
             wallet_pay = wallet.balance
             if status == 'true':
                 price -= float(wallet_pay)
+    price = round(price, 2)
     context={
-        'wallet':wallet_pay,
         'price':price,
+        'wallet':wallet_pay
     }
     
     return JsonResponse(context)
@@ -182,6 +206,7 @@ def checkout(request):
     coupon = None
     wallet = None
     wallet_pay = None
+    out_of_stock = None
     try:
         if user.id:
             cart_items = CartItem.objects.filter(user=user, is_active=True)
@@ -194,12 +219,22 @@ def checkout(request):
         vat = round((total * 18) / 100, 2)
         shipping = 15
         price = round(float(total + vat + shipping) - discount, 2)
+
+        for cart_item in cart_items:
+            if cart_item.product.stock < cart_item.quantity:
+                out_of_stock = cart_item
     except Cart.DoesNotExist:
         total = 0
         discount = 0
         vat = 0
         shipping = 0
         price = 0
+    
+    if len(cart_items)<1:
+        return redirect('cart')
+    elif out_of_stock:
+        messages.warning(request, "Unfortunately, some items in your cart are out of stock")
+        return redirect('cart')
 
     if 'coupon' in request.session:
         coupon = Coupon.objects.filter(code=request.session.get('coupon')).first()
@@ -224,8 +259,12 @@ def checkout(request):
         if addressId:
             address = Address.objects.get(id=addressId)
         else:
-            address = UserAddress.objects.get(user_id=user, is_default=True)
-            address = Address.objects.get(id=address.id)
+            address = UserAddress.objects.filter(user_id=user, is_default=True).first()
+            if address:
+                address = Address.objects.get(id=address.id)
+            else:
+                messages.warning(request, "Delivery address has not been selected!")
+                return redirect('checkout')
     
         order = Order.objects.create(
             user=user,
@@ -252,7 +291,7 @@ def checkout(request):
                 order.wallet = wallet.balance
                 wallet.balance = 0
             del request.session['wallet']
-            order.current_price = order.price - order.wallet
+            order.current_price = round(order.price - float(order.wallet), 2)
             Transaction.objects.create(
                 transaction = uuid4(),
                 user = wallet.user,
@@ -278,6 +317,9 @@ def checkout(request):
             order.statuses.add(status)
             order.is_ordered = True
             order.payment = payment
+            if order.current_price <= 0:
+                payment.status = 'Paid'
+                payment.save()
             order.save()
 
         return order_product(request, cart_items, order, user, payment)
@@ -299,6 +341,7 @@ def checkout(request):
             wallet_pay = wallet.balance
             price -= float(wallet_pay)
         
+    price = round(price, 2)
 
     context = {
         'address': address,
@@ -429,8 +472,8 @@ def history(request):
 @verification_required
 def home(request):
     
-    categories = Category.objects.all()
-    products = Product.objects.all()
+    categories = Category.objects.all().exclude(is_available=False)
+    products = Product.objects.all().exclude(is_available=False)
     context = {
         'categories':categories,
         'products':products

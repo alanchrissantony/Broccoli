@@ -11,5 +11,6 @@ urlpatterns = [
     path('register/', views.register, name="register"),
     path('verification/', views.verification, name="verification"),
     path('verification/resend', views.send, name="resend"),
-    path('alter/', views.password, name="paasword"),
+    path('password-reset/', views.verify, name="otp"),
+    path('password-reset/new-password/', views.password, name="password"),
 ]

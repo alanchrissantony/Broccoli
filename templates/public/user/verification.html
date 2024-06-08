@@ -3,7 +3,8 @@
 {% block title %}Verification{% endblock title %}
 
 {% block content %}
-    
+
+    {% include "components/user/toast.html" %}
     {% include "components/user/breadcrumb.html" with title='Verification' %}
 
     <!-- LOGIN AREA START -->
@@ -22,14 +23,18 @@
                     <div class="account-login-inner">
                         <form method="post" class="ltn__form-box contact-form-box">
                             {% csrf_token %}
-                            {% for message in messages %}<p style="text-align: center;" class="{{message.tags}}-message">{{message}}</p>{% endfor %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
+                                {% endfor %}
+                            {% endif %}
                             <div class="searchbox-wrap" style="display: flex;">
-                                <input type="email" name="email" placeholder="Email*" value="{{email}}">
-                                <button class="theme-btn-1 btn" type="submit" style="
-                                height                            : 65px;
-                                border                            : none;
-                                cursor                            : pointer; 
-                                cursor                            : hand;"><i class="fas fa-arrow-right"></i></button>
+                                <input type="email" name="email" placeholder="Email*" value="{{email}}" readonly>
+                                    <a href="/user/signout"><button class="theme-btn-1 btn" type="button" style="
+                                    height                            : 65px;
+                                    border                            : none;
+                                    cursor                            : pointer; 
+                                    cursor                            : hand;"><i class='bx bx-log-out-circle bx-md'></i></button></a>
                             </div>
                             <input type="password" name="otp" placeholder="OTP*">
                             <div class="btn-wrapper mt-0">

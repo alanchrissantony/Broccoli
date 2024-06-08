@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from order.models import OrderProduct, Order, Review
+from order.models import OrderProduct, Order, Review, OrderCancel, OrderStatus
 from django.core.paginator import Paginator
 from wallet.models import Wallet, Transaction
 from django.contrib.auth.decorators import login_required
@@ -8,6 +8,7 @@ from product.models import Product
 from accounts.models import Account
 from uuid import uuid4
 from decimal import Decimal
+from django.contrib import messages
 
 # Create your views here.
 @login_required(login_url='signin')
@@ -72,18 +73,42 @@ def delete(request, id):
             )
             wallet.balance += Decimal(order.price)
             wallet.save()
-        
+        cancel = OrderCancel.objects.create(order=order)
         for product in products:
             product.product.stock += product.quantity
             product.product.save()
-            product.delete()
-        order.delete()
+        last_status = order.statuses.last().name
+        if last_status == 'Order Confirmed':
+            status, _ = OrderStatus.objects.get_or_create(name='Shipped')
+            order.statuses.add(status)
+            last_status = 'Shipped'
+        
+        if last_status == 'Shipped':
+            status, _ = OrderStatus.objects.get_or_create(name='Out for delivery')
+            order.statuses.add(status)
+        status, _ = OrderStatus.objects.get_or_create(name='Cancelled')
+        order.statuses.add(status)
+        order.save()
     
     except:
         pass
     return redirect('account')
 
 def tracking(request):
+    if request.method == "POST":
+        number = request.POST.get('number')
+        email = request.POST.get('email')
+
+        user = Account.objects.filter(email=email).first()
+        
+        if user:
+            order = Order.objects.filter(order_number=number, user=user).first()
+            if order:
+                return redirect(f'/orders/{order.id}')
+            messages.error(request, "Invalid credentials!")
+        else:
+            messages.error(request, "Invalid email!")
+        
     return render(request, 'public/user/order-tracking.html')
 
 def invoice(request, id):

@@ -5,7 +5,7 @@
 {% block content %}
 
 
-    
+    {% include "components/user/toast.html" %}
     {% include "components/user/breadcrumb.html" with title='Register' %}
 
     <!-- LOGIN AREA START (Register) -->
@@ -24,7 +24,11 @@
                     <div class="account-login-inner">
                         <form class="ltn__form-box contact-form-box" id="myForm" method="post">
                             {% csrf_token %}
-                            {% for message in messages %}<p style="text-align: center;" class="{{message.tags}}-message">{{message}}</p>{% endfor %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
+                                {% endfor %}
+                            {% endif %}
                             <input type="text" name="firstname" placeholder="First Name" required>
                             <input type="text" name="lastname" placeholder="Last Name" required>
                             <input type="email" name="email" placeholder="Email*" required>

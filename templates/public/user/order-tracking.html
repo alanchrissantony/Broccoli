@@ -4,6 +4,7 @@
 
 {% block content %}
     
+    {% include "components/user/toast.html" %}
     {% include "components/user/header.html" %}
     {% include "components/user/cart.html" %}
     {% include "components/user/mobile.html" %}
@@ -13,14 +14,20 @@
     <div class="ltn__login-area mb-120">
         <div class="container">
             <div class="row">
+                {% if messages %}
+                    {% for message in messages %}
+                        <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
+                    {% endfor %}
+                {% endif %}
                 <div class="col-lg-8 offset-lg-2">
                     <div class="account-login-inner section-bg-1">
-                        <form action="#" class="ltn__form-box contact-form-box">
+                        <form method="post" class="ltn__form-box contact-form-box">
+                            {% csrf_token %}
                             <p class="text-center"> To track your order please enter your Order ID in the box below and press the "Track Order" button. This was given to you on your receipt and in the confirmation email you should have received. </p>
                             <label>Order ID</label>
-                            <input type="text" name="email" placeholder="Found in your order confirmation email.">
+                            <input type="text" name="number" placeholder="Found in your order confirmation email." required>
                             <label>Billing email</label>
-                            <input type="text" name="email" placeholder="Email you used during checkout.">
+                            <input type="email" name="email" placeholder="Email you used during checkout." required>
                             <div class="btn-wrapper mt-0 text-center">
                                 <button class="btn theme-btn-1 btn-effect-1 text-uppercase" type="submit">Track Order</button>
                             </div>

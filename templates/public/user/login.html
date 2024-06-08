@@ -4,6 +4,7 @@
 
 {% block content %}
     
+    {% include "components/user/toast.html" %}
     {% include "components/user/breadcrumb.html" with title='Sign In' %}
 
     <!-- LOGIN AREA START -->
@@ -22,14 +23,18 @@
                     <div class="account-login-inner">
                         <form class="ltn__form-box contact-form-box" method="post">
                             {% csrf_token %}
-                            {% for message in messages %}<p style="text-align: center;" class="{{message.tags}}-message">{{message}}</p>{% endfor %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
+                                {% endfor %}
+                            {% endif %}
                             <input type="text" name="email" placeholder="Email*">
                             <input type="password" name="password" placeholder="Password*">
                             <div class="btn-wrapper mt-0">
                                 <button class="theme-btn-1 btn btn-block" type="submit">SIGN IN</button>
                             </div>
                             <div class="go-to-btn mt-20">
-                                <a href="#"><small>FORGOTTEN YOUR PASSWORD?</small></a>
+                                <a href="/user/password-reset"><small>FORGOTTEN YOUR PASSWORD?</small></a>
                             </div>
                         </form>
                     </div>

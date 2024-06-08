@@ -135,6 +135,11 @@
         background: #26A541;
     }
 
+    #progressbar li.cancel:before,
+    #progressbar li.cancel:after{
+        background-color:#D95ABE;
+    }
+
     .dropdown {
         position: relative;
         display: inline-block;
@@ -204,7 +209,7 @@
                                         <div class="progress-track" style="width: 100%;">
                                             <ul id="progressbar">
                                                 {% for status in order.statuses.all %}
-                                                <li class="step{{ forloop.counter }} active"
+                                                <li class="step{{ forloop.counter }} active {% if status.name == 'Cancelled' %}cancel{% endif %}"
                                                     id="step{{ forloop.counter }}">{{ status.name }}</li>
                                                 {% endfor %}
                                                 {% if order.statuses.count < 2 %}
@@ -290,6 +295,7 @@
                                         <h6>Method: {{ product.payment.payment_method }}</h6>
                                     </td>
                                 </tr>
+                                {% if order.statuses.last.name == "Delivered" %}
                                 <tr>
                                     <td colspan="5">
                                         <div class="ltn__checkout-single-content ltn__returning-customer-wrap">
@@ -328,11 +334,14 @@
                                         </div>
                                     </td>
                                 </tr>
+                                {% endif %}
                             </tbody>
                         {% endfor %}
                     </table>
                     <div class="mt-20 text-right">
-                        <a href="/orders/delete/{{order.id}}" class="theme-btn-1 btn btn-effect-1">Cancel</a>
+                        {% if order.statuses.last.name != "Delivered" and order.statuses.last.name != "Cancelled" %}
+                            <a href="/orders/delete/{{order.id}}" class="theme-btn-1 btn btn-effect-1">Cancel</a>
+                        {% endif %}
                         <a href="/user/account/#liton_tab_1_2" class="theme-btn-2 btn btn-effect-2">Back</a>
                     </div>
                         <div class="ltn__pagination-area text-center">

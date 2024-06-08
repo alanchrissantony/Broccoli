@@ -77,6 +77,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.CartCounter',
+                'cart.context_processors.WishlistCounter',
                 'cart.context_processors.WalletProcessor',
             ],
             'libraries':{

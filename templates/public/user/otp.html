@@ -1,0 +1,147 @@
+{% extends "public/user/base.html" %}
+
+{% block title %}Verification{% endblock title %}
+
+{% block content %}
+    {% include "components/user/toast.html" %}
+    {% include "components/user/breadcrumb.html" with title='Verification' %}
+
+    <!-- LOGIN AREA START -->
+    <div class="ltn__login-area pb-65">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title-area text-center">
+                        <h1 class="section-title">Verify <br>Your Account</h1>
+                        <p>Get access to your Orders, Wishlist and Recommendations</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="account-login-inner">
+                        <form method="post" class="ltn__form-box contact-form-box">
+                            {% csrf_token %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
+                                {% endfor %}
+                            {% endif %}
+                
+                            <div id="resend" class="searchbox-wrap email-verification-form" style="display: flex;">
+                                <input type="email" id="email" name="email" placeholder="Email*">
+                                <button id="resend-button" onclick="send()" class="theme-btn-1 btn verification-button" type="button" type="button">
+                                  <i id="resend-icon" class="fas fa-arrow-right"></i>
+                                  <span id="timer">05:00</span>
+                                </button>
+                              </div>
+                            <input type="password" name="otp" placeholder="OTP*">
+                            <div class="btn-wrapper mt-0">
+                                <button class="theme-btn-1 btn btn-block" type="submit">VERIFY</button>
+                            </div>
+                                <style>
+                                    #timer {
+                                        font-weight: bold;
+                                        margin-top: 20px;
+                                        display: none;
+                                    }
+                                    #timer.active{
+                                        display: contents;
+                                    }
+
+                                    .verification-button {
+                                    /* Base styles for the button */
+                                    /* Adjust these styles as needed for appearance */
+                                    height: 65px;
+                                    border: none;
+                                    cursor: pointer;
+                                    }
+
+                                    .verification-button.disabled {
+                                    /* Styles for the disabled button state */
+                                    opacity: 0.5;
+                                    cursor: default;
+                                    }
+
+                                    .verification-button.disabled i {
+                                    /* Hide icon for disabled button */
+                                    display: none;
+                                    }
+                                </style>
+                            <div class="go-to-btn mt-20">
+                                <a href="/user/signin"><small>SIGN IN?</small></a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- LOGIN AREA END -->
+<script>
+
+document.addEventListener('DOMContentLoaded', (event) => {
+  let timeLeft = 300; // 5 minutes in seconds
+  const timerElement = document.getElementById('timer');
+  const resendButton = document.getElementById('resend-button');
+  const resendIcon = document.getElementById('resend-icon');
+  let countdown;
+
+  const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    };
+
+  const startCountdown = () => {
+    countdown = setInterval(() => {
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        timerElement.textContent = '00:00';
+        timerElement.classList.remove('active'); // Enable button
+        resendButton.classList.remove('disabled'); // Enable button
+        resendIcon.style.display = 'inline'; // Show icon
+      } else {
+        timerElement.textContent = formatTime(timeLeft);
+        timeLeft--;
+      }
+    }, 1000);
+  };
+
+  const resetTimer = () => {
+    clearInterval(countdown);
+    timeLeft = 300;
+    timerElement.textContent = formatTime(timeLeft);
+    timerElement.classList.add('active');
+    resendButton.classList.add('disabled'); // Disable button
+    resendIcon.style.display = 'none'; // Hide icon
+    startCountdown();
+  };
+
+  window.send = () => {
+    const email = document.getElementById('email').value;
+    const domain = window.location.origin;
+    const url = `${domain}/user/verification/resend`;
+
+    $.ajax({
+      url: url,
+      type: "GET",
+      data: { email: email },
+      success: function(response) {
+        resetTimer();
+        // Update the page content here using the response data
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.error(textStatus, errorThrown);
+        // Display an error message to the user (more specific based on error)
+        resetTimer();
+      }
+    });
+  };
+
+  startCountdown(); // Start the countdown on page load
+});
+
+</script>
+{% endblock content %}
+

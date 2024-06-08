@@ -25,7 +25,6 @@ def add(request, id):
     return redirect('wishlists')
 
 def remove(request, id):
-    print(112114)
     try:
         wishlist = Wishlist.objects.get(user=request.user, product=id)
         wishlist.delete()

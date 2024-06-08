@@ -1273,7 +1273,27 @@
             if ($button.text() == "+") {
                 if (oldValue < productStock) {
                     var newVal = oldValue + 1;
-                    $.get("/cart/add/" + productId + '/' + 1);
+                    const domain = window.location.origin
+                    const url = `${domain}/cart/add/${productId}/${1}`
+                    $.ajax({
+                        url: url, // Replace with your actual URL
+                        type: "GET",
+                        success: function(response) {
+                            // Handle successful response
+                            $('#cart-total-ajax').text(`$${response.total}`);
+                            $('#cart-total').text(`$${response.price}`);
+                            $('#cart-discount-ajax').text(`-$${response.discount}`);
+                            $('#cart-shipping-ajax').text(`$${response.shipping}`);
+                            $('#cart-vat-ajax').text(`$${response.vat}`);
+                            $('#cart-total-wallet').text(`$${response.wallet}`);
+                            $('#cart-wallet').text(`-$${response.wallet}`);
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            // Handle error
+                            console.error(textStatus, errorThrown);
+                            // Display an error message to the user
+                        }
+                    });
                     subtotalElement.text("$" + (price * newVal).toFixed(2));
                 } else {
                     var newVal = oldValue;
@@ -1281,7 +1301,33 @@
             } else {
                 if (oldValue > min) {
                     var newVal = oldValue - 1;
-                    $.get("/cart/remove/" + productId);
+                    const domain = window.location.origin
+                    const url = `${domain}/cart/remove/${productId}`
+                    $.ajax({
+                        url: url, // Replace with your actual URL
+                        type: "GET",
+                        success: function(response) {
+                            // Handle successful response
+                            $('#cart-total-ajax').text(`$${response.total}`);
+                            $('#cart-total').text(`$${response.price}`);
+                            $('#cart-discount-ajax').text(`-$${response.discount}`);
+                            $('#cart-shipping-ajax').text(`$${response.shipping}`);
+                            $('#cart-vat-ajax').text(`$${response.vat}`);
+                            $('#cart-wallet').text(`-$${response.wallet}`);
+
+                            if(response.coupon){
+                                $('#cart-coupon-row').show();
+                                $('#cart-coupon').text(`-$${response.coupon}`);
+                            }else{
+                                $('#cart-coupon-row').hide();
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            // Handle error
+                            console.error(textStatus, errorThrown);
+                            // Display an error message to the user
+                        }
+                    });
                 } else {
                     newVal = min;
                 }

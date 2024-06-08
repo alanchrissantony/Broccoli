@@ -1,6 +1,7 @@
 from cart.models import Cart, CartItem
 from cart.views import cart_id
 from wallet.models import Wallet
+from wishlists.models import Wishlist
 
 
 
@@ -17,6 +18,7 @@ def CartCounter(request, total=0, quantity=0):
             cart_items = {}
 
     for cart_item in cart_items:
+        
         total += (cart_item.product.price * cart_item.quantity)
         quantity += cart_item.quantity
 
@@ -24,6 +26,18 @@ def CartCounter(request, total=0, quantity=0):
         'cart_view':cart_items,
         'cart_quantity':quantity,
         'cart_total':total
+    }
+    return context
+
+def WishlistCounter(request, quantity=0):
+    user = request.user
+
+    if user.id:
+        wishlists = Wishlist.objects.filter(user=user)
+        quantity = len(wishlists)
+
+    context = {
+        'wishlist_quantity':quantity,
     }
     return context
 

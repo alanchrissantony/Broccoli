@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
 from accounts.models import Account
 from user.models import UserAddress
-from promotion.models import Promotion, PromotionCategory, Discount
 from order.models import OrderProduct, OrderStatus, Order
 from django.contrib.auth.decorators import login_required
 from product.models import Product, Image
 from category.models import Category
-from cart.models import Cart, CartItem
+from cart.models import CartItem
 from accounts.validator import Validator
 from django.contrib import messages, auth
 from accounts.tests import JsonEncoder
@@ -21,8 +20,16 @@ import json, os
 # Create your views here.
 
 @login_required(login_url='root_signin')
-def root(request):
-    return render(request, 'public/admin/dashboard.html')
+def root(request, sales=0):
+    orders = Order.objects.all().order_by('-created_at')
+    for order in orders:
+        sales+=order.price
+    sales = round(sales)
+    context={
+        'orders':orders,
+        'sales':sales
+    }
+    return render(request, 'public/admin/dashboard.html', context)
 
 
 class Authentication:
@@ -212,12 +219,14 @@ class Users:
     def add(request):
         
         if request.method == 'POST':
-            first_name = request.POST['firstName']
-            last_name = request.POST['lastName']
-            username = request.POST['username']
-            email = request.POST['email']
-            password = request.POST['password']
-            confirm_password = request.POST['confirm_password']
+
+            first_name = request.POST.get('firstname').strip(' ')
+            last_name = request.POST.get('lastname').strip(' ')
+            email = request.POST.get('email').strip(' ')
+            username = request.POST.get('username').strip(' ')
+            password = request.POST.get('password')
+            confirm_password = request.POST.get('confirmpassword')
+
 
             if password == confirm_password:
                 if (Validator.validate_name(first_name)):
@@ -260,12 +269,15 @@ class Users:
 
         try:
             user = Account.objects.get(id=id)
+            address = UserAddress.objects.filter(user_id=user).first()
             if not user:
                 raise ValueError
+
             admin = request.user
             context = {
                 'admin':admin,
-                    'user':user
+                'user':user,
+                'address':address
                 }
         except:
             return redirect('root_users')
