@@ -101,25 +101,25 @@
                                 <tbody>
                                     {% for cart_item in cart_items %}
                                     <tr>
-                                            <td class="cart-product-remove">{{ forloop.counter }}</td>
-                                            <td class="cart-product-image">
-                                                <a href="product-details.html"><img src="{{cart_item.product.images.first.image.url}}" alt="#"></a>
+                                            <td class="cart-product-remove ">{{ forloop.counter }}</td>
+                                            <td class="cart-product-image ">
+                                                <a href="/products/{{cart_item.product.id}}"><img src="{{cart_item.product.images.first.image.url}}" alt="#"></a>
                                             </td>
-                                            <td class="cart-product-info">
+                                            <td class="cart-product-info col-md-2">
                                                 <h4><a href="product-details.html">{{cart_item.product.name}}</a></h4>
                                             </td>
-                                            <td class="cart-product-price">${{cart_item.product.price}}</td>
-                                            <td class="cart-product-quantity">
-                                                <div class="cart-plus-minus" data-product-id="{{ cart_item.product.id }}" data-product-stock="{{ cart_item.product.stock }}" data-product-min="{{ 0 }}">
+                                            <td class="cart-product-price ">${{cart_item.product.price}}</td>
+                                            <td class="cart-product-quantity ">
+                                                <div class="cart-plus-minus" data-product-id="{{ cart_item.product.id }}" data-product-stock="{{ cart_item.product.stock }}" data-product-min="{{ 1 }}">
                                                     <input type="text" value="{{cart_item.quantity}}" name="qtybutton" class="cart-plus-minus-box" readonly>
                                                 </div>
                                             </td>
                                             {% if cart_item.quantity > cart_item.product.stock %}
-                                            <td class=".text-danger">Out of Stock</td>
+                                            <td class=".text-danger ">Out of Stock</td>
                                             {% else %}
-                                            <td class="cart-product-subtotal" id="cart-product-subtotal">${{cart_item.sub_total}}</td>
+                                            <td class="cart-product-subtotal " id="cart-product-subtotal">${{cart_item.sub_total}}</td>
                                             {% endif %}
-                                            <td>
+                                            <td class="">
                                                 <a href="/cart/delete/{{cart_item.product.id}}"><i class="btn btx bx bx-trash"></i></a>
                                             </td>
                                         </tr>
@@ -192,7 +192,7 @@
                                 </div>
                                 <div style="text-align: center;">
                                     <h3>Your cart is empty</h3>
-                                    <p>Looks like you have not added anything to you cart. <br>Go ahead & explore top categories.</p>
+                                    <p>Looks like you have not added anything to your cart. <br>Go ahead & explore top categories.</p>
                                 </div>
                                 <div style="text-align: center;">
                                     <a href="/" class="theme-btn-1 btn black-btn">Continue Shopping</a>
@@ -257,12 +257,16 @@
                         $('#cart-coupon').text(`-$${response.coupon}`);
                         $('#cart-total').text(`$${response.price}`);
                         $('#cart-total-wallet').text(`$${response.wallet}`);
+                        $('#cart-wallet').text(`-$${response.wallet}`);
                         $('#coupon-btn').text('Coupon Applied');
+                        window.showToaster_ltn('success', 'Coupon applied Successfully');
                     } else {
                         $('#cart-coupon-row').hide();
                         $('#cart-total').text(`$${response.price}`);
                         $('#cart-total-wallet').text(`$${response.wallet}`);
+                        $('#cart-wallet').text(`-$${response.wallet}`);
                         $('#coupon-btn').text('Invalid Coupon');
+                        window.showToaster_ltn('Warning', 'Invalid Coupon!');
                     }
                     // Update the page content here using the response data
                 },

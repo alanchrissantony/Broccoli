@@ -25,91 +25,95 @@
                     <div class="card mb-4">
                         <h5 class="card-header">Order Details</h5>
                         <!-- Account -->
-                            {% for message in messages %}<p style="text-align: center;" class="{{message.tags}}-message">{{message}}</p>{% endfor %}
-                            <div class="card-body">
-                                <table class="table">
-                                    <tbody>
-                                        <tr>
-                                            <td class="cart-product-image col-2" rowspan="2" style="border: none;">
-                                                <a href="/products/{{item.product.id}}"><img height="100" width="100" src="{{item.product.images.first.image.url}}" alt=""></a>
-                                            </td>
-                                            <td class="cart-product-info col-3" style="border: none;">
-                                                
-                                                <h4><a href="product/details">{{item.product.name}}</a></h4>
-                                                <h6 class="cart-product-price">Quantity: <span
-                                                        style="font-weight: normal; float: right;">{{item.quantity}}</span></h6>
-                                                <h6 class="cart-product-price">Price: <span
-                                                        style="font-weight: normal; float: right;">${{item.product.price}}</span>
-                                                </h6>
-                                            </td>
-                                            <td class="cart-product-info col-7" style="border: none; float: right;">
-                                                <h4><a href="product/details">Order Id: <span
-                                                    style="font-weight: normal;">#{{item.order.order_number}}</span></a>
-                                                </h4>
-                                                <h6 class="cart-product-price">Order Confirmed On: {{item.order.created_at}}</h6>
-                                                <h6 class="cart-product-price">Expected Delivery On: {{item.order.updated_at}}</h6>
-                                            </td>
-                                        </tr>                                      
-                                    </tbody>
-                                </table>
-                            </div>
-                            <hr class="my-0" />
-                            <div class="card-body">
-                                <table class="table">
-                                    <tbody>
-                                        <tr>
-                                            <td class="cart-product-info col-4" style="border: none;">
-                                                <h5>Name: {{item.order.user.first_name}} {{item.order.user.last_name}}</h5>
-                                                <h5>Email: {{item.order.user.email}}</h5>
-                                                <h5>Username: {{item.order.user.username}}</h5>
-                                    
-                                            </td>
-                                            <td class="cart-product-info col-4" style="border: none;">
-                                                <h6 class="cart-product-price" style="line-height: 1.5;">Address: <span
-                                                    style="font-weight: normal;">{{item.order.address.first_name}} {{item.order.address.last_name}},<br/>
-                                                    {{item.order.address.address}} {{item.order.address.additional}},<br/>
-                                                    {{item.order.address.city}}, {{item.order.address.state}}, {{item.order.address.country}},<br/>
-                                                    {{item.order.address.zip_code}}
+                        {% for message in messages %}<p style="text-align: center;" class="{{message.tags}}-message">
+                            {{message}}</p>{% endfor %}
+                        <div class="card-body">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="cart-product-info col-4" style="border: none;">
+                                            <h5>Name: {{order.user.first_name}} {{order.user.last_name}}</h5>
+                                            <h5>Email: {{order.user.email}}</h5>
+                                            <h5>Username: {{order.user.username}}</h5>
+
+                                        </td>
+                                        <td class="cart-product-info col-4" style="border: none;">
+                                            <h6 class="cart-product-price" style="line-height: 1.5;">Address: <span
+                                                    style="font-weight: normal;">{{order.address.first_name}}
+                                                    {{order.address.last_name}},<br />
+                                                    {{order.address.address}} {{order.address.additional}},<br />
+                                                    {{order.address.city}}, {{order.address.state}},
+                                                    {{order.address.country}},<br />
+                                                    {{order.address.zip_code}}
                                                 </span></h6>
-                                                <h6 class="cart-product-price">Phone: <span
-                                                    style="font-weight: normal;">{{item.order.address.phone_number}}</span>
-                                                </h6>
-                                            </td>
-                                            <td class="cart-product-info col-4" style="border: none;">
-                                                
-                                                <h6 class="cart-product-price">Total: <span
-                                                    style="font-weight: normal; float: right;">{{item.order.total}}</span></h6>
-                                                <h6 class="cart-product-price">Discount: <span
-                                                    style="font-weight: normal; float: right;">{{item.order.discount}}</span></h6>
-                                                <h6 class="cart-product-price">Shipping Charge: <span
-                                                    style="font-weight: normal; float: right;">{{item.order.shipping}}</span></h6>
-                                                <h6 class="cart-product-price">Vat: <span
-                                                    style="font-weight: normal; float: right;">{{item.order.vat}}</span></h6>
-                                                <h6 class="cart-product-price"><a href="">Amount Payable: <span
-                                                    style="font-weight: normal; float: right;">{{item.order.price}}</span></a></h6>
-                                            </td>
-                                        </tr>                                      
-                                    </tbody>
-                                </table>
+                                            <h6 class="cart-product-price">Phone: <span
+                                                    style="font-weight: normal;">{{order.address.phone_number}}</span>
+                                            </h6>
+                                        </td>
+                                        <td class="cart-product-info col-4" style="border: none;">
+
+                                            <h6 class="cart-product-price">Total: <span
+                                                    style="font-weight: normal; float: right;">{{order.total}}</span>
+                                            </h6>
+                                            <h6 class="cart-product-price">Discount: <span
+                                                    style="font-weight: normal; float: right;">{{order.discount}}</span>
+                                            </h6>
+                                            <h6 class="cart-product-price">Shipping Charge: <span
+                                                    style="font-weight: normal; float: right;">{{order.shipping}}</span>
+                                            </h6>
+                                            <h6 class="cart-product-price">Vat: <span
+                                                    style="font-weight: normal; float: right;">{{order.vat}}</span></h6>
+                                            <h6 class="cart-product-price"><a href="">Amount Payable: <span
+                                                        style="font-weight: normal; float: right;">{{order.price}}</span></a>
+                                            </h6>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr class="my-0" />
+                        <div class="card-body">
+                            {% for product in products %}
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="cart-product-image col-2" rowspan="2" style="border: none;">
+                                            <a href="/products/{{product.product.id}}"><img height="100" width="100"
+                                                    src="{{product.product.images.first.image.url}}" alt=""></a>
+                                        </td>
+                                        <td class="cart-product-info col-3" style="border: none;">
+
+                                            <h4><a href="product/details">{{product.product.name}}</a></h4>
+                                            <h6 class="cart-product-price">Quantity: <span
+                                                    style="font-weight: normal; float: right;">{{product.quantity}}</span>
+                                            </h6>
+                                            <h6 class="cart-product-price">Price: <span
+                                                    style="font-weight: normal; float: right;">${{product.product.price}}</span>
+                                            </h6>
+                                        </td>
+                                        <td class="cart-product-info col-7" style="border: none; float: right;">
+                                            
+                                            <h6 class="cart-product-price">{{product.product.description}}</h6>
+                                            </h6>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            {% endfor %}
+                        </div>
+
+
+                        <hr class="my-0" />
+                        <form id="formAccountSettings" method="POST">
+                            {% csrf_token %}
+                            <div class="card-body">
+                                <div class="mt-2">
+                                    <input type="hidden" value="{{order.statuses.last}}" name="status">
+                                    <button type="submit"
+                                        class="btn btn-primary me-2 {% if order.statuses.last.name == 'Delivered' %}disabled{% elif order.statuses.last.name == 'Cancelled' %}{% endif %}">{{order.statuses.last}}</button>
+                                    <a href="/root/orders/cancel/{{order.id}}" class="btn btn-outline-secondary">Cancel</a>
                                 </div>
-                                <hr class="my-0" />
-                                <form id="formAccountSettings" method="POST">
-                                {% csrf_token %}
-                                <div class="card-body">
-                                    <div class="mb-3 col-md-6">
-                                        <label class="form-label" for="country">Order Status</label>
-                                        <select id="country" class="select2 form-select" name="status">
-                                            <option value="">Status</option >
-                                            {% for status in statuses %}
-                                                <option value="{{status.name}}">{{status.name}}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="mt-2">
-                                        <button type="submit" class="btn btn-primary me-2">Save</button>
-                                        <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-                                    </div>
-                                </div>
+                            </div>
                         </form>
                         <!-- /Account -->
                     </div>
@@ -124,7 +128,7 @@
                                         Please be certain.</p>
                                 </div>
                             </div>
-                            <form id="formAccountDeactivation" action="/root/orders/delete/{{item.order.id}}">
+                            <form id="formAccountDeactivation" action="/root/orders/delete/{{order.id}}">
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox" name="accountActivation"
                                         id="accountActivation" required />

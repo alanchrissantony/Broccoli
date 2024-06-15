@@ -1,0 +1,134 @@
+{% extends "public/admin/base.html" %}
+
+{% block title %}Products{% endblock title %}
+
+{% load static %}
+
+{% block content %}
+{% include "components/admin/aside.html" %}
+<!-- Layout container -->
+<div class="layout-page">
+
+    {% include "components/admin/searchbar.html" %}
+    <!-- Content wrapper -->
+    <div class="content-wrapper">
+        <!-- Content -->
+
+        <div class="container-xxl flex-grow-1 container-p-y">
+            <h4 class="fw-bold py-3 mb-4">
+                <span class="text-muted fw-light">Discount Management /</span>Add Discount
+            </h4>
+
+            <div class="row">
+                <div class="col-md-12">
+                    {% include "components/admin/discount_manage_button.html" %}
+                    <div class="card mb-4">
+                        <h5 class="card-header">Discount Details</h5>
+                        <!-- Account -->
+                        <form id="formAccountSettings" method="POST">
+                            {% csrf_token %}
+                            {% for message in messages %}
+                                <p style="text-align: center;" class="{{message.tags}}-message">{{message}}</p>
+                            {% endfor %}
+                        <div class="card-body">
+                                <div class="row">
+                                    <div class="mb-3 col-md-6">
+                                        <label for="name" class="form-label">Name</label>
+                                        <input class="form-control" type="text" id="firstName" name="name" autofocus required/>
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label for="type" class="form-label">Type</label>
+                                        <select id="country" class="select2 form-select" name="type" required>
+                                            <option value="">Select</option>
+                                            {% for category in categories %}
+                                                <option value="{{category.name}}">{{category.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label" for="country">Discount</label>
+                                        <input class="form-control" type="number" value="0" min="0" max="10000" name="discount" id="lastName" step="any" required/>
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label for="address" class="form-label">Description</label>
+                                        <input type="text" class="form-control" id="organization" name="description" required/>
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label for="organization" class="form-label">Start Date</label>
+                                        <input type="date" class="form-control" id="organization" name="start" required/>
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label for="organization" class="form-label">End Date</label>
+                                        <input type="date" class="form-control" id="organization" name="end" required/>
+                                    </div>
+                                    <div class="mt-2">
+                                        <button type="submit" class="btn btn-primary me-2">Save</button>
+                                        <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                                    </div>
+                        </div>
+                    </form>
+                        <!-- /Account -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- / Content -->
+
+
+        {% include "components/admin/footer.html" %}
+
+        <div class="content-backdrop fade"></div>
+    </div>
+    <!-- Content wrapper -->
+</div>
+<!-- / Layout page -->
+
+<!-- Toast UI Image Editor Scripts -->
+<link rel="stylesheet" href="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.css">
+<script src="https://uicdn.toast.com/tui-code-snippet/latest/tui-code-snippet.js"></script>
+<script src="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.js"></script>
+<script src="https://uicdn.toast.com/tui-image-editor/latest/tui-image-editor.js"></script>
+
+<script>
+    var input = document.getElementById('upload');
+
+    // Listen for the change event on the input element
+    input.addEventListener('change', function(event) {
+        var file = event.target.files[0]; // Get the selected file
+        if (file) {
+            var reader = new FileReader(); // Create a FileReader object
+            reader.onload = function(event) {
+                var img = new Image(); // Create an Image object
+                img.src = event.target.result; // Set the src attribute to the data URL of the selected file
+                img.onload = function() {
+                    // Replace the src attribute of the existing image with the new image's data URL
+                    document.getElementById('uploadedAvatar').src = img.src;
+
+                    // Initialize the Toast UI Image Editor
+                    var editor = new tui.ImageEditor(document.querySelector('#tui-image-editor'), {
+                        includeUI: {
+                            loadImage: {
+                                path: img.src,
+                                name: 'UploadedImage'
+                            },
+                            theme: {}, // Use the default theme
+                            initMenu: 'filter',
+                            menuBarPosition: 'bottom'
+                        },
+                        cssMaxWidth: 700,
+                        cssMaxHeight: 500,
+                        selectionStyle: {
+                            cornerSize: 20,
+                            rotatingPointOffset: 70
+                        }
+                    });
+                };
+            };
+            reader.readAsDataURL(file); // Read the contents of the selected file
+        }
+    });
+</script>
+
+<div id="tui-image-editor"></div>
+
+{% endblock content %}

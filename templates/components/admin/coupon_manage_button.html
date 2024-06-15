@@ -1,0 +1,10 @@
+<ul class="nav nav-pills flex-column flex-md-row mb-3">
+    <li class="nav-item">
+        <a class="nav-link {% if request.resolver_match.url_name == "root_coupons" %}active{% endif %}" href="/root/coupons"><i class="bx bxs-discount"></i>
+            Coupons</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.resolver_match.url_name == "root_add_coupons" %}active{% endif %}" href="/root/coupons/add"><i class="bx bx-plus me-1"></i>
+            Add Coupon</a>
+    </li>
+</ul>

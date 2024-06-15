@@ -30,7 +30,10 @@ def product(request):
     context = {
         'products' : obj,
         'categories' : categories,
-        'top_rated':top_rated
+        'top_rated':top_rated,
+        'sort_by':sort_by,
+        'search':search,
+        'category':category,
     }
     return render(request, 'public/user/products.html', context)
 

@@ -5,10 +5,9 @@
 {% block content %}
 
     {% include "components/user/toast.html" %}
-    {% include "components/user/breadcrumb.html" with title='Verification' %}
 
     <!-- LOGIN AREA START -->
-    <div class="ltn__login-area pb-65">
+    <div class="ltn__login-area pb-65 pt-100">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -23,11 +22,7 @@
                     <div class="account-login-inner">
                         <form method="post" class="ltn__form-box contact-form-box">
                             {% csrf_token %}
-                            {% if messages %}
-                                {% for message in messages %}
-                                    <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
-                                {% endfor %}
-                            {% endif %}
+                            
                             <div class="searchbox-wrap" style="display: flex;">
                                 <input type="email" name="email" placeholder="Email*" value="{{email}}" readonly>
                                     <a href="/user/signout"><button class="theme-btn-1 btn" type="button" style="
@@ -111,6 +106,21 @@
         resetTimer(); // Restart the timer
     }
 });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = [
+            {% for message in messages %}
+            {
+                'message': '{{ message.message|escapejs }}',
+                'tags': '{{ message.tags }}'
+            },
+            {% endfor %}
+        ];
+        messages.forEach(function(message) {
+            showToaster_ltn(message.tags.charAt(0).toUpperCase() + message.tags.slice(1), message.message);
+        });
+    });
 </script>
 {% endblock content %}
 

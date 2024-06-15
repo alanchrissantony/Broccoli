@@ -33,43 +33,43 @@
                             <table class="table table-striped table-borderless border-bottom">
                                 <thead>
                                     <tr>
-                                        <th class="text-nowrap">Name</th>
-                                        <th class="text-nowrap text-center">Price</th>
-                                        <th class="text-nowrap text-center">Quantity</th>
+                                        <th class="text-nowrap">Order</th>
+                                        <th class="text-nowrap text-center">Date</th>
                                         <th class="text-nowrap text-center">User</th>
+                                        <th class="text-nowrap text-center">Status</th>
                                         <th class="text-nowrap text-center">Ordered</th>
                                         <th class="text-nowrap text-center">Manage</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for item in items %}
+                                    {% for order in orders %}
                                         <tr>
-                                            <td class="text-nowrap">{{item.product.name}}</td>
+                                            <td class="text-nowrap">{{forloop.counter}}</td>
                                             <td>
-                                                <p style="text-align: center;">{{item.product.price}}</p>
+                                                <p style="text-align: center;">{{order.created_at}}</p>
                                             </td>
                                             <td>
-                                                <p style="text-align: center;">{{item.quantity}}</p>
+                                                <p style="text-align: center;">{{order.user.username}}</p>
                                             </td>
                                             <td>
-                                                <p style="text-align: center;">{{item.user.username}}</p>
+                                                <p style="text-align: center;">{{order.statuses.last}}</p>
                                             </td>
                                             <td style="text-align: center;">
-                                                {% if item.order.is_ordered == True %}
+                                                {% if order.is_ordered == True %}
                                                     <i class='bx bxs-check-circle' style="color: #80B500;"></i>
                                                 {% endif %}
                             
-                                                {% if item.order.is_ordered == False %}
+                                                {% if order.is_ordered == False %}
                                                     <i class='bx bxs-x-circle' style="color: #FF6161;"></i>
                                                 {% endif %}
                                             </td>
                                             <td style="text-align: center;">
                                                 <ul style="display: inline-flex; list-style-type: none; padding: 0;">
-                                                    <li><a href="/root/orders/edit/{{item.id}}">
+                                                    <li><a href="/root/orders/edit/{{order.id}}">
                                                         <i class="btn btx bx bx-pencil"></i>
                                                     </a></li>
 
-                                                    <li onclick="handle_delete(`{{item.order.id}}`)"><a href="#" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
+                                                    <li onclick="handle_delete(`{{order.id}}`)"><a href="#" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
                                                         <i class="btn btx bx bx-trash"></i>
                                                     </a></li>
                                                 </ul>        
@@ -91,25 +91,25 @@
                 <nav aria-label="Page navigation" class="d-flex justify-content-center">
                     <ul class="pagination">
 
-                        {% if items.has_previous %}
+                        {% if orders.has_previous %}
                         <li class="page-item{% if not items.has_previous %} disabled{% endif %}">
                             <a class="page-link" href="?page=1"><i class="tf-icon bx bx-chevrons-left"></i></a>
                         </li>
                         <li class="page-item{% if not items.has_previous %} disabled{% endif %}">
-                            <a class="page-link" href="?page={{ items.previous_page_number }}"><i class="tf-icon bx bx-chevron-left"></i></a>
+                            <a class="page-link" href="?page={{ orders.previous_page_number }}"><i class="tf-icon bx bx-chevron-left"></i></a>
                         </li>
                         {% endif %}
-                        {% for page_num in items.paginator.page_range %}
-                            <li class="page-item{% if page_num == items.number %} active{% endif %}">
+                        {% for page_num in orders.paginator.page_range %}
+                            <li class="page-item{% if page_num == orders.number %} active{% endif %}">
                                 <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
                             </li>
                         {% endfor %}
-                        {% if items.has_next %}
-                        <li class="page-item{% if not items.has_next %} disabled{% endif %}">
-                            <a class="page-link" href="?page={{ items.next_page_number }}"><i class="tf-icon bx bx-chevron-right"></i></a>
+                        {% if orders.has_next %}
+                        <li class="page-item{% if not orders.has_next %} disabled{% endif %}">
+                            <a class="page-link" href="?page={{ orders.next_page_number }}"><i class="tf-icon bx bx-chevron-right"></i></a>
                         </li>
-                        <li class="page-item{% if not items.has_next %} disabled{% endif %}">
-                            <a class="page-link" href="?page={{ items.paginator.num_pages }}"><i class="tf-icon bx bx-chevrons-right"></i></a>
+                        <li class="page-item{% if not orders.has_next %} disabled{% endif %}">
+                            <a class="page-link" href="?page={{ orders.paginator.num_pages }}"><i class="tf-icon bx bx-chevrons-right"></i></a>
                         </li>
                         {% endif %}
 

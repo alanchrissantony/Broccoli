@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from accounts.models import Account
 from user.models import UserAddress
-from order.models import OrderProduct, OrderStatus, Order
+from order.models import OrderProduct, OrderStatus, Order, OrderCancel
 from django.contrib.auth.decorators import login_required
 from product.models import Product, Image
 from category.models import Category
+from promotion.models import Discount, Promotion, PromotionCategory, Coupon
 from cart.models import CartItem
 from accounts.validator import Validator
 from django.contrib import messages, auth
@@ -13,7 +14,8 @@ from django.views.decorators.cache import cache_control
 from core.models import image_upload_path
 from django.conf import settings
 from django.core.paginator import Paginator
-import json, os
+from wallet.models import Wallet, Transaction
+import json, os, uuid, decimal
 
 
 
@@ -71,11 +73,14 @@ class Products:
     def products(request):
         
         products = Product.objects.all()
-
+        items_per_page = 10
+        paginator = Paginator(products, items_per_page)
+        page = request.GET.get('page')
+        obj = paginator.get_page(page)
         admin = request.user
         context = {
             'admin':admin,
-            'products':products,
+            'products':obj,
         }
         return render(request, 'public/admin/products.html', context)
 
@@ -101,21 +106,23 @@ class Products:
                 # Add the image path to the list
                 image_paths.append(image_path)
 
-            name = request.POST['name']
-            price = request.POST['price']
+            name = request.POST['name'].strip(' ')
+            price = request.POST['price'].strip(' ')
             try:
                 category = Category.objects.get(name=request.POST['category'])
             except Category.DoesNotExist:
                 messages.error(request, 'Please select a valid category.')
                 return redirect('root/products/add')
-            stock = request.POST['stock']
-            description = request.POST['description']
+            stock = request.POST['stock'].strip(' ')
+            description = request.POST['description'].strip(' ')
             slug = name.lower().replace(" ", "_")
 
             if Validator.validate_data(name):
                 messages.error(request, 'Please enter a valid name.')
-            elif Validator.validate_data(stock):
+            elif Validator.validate_stock(stock):
                 messages.error(request, 'Please enter a valid stock.')
+            elif Validator.validate_price(price):
+                messages.error(request, 'Please enter a valid price.')
             else:
                 # Create the product object
                 product = Product.objects.create(
@@ -160,23 +167,37 @@ class Products:
                 product.images.add(img)
 
             # Handle other form fields
-            name = request.POST.get('name')
-            price = request.POST.get('price')
-            category_name = request.POST.get('category')
-            category = Category.objects.get(name=category_name)
-            stock = request.POST.get('stock')
-            description = request.POST.get('description')
-            is_available = bool(request.POST.get('isAvailable'))  # Convert to boolean
+            name = request.POST.get('name').strip(' ')
+            price = request.POST.get('price').strip(' ')
+            category_name = request.POST.get('category').strip(' ')
+            stock = request.POST.get('stock').strip(' ')
+            description = request.POST.get('description').strip(' ')
+            is_available = bool(request.POST.get('isAvailable')).strip(' ')  # Convert to boolean
 
-                # Update product fields
-            product.name = name
-            product.price = price
-            product.category = category
-            product.stock = stock
-            product.description = description
-            product.is_available = is_available
+            if Validator.validate_data(name):
+                messages.error(request, 'Please enter a valid name.')
+            elif Validator.validate_stock(stock):
+                messages.error(request, 'Please enter a valid stock.')
+            elif Validator.validate_price(price):
+                messages.error(request, 'Please enter a valid price.')
+            else:
+                try:
+                    category = Category.objects.get(name=category_name)
 
-            product.save()
+                    # Update product fields
+                    product.name = name
+                    product.price = price
+                    product.category = category
+                    product.stock = stock
+                    product.description = description
+                    product.is_available = is_available
+
+                    product.save()
+                except:
+                    messages.error(request, 'Please select a valid category.')
+                    return redirect('/root/products/edit/{{id}}')
+                
+        
             return redirect('root_products')
 
         # Fetch product and categories for rendering form
@@ -208,10 +229,14 @@ class Users:
     @login_required(login_url='root_signin')
     def users(request):
         users = Account.objects.all().filter(is_admin=False)
+        items_per_page = 10
+        paginator = Paginator(users, items_per_page)
+        page = request.GET.get('page')
+        obj = paginator.get_page(page)
         admin = request.user
         context = {
             'admin':admin,
-            'users':users
+            'users':obj
         }
         return render(request, 'public/admin/users.html', context)
 
@@ -291,46 +316,78 @@ class Users:
         user.delete()
         return redirect('/root/users')
 
-
-class Carts:
-    @login_required(login_url='root_signin')
-    def carts(request):
-        carts = CartItem.objects.all()
-        context={
-            'carts':carts
-        }
-        return render(request, 'public/admin/carts.html', context)
     
 class Orders:
     @login_required(login_url='root_signin')
     def orders(request):
+        order = Order.objects.all()
         items_per_page = 10
-        order = OrderProduct.objects.all()
-
         paginator = Paginator(order, items_per_page)
         page = request.GET.get('page')
         obj = paginator.get_page(page)
 
         context={
-            'items':obj
+            'orders':obj
         }
         return render(request, 'public/admin/orders.html', context)
     
     @login_required(login_url='root_signin')
     def edit(request, id):
-        item = OrderProduct.objects.get(id=id)
+        order = Order.objects.get(id=id)
+        products = OrderProduct.objects.filter(order=order)
         if request.method == "POST":
             status = request.POST['status']
+            if status == 'Order Confirmed':
+                status = 'Shipped'
+            elif status == 'Shipped':
+                status = 'Out for delivery'
+            elif status == 'Out for delivery':
+                status = 'Delivered'
             status, _ = OrderStatus.objects.get_or_create(name=status)
-            item.order.statuses.add(status)
+            order.statuses.add(status)
             return redirect("root_orders")
 
-        statuses = OrderStatus.objects.all()
         context={
-            'item':item,
-            'statuses':statuses
+            'order':order,
+            'products':products,
         }
         return render(request, 'public/admin/edit_order.html', context)
+    
+    def cancel(request, id):
+        try:
+            order = Order.objects.get(id=id)
+            products = OrderProduct.objects.filter(order=order)
+            if order.payment.status == 'Paid':
+                wallet = Wallet.objects.get(user=request.user)
+                Transaction.objects.create(
+                    transaction = uuid.uuid4(),
+                    user = wallet.user,
+                    amount = order.price,
+                    balance = float(wallet.balance) + order.price,
+                    status = 'Credit'
+                )
+                wallet.balance += decimal.Decimal(order.price)
+                wallet.save()
+            cancel = OrderCancel.objects.create(order=order)
+            for product in products:
+                product.product.stock += product.quantity
+                product.product.save()
+            last_status = order.statuses.last().name
+            if last_status == 'Order Confirmed':
+                status, _ = OrderStatus.objects.get_or_create(name='Shipped')
+                order.statuses.add(status)
+                last_status = 'Shipped'
+            
+            if last_status == 'Shipped':
+                status, _ = OrderStatus.objects.get_or_create(name='Out for delivery')
+                order.statuses.add(status)
+            status, _ = OrderStatus.objects.get_or_create(name='Cancelled')
+            order.statuses.add(status)
+            order.save()
+    
+        except:
+            pass
+        return redirect('root_orders')
     
     def delete(request, id):
         try:
@@ -341,3 +398,100 @@ class Orders:
         except:
             pass
         return redirect('root_orders')
+
+
+    def cancellation(request):
+        orders = OrderCancel.objects.all().order_by('-created_at')
+        items_per_page = 10
+        paginator = Paginator(orders, items_per_page)
+        page = request.GET.get('page')
+        obj = paginator.get_page(page)
+        context={
+            'orders':obj
+        }
+        return render(request, 'public/admin/cancellation.html', context)
+    
+
+class UserWallet:
+
+    def user_wallet(request):
+        wallet = Wallet.objects.all()
+        items_per_page = 10
+        paginator = Paginator(wallet, items_per_page)
+        page = request.GET.get('page')
+        obj = paginator.get_page(page)
+
+        context={
+            'wallets':obj
+        }
+        return render(request, 'public/admin/wallets.html', context)
+    
+class ProductPromotion:
+
+    class ProductDiscount:
+
+        def product_discount(request):
+            discounts = Discount.objects.all()
+            items_per_page = 10
+            paginator = Paginator(discounts, items_per_page)
+            page = request.GET.get('page')
+            obj = paginator.get_page(page)
+            context = {
+                'discounts':obj
+                }
+            return render(request, 'public/admin/discounts.html', context)
+        
+        def add(request):
+            context = {
+                
+                }
+            return render(request, 'public/admin/add_discount.html', context)
+        
+
+    class ProductCoupon:
+        
+        def product_coupon(request):
+            coupons = Coupon.objects.all()
+            items_per_page = 10
+            paginator = Paginator(coupons, items_per_page)
+            page = request.GET.get('page')
+            obj = paginator.get_page(page)
+            context = {
+                'coupons':obj
+                }
+            return render(request, 'public/admin/coupons.html', context)
+        
+        def add(request):
+            context = {
+                
+                }
+            return render(request, 'public/admin/add_coupon.html', context)
+        
+    
+    class ProductPromotion:
+        
+        def product_promotion(request):
+            promotions = Promotion.objects.all()
+            items_per_page = 10
+            paginator = Paginator(promotions, items_per_page)
+            page = request.GET.get('page')
+            obj = paginator.get_page(page)
+            context = {
+                'promotions':obj
+                }
+            return render(request, 'public/admin/product_promotions.html', context)
+
+
+    class CategoryPromotion:
+        
+        def category_promotion(request):
+            promotions = PromotionCategory.objects.all()
+            items_per_page = 10
+            paginator = Paginator(promotions, items_per_page)
+            page = request.GET.get('page')
+            obj = paginator.get_page(page)
+            context = {
+                'promotions':obj
+                }
+            return render(request, 'public/admin/category_promotions.html', context)
+

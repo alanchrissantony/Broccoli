@@ -121,7 +121,7 @@
                 <h4 class="title-2">Billing Details</h4>
                 <div class="row">
                     {% for address in address %}
-                    <div class="col-4">
+                    <div class="col-12 col-sm-6 col-md-4">
                         <div class="ltn__checkout-inner">
                             <div class="ltn__checkout-single-content mt-50 address-card {% if address.is_default %} active {% endif %}" onclick="selectAddress(this, '{{ address.id }}')">
                                 <div class="ltn__checkout-single-content-info">

@@ -1270,8 +1270,9 @@
             var price = parseFloat($button.closest("tr").find(".cart-product-price").text().replace("$", ""));
             var subtotalElement = $button.closest("tr").find(".cart-product-subtotal");
 
+
             if ($button.text() == "+") {
-                if (oldValue < productStock) {
+                if (oldValue < 5 && oldValue < productStock) {
                     var newVal = oldValue + 1;
                     const domain = window.location.origin
                     const url = `${domain}/cart/add/${productId}/${1}`
@@ -1287,6 +1288,23 @@
                             $('#cart-vat-ajax').text(`$${response.vat}`);
                             $('#cart-total-wallet').text(`$${response.wallet}`);
                             $('#cart-wallet').text(`-$${response.wallet}`);
+                            if(response.message){
+                
+                                const toastPlacementExample = document.querySelector('.toast-placement-ex');
+                                
+                                $('#toast-message').text(`${response.message}`);
+                                $('#toast-tag').text(`${response.tag.toString().toUpperCase()}`);
+
+                                if(response.tag == 'error'){
+                                    response.tag = ['danger']
+                                }
+                                
+                                toastPlacementExample.classList.add('bg-'+response.tag);
+                                toastPlacementExample.classList.add('top-0', 'end-0');
+                                
+                                const toastPlacement = new bootstrap.Toast(toastPlacementExample);
+                                toastPlacement.show();
+                            }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
                             // Handle error
@@ -1296,6 +1314,32 @@
                     });
                     subtotalElement.text("$" + (price * newVal).toFixed(2));
                 } else {
+                    if(productStock > oldValue){
+                        
+                        const toastPlacementExample = document.querySelector('.toast-placement-ex');
+                                
+                        $('#toast-message').text("Sorry, you can't add more of this item. You've reached the cart limit.");
+                        $('#toast-tag').text('warning'.toString().toUpperCase())
+                        
+                        toastPlacementExample.classList.add('bg-warning');
+                        toastPlacementExample.classList.add('top-0', 'end-0');
+                        
+                        const toastPlacement = new bootstrap.Toast(toastPlacementExample);
+                        toastPlacement.show();
+                    }
+                    else{
+                        const toastPlacementExample = document.querySelector('.toast-placement-ex');
+                                
+                        $('#toast-message').text("This item is currently out of stock. We apologize for any inconvenience.");
+                        $('#toast-tag').text('warning'.toString().toUpperCase())
+                        
+                        toastPlacementExample.classList.add('bg-secondary');
+                        toastPlacementExample.classList.add('top-0', 'end-0');
+                        
+                        const toastPlacement = new bootstrap.Toast(toastPlacementExample);
+                        toastPlacement.show();
+                    }
+                    
                     var newVal = oldValue;
                 }
             } else {

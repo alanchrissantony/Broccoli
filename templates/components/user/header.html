@@ -21,7 +21,7 @@
                                     <li><a href="/">Home</a></li>
                                     <li><a href="/products">Menu</a></li>
                                     <li><a href="/products?filter=offers">Deals</a></li>
-                                    <li><a href="#">Orders</a>
+                                    <li><a href="/user/account/#liton_tab_1_2">Orders</a>
                                         <ul>
                                             <li><a href="/user/account/#liton_tab_1_2">Orders </a></li>
                                             <li><a href="/orders/tracking">Order Tracking</a></li>
@@ -51,7 +51,7 @@
                                             </li>
                                             <li><a href="#">Party Store</a>
                                                 <ul>
-                                                    <li><a href="shop.html">Shop</a></li>
+                                                    <li><a href="/products">Shop</a></li>
                                                     <li><a href="shop-left-sidebar.html">Shop Left sidebar</a></li>
                                                     <li><a href="shop-right-sidebar.html">Shop right sidebar</a></li>
                                                     <li><a href="shop-grid.html">Shop Grid</a></li>
@@ -59,14 +59,20 @@
                                                     <li><a href="cart.html">Cart</a></li>
                                                 </ul>
                                             </li>
-                                            <li><a href="shop.html"><img src="{% static 'img/banner/menu-banner-1.png' %}" alt="#"></a>
+                                            <li><a href="/products"><img src="{% static 'img/banner/menu-banner-1.png' %}" alt="#"></a>
                                             </li>
                                         </ul>
                                     </li>
                                     <li class="special-link"><a href="/user/account/#liton_tab_1_3">My Wallet <i class="fa fa-angle-down"></i></a>
-                                        <ul>
-                                            <li><p style="color: black; text-align: start;">Available balance<br><span style="color: #80B500; font-size: large; font-weight: bold;">${{wallet_balance}}</span></p></li>
-                                        </ul>
+                                      <ul style="display: flex; align-items: center;">
+                                        <li ><i style="font-size: 2rem;" class='bx bx-wallet'></i></li>
+                                        <li style="padding: 0; display: flex; align-items: center;">
+                                          <p style="color: black; text-align: start; margin: 0;">
+                                            My balance<br>
+                                            <span style="color: #80B500; font-size: large; font-weight: bold;">${{wallet_balance}}</span>
+                                          </p>
+                                        </li>
+                                      </ul>
                                     </li>
                                 </ul>
                             </div>
@@ -99,7 +105,12 @@
                                 <ul>
                                     <li><a href="/user/account">My Account</a></li>
                                     <li><a href="/wishlists">Wishlist</a></li>
-                                    <li><a href="/user/signout">Sign out</a></li>
+                                    {% if request.user.id %}
+                                      <li><a href="/user/signout">Sign out</a></li>
+                                    {% else %}
+                                      <li><a href="/user/signin">Sign in</a></li>
+                                    {% endif %}
+                                    
                                 </ul>
                             </li>
                         </ul>

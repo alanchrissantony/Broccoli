@@ -1,6 +1,7 @@
 {% extends "public/user/base.html" %}
 
 {% block title %}Wishlist{% endblock title %}
+{% load static %}
 
 {% block content %}
     
@@ -14,6 +15,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
+                    {% if wishlists %}
                     <div class="shoping-cart-inner">
                         <div class="shoping-cart-table table-responsive">
                             <table class="table">
@@ -53,6 +55,20 @@
                             </table>
                         </div>
                     </div>
+                    {% else %}
+                            <div class="shoping-cart-table table-responsive">
+                                <div style="text-align: center;">
+                                    <img style="max-width: 50%;" src="{% static "img/others/wishlist_empty.jpeg" %}" alt="">
+                                </div>
+                                <div style="text-align: center;">
+                                    <h3>Your wishlist is empty</h3>
+                                    <p>Looks like you have not added anything to your wishlist. <br>Go ahead & explore top categories.</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <a href="/" class="theme-btn-1 btn black-btn">Continue Shopping</a>
+                                </div>
+                            </div>
+                        {% endif %}
                 </div>
             </div>
         </div>

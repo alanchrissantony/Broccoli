@@ -19,6 +19,7 @@ from django.http import JsonResponse
 from wallet.models import Wallet, Transaction
 from uuid import uuid4
 from decimal import Decimal
+from layout.models import Slide
 
 # Create your views here.
 
@@ -53,7 +54,7 @@ def order_product(request, cart_items, order, user, payment):
 def about(request):
     return render(request, 'public/user/about.html')
 
-def coupon(request, wallet=None, wallet_pay=0, coupon=None, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None):
+def coupon(request, wallet=None, wallet_pay=0, coupon=None, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None, coupon_code=None):
     coupon_code = request.GET.get('coupon')
 
     try:
@@ -80,7 +81,6 @@ def coupon(request, wallet=None, wallet_pay=0, coupon=None, total=0, quantity=0,
         else:
             wallet_pay = wallet.balance
 
-
     if coupon_code:
         coupon = Coupon.objects.filter(code=coupon_code).first()
         if coupon and price >= coupon.minimum_price:
@@ -105,6 +105,7 @@ def coupon(request, wallet=None, wallet_pay=0, coupon=None, total=0, quantity=0,
                         price -= float(wallet.balance)
 
             price = round(price, 2)
+
             context={
                 'coupon':coupon.discount,
                 'price':price,
@@ -112,21 +113,23 @@ def coupon(request, wallet=None, wallet_pay=0, coupon=None, total=0, quantity=0,
             }
             return JsonResponse(context)
         else:
+            
             if 'coupon' in request.session:
                 del request.session['coupon']
-
-            if 'wallet' in request.session:
+            
+    if 'wallet' in request.session:
+        
+        
+        if wallet:
+            if wallet.balance > price: 
+                wallet_pay = price          
+                price = 0
+            else:
+                wallet_pay = wallet.balance
+                price -= float(wallet.balance)
+            price = round(price, 2)
                 
-
-                if wallet:
-                    if wallet.balance > price: 
-                        wallet_pay = price          
-                        price = 0
-                    else:
-                        wallet_pay = wallet.balance
-                        price -= float(wallet.balance)
-                price = round(price, 2)
-
+                
     context={
         'coupon':None,
         'price':price,
@@ -468,15 +471,20 @@ def faq(request):
 def history(request):
     return render(request, 'public/user/history.html')
 
-@login_required(login_url='signin')
-@verification_required
 def home(request):
     
-    categories = Category.objects.all().exclude(is_available=False)
-    products = Product.objects.all().exclude(is_available=False)
+    categories = Category.objects.all().exclude(is_available=False)[:5]
+    products_array = []
+    for category in categories:  
+        products_array.append(Product.objects.filter(category=category).exclude(is_available=False))
+    products = Product.objects.all().exclude(is_available=False).order_by('-rating')[:12]
+    slides = Slide.objects.all()
+
     context = {
         'categories':categories,
-        'products':products
+        'products_array':products_array,
+        'products':products,
+        'slides':slides
     }
     return render(request, 'public/user/index.html', context)
 

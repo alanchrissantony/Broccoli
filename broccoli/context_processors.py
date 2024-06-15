@@ -2,6 +2,7 @@ from cart.models import Cart, CartItem
 from cart.views import cart_id
 from wallet.models import Wallet
 from wishlists.models import Wishlist
+from layout.models import Banner
 
 
 
@@ -49,5 +50,13 @@ def WalletProcessor(request, balance=0):
             balance = wallet.balance
     context={
         'wallet_balance':balance
+    }
+    return context
+
+
+def bannerProcessor(request):
+    banner_image = Banner.objects.filter().last()
+    context={
+        'banner_image':banner_image
     }
     return context

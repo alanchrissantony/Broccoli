@@ -14,11 +14,6 @@
     <div class="ltn__login-area mb-120">
         <div class="container">
             <div class="row">
-                {% if messages %}
-                    {% for message in messages %}
-                        <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
-                    {% endfor %}
-                {% endif %}
                 <div class="col-lg-8 offset-lg-2">
                     <div class="account-login-inner section-bg-1">
                         <form method="post" class="ltn__form-box contact-form-box">
@@ -41,6 +36,22 @@
 
     {% include "components/user/feature.html" %}
     {% include "components/user/footer.html" %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = [
+                {% for message in messages %}
+                {
+                    'message': '{{ message.message|escapejs }}',
+                    'tags': '{{ message.tags }}'
+                },
+                {% endfor %}
+            ];
+            messages.forEach(function(message) {
+                showToaster_ltn(message.tags.charAt(0).toUpperCase() + message.tags.slice(1), message.message);
+            });
+        });
+    </script>
 
 {% endblock content %}
 

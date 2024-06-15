@@ -19,6 +19,7 @@ class Discount(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -70,6 +71,7 @@ class Promotion(models.Model):
     
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     discount = models.ForeignKey(Discount, on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
 
     def __str__(self):
         return self.product.name
@@ -78,6 +80,7 @@ class PromotionCategory(models.Model):
     
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     discount = models.ForeignKey(Discount, on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = 'Promotion Category'

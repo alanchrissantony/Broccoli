@@ -16,11 +16,7 @@
     <div class="ltn__product-area ltn__product-gutter">
         <div class="container">
             <div class="row">
-                {% if messages %}
-                    {% for message in messages %}
-                        <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
-                    {% endfor %}
-                {% endif %}
+                
                 <div class="col-lg-8 order-lg-2 mb-120">
                     <div class="ltn__shop-options">
                         <ul>
@@ -190,17 +186,17 @@
 
                                 <!-- Previous page link -->
                                 {% if products.has_previous %}
-                                    <li class="{% if not products.has_previous %} disabled{% endif %}"><a href="?page=1"><i class="fas fa-angle-double-left"></i></a></li>
+                                    <li class="{% if not products.has_previous %} disabled{% endif %}"><a href="?page=1{% if sort_by %}&sort_by={{sort_by}}{% endif %}{% if search %}&search={{search}}{% endif %}{% if category %}&category={{category}}{% endif %}"><i class="fas fa-angle-double-left"></i></a></li>
                                 {% endif %}
                     
                                 <!-- Current page link -->
                                 {% for page_num in products.paginator.page_range %}
-                                <li class="{% if page_num == products.number %} active{% endif %}"><a href="?page={{ page_num }}">{{ page_num }}</a></li>
+                                <li class="{% if page_num == products.number %} active{% endif %}"><a href="?page={{ page_num }}{% if sort_by %}&sort_by={{sort_by}}{% endif %}{% if search %}&search={{search}}{% endif %}{% if category %}&category={{category}}{% endif %}">{{ page_num }}</a></li>
                                 {% endfor %}
 
                                 <!-- Next page link -->
                                 {% if products.has_next %}
-                                    <li class="{% if not products.has_next %} disabled{% endif %}"><a href="?page={{ products.paginator.num_pages }}"><i class="fas fa-angle-double-right"></i></a></li>
+                                    <li class="{% if not products.has_next %} disabled{% endif %}"><a href="?page={{ products.paginator.num_pages }}{% if sort_by %}&sort_by={{sort_by}}{% endif %}{% if search %}&search={{search}}{% endif %}{% if category %}&category={{category}}{% endif %}"><i class="fas fa-angle-double-right"></i></a></li>
                                 {% endif %}
 
                             </ul>
@@ -290,9 +286,13 @@
         if(stock > 0){
             const url = window.location.origin
             const response = await fetch(url+'/cart/add/'+proId+'/'+1)
-            $('#modal-product-status').html('Successfully added to your Cart.');
+            $('#modal-product-status').html('<i class="fa fa-check-circle"></i> Successfully added to your Cart.');
+            document.getElementById('view_cart_modal_btn').classList.remove('disabled')
+            document.getElementById('checkout_cart_modal_btn').classList.remove('disabled')
         }else{
-            $('#modal-product-status').html('Currently unavailable.');
+            $('#modal-product-status').html('<i class="fa fa-times-circle" style="color: #b12704;"></i> Currently unavailable.');
+            document.getElementById('view_cart_modal_btn').classList.add('disabled')
+            document.getElementById('checkout_cart_modal_btn').classList.add('disabled')
         }
         $('#modal-product-name').html(name);
         $('#modal-product-image').attr('src',image);
@@ -318,5 +318,21 @@
             $('#modal-quick-view-product-rating').attr('src',rating);
         }
     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = [
+            {% for message in messages %}
+            {
+                'message': '{{ message.message|escapejs }}',
+                'tags': '{{ message.tags }}'
+            },
+            {% endfor %}
+        ];
+        messages.forEach(function(message) {
+            showToaster_ltn(message.tags.charAt(0).toUpperCase() + message.tags.slice(1), message.message);
+        });
+    });
+</script>
 
 {% endblock content %}

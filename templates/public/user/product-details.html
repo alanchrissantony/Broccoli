@@ -4,6 +4,15 @@
 
 {% block content %}
 
+<style>
+.ltn__tagcloud-widget .ltn_a_style{
+    cursor: pointer;
+}
+.ltn__tagcloud-widget .ltn_a_style:hover{
+    background-color: #f7f5eb;
+}
+</style>
+
 {% load static %}
 {% load custom_filters %}
 
@@ -17,11 +26,7 @@
     <div class="ltn__shop-details-area pb-85">
         <div class="container">
             <div class="row">
-                {% if messages %}
-                    {% for message in messages %}
-                        <span id="django-message" data-message="{{ message }}" data-tags="{{ message.tags }}"></span>
-                    {% endfor %}
-                {% endif %}
+                
                 <div class="col-lg-8 col-md-12">
                     <div class="ltn__shop-details-inner mb-60">
                         <div class="row">
@@ -68,6 +73,11 @@
                                         <span>${{ product|calculate_discounted_price }}</span>
                                         <del>${{product.price}}</del>
                                     </div>
+                                    <div class="widget ltn__tagcloud-widget" style="padding: 0; margin: 0; border: none;">
+                                        <ul>
+                                            <li><a class="ltn_a_style">1 kg</a></li>
+                                        </ul>
+                                    </div>
                                     <div class="modal-product-meta ltn__product-details-menu-1">
                                         <ul>
                                             <li>
@@ -113,12 +123,21 @@
                                     </div>
                                     <div class="ltn__product-details-menu-3">
                                         <ul>
+                                            {% if request.user.id %}
                                             <li onclick="handleWishlist(`{{product.id}}`, `{{product|in_wishlist:request.user}}`)">
                                                 <a href="#ltn__product-details-menu-3">
                                                     {% if product|in_wishlist:request.user %}<i id="wishlist-heart-icon" class="fa fa-heart" style="color: #E1306C;"></i>{% else %}<i id="wishlist-heart-icon" class="far fa-heart"></i>{% endif %}
                                                     <span>Add to Wishlist</span>
                                                 </a>
                                             </li>
+                                            {% else %}
+                                            <li>
+                                                <a href="/user/signin">
+                                                    <i id="wishlist-heart-icon" class="far fa-heart"></i>
+                                                    <span>Add to Wishlist</span>
+                                                </a>
+                                            </li>
+                                            {% endif %}
                                             <li onclick="quickView(`{{product.id}}`, `{{product.name}}`, `{{product.images.first.image.url}}`, `{{product.category}}`, `{{product.price}}`, `{{product.rating}}`)">
                                                 <a href="#" class="" title="Compare" data-toggle="modal" data-target="#quick_view_modal">
                                                     <i class="fas fa-exchange-alt"></i>
@@ -346,7 +365,6 @@
         </div>
     </div>
     <!-- PRODUCT SLIDER AREA END -->
-
     {% include "components/user/feature.html" %}
     {% include "components/user/footer.html" %}
     {% include "components/user/modal-quick-view.html" %}
@@ -369,9 +387,13 @@
         if(stock > 0){
             const url = window.location.origin
             const response = await fetch(url+'/cart/add/'+proId+'/'+1)
-            $('#modal-product-status').html('Successfully added to your Cart.');
+            $('#modal-product-status').html('<i class="fa fa-check-circle"></i> Successfully added to your Cart.');
+            document.getElementById('view_cart_modal_btn').classList.remove('disabled')
+            document.getElementById('checkout_cart_modal_btn').classList.remove('disabled')
         }else{
-            $('#modal-product-status').html('Currently unavailable.');
+            $('#modal-product-status').html('<i class="fa fa-times-circle" style="color: #b12704;"></i> Currently unavailable.');
+            document.getElementById('view_cart_modal_btn').classList.add('disabled')
+            document.getElementById('checkout_cart_modal_btn').classList.add('disabled')
         }
         $('#modal-product-name').html(name);
         $('#modal-product-image').attr('src',image);
@@ -386,6 +408,7 @@
             $('#modal-wishlist-product-image').attr('src',image);
         }
         const handleWishlist = async(proId, flag)=>{
+            
             const url = window.location.origin
             
             if(flag=='True'){
@@ -423,8 +446,23 @@
         function resetLargeImage() {
             $('#product-details-image').attr('src', default_img);
         }
+
     </script>
 
-    
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = [
+            {% for message in messages %}
+            {
+                'message': '{{ message.message|escapejs }}',
+                'tags': '{{ message.tags }}'
+            },
+            {% endfor %}
+        ];
+        messages.forEach(function(message) {
+            showToaster_ltn(message.tags.charAt(0).toUpperCase() + message.tags.slice(1), message.message);
+        });
+    });
+</script>
 
 {% endblock content %}

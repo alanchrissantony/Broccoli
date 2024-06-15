@@ -89,6 +89,36 @@
         </div>
         <!-- / Content -->
 
+        <div class="pagination-container">
+            <nav aria-label="Page navigation" class="d-flex justify-content-center">
+                <ul class="pagination">
+
+                    {% if products.has_previous %}
+                    <li class="page-item{% if not items.has_previous %} disabled{% endif %}">
+                        <a class="page-link" href="?page=1"><i class="tf-icon bx bx-chevrons-left"></i></a>
+                    </li>
+                    <li class="page-item{% if not items.has_previous %} disabled{% endif %}">
+                        <a class="page-link" href="?page={{ products.previous_page_number }}"><i class="tf-icon bx bx-chevron-left"></i></a>
+                    </li>
+                    {% endif %}
+                    {% for page_num in products.paginator.page_range %}
+                        <li class="page-item{% if page_num == products.number %} active{% endif %}">
+                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if products.has_next %}
+                    <li class="page-item{% if not products.has_next %} disabled{% endif %}">
+                        <a class="page-link" href="?page={{ products.next_page_number }}"><i class="tf-icon bx bx-chevron-right"></i></a>
+                    </li>
+                    <li class="page-item{% if not products.has_next %} disabled{% endif %}">
+                        <a class="page-link" href="?page={{ products.paginator.num_pages }}"><i class="tf-icon bx bx-chevrons-right"></i></a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+        </div>
+
         {% include "components/admin/footer.html" %}
 
         <div class="content-backdrop fade"></div>

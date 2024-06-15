@@ -13,7 +13,7 @@ from django.urls import reverse
 from wallet.views import create_wallet
 from order.models import Order
 from wallet.models import Transaction
-from django.core.paginator import Paginator
+from datetime import datetime
 
 
 # Create your views here.
@@ -36,11 +36,12 @@ def send(request):
     if email is None:
         email = request.user.email
     otp = otp_verification.generate_token()
-    print(otp)
     send_otp(email, otp)
     messages.success(request, "Verification code sent to your email address.")
     return True
 
+@login_required(login_url='signin')
+@verification_required
 def account(request):
 
     if request.method=='POST':
@@ -80,10 +81,13 @@ def account(request):
     address = UserAddress.objects.filter(user_id=request.user)
     orders = Order.objects.filter(user=request.user, is_ordered=True)
     transactions = Transaction.objects.filter(user=request.user).order_by('-created_at')
+    current_date = datetime.now()
+    formatted_date = current_date.strftime("%m/%y")
     context={
         'addresses':address,
         'orders':orders,
-        'transactions':transactions
+        'transactions':transactions,
+        'current_date':formatted_date
     }
     return render(request, 'public/user/account.html', context)
 
@@ -102,6 +106,8 @@ def signin(request):
         email=request.POST['email']
         password=request.POST['password']
 
+        request.session['email']=email
+
         user=auth.authenticate(email=email, password=password)
 
         if user:
@@ -118,6 +124,14 @@ def signin(request):
             except:
                 pass
             auth.login(request, user)
+            if 'user' in request.session:
+                del request.session['user']
+            if 'firstname' in request.session:
+                del request.session['firstname']
+            if 'lastname' in request.session:
+                del request.session['lastname']
+            if 'email' in request.session:
+                del request.session['email']
             return redirect('home')
             
         messages.error(request, 'Invalid credentials')
@@ -135,13 +149,17 @@ def register(request):
 
     # Handle POST request for user registration
     if request.method == 'POST':
-        first_name = request.POST.get('firstname').strip(' ')
-        last_name = request.POST.get('lastname').strip(' ')
+        first_name = request.POST.get('firstname').strip(' ').capitalize()
+        last_name = request.POST.get('lastname').strip(' ').capitalize()
         email = request.POST.get('email').strip(' ')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirmpassword')
         username = email.split('@')[0].lower()
 
+        request.session['firstname']=first_name
+        request.session['lastname']=last_name
+        request.session['email']=email
+        
         # Validate form input
         if password != confirm_password:
             messages.error(request, "The passwords provided do not match!")
@@ -156,32 +174,24 @@ def register(request):
         else:
             # Attempt to create user
             try:
-                user = Account.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
-                messages.success(request, "User has been successfully created!")
-                user=auth.authenticate(email=email, password=password)
-
+                user=Account.objects.filter(email=email).first()
                 if user:
-                    try:
-                        cart = Cart.objects.get(cart_id=cart_id(request))
-                        is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
-
-                        if is_cart_item_exists:
-                            cart_item = CartItem.objects.filter(cart=cart)
-
-                            for item in cart_item:
-                                item.user = user
-                                item.save()
-                    except:
-                        pass
-                    auth.login(request, user)
-                    create_wallet(user)
+                    raise IntegrityError
+                request.session['user'] = {
+                    'first_name':first_name,
+                    'last_name':last_name,
+                    'email':email,
+                    'username':username,
+                    'password':password
+                }
                 otp = otp_verification.generate_token()
-                print(otp)
                 send_otp(email, otp)  # Send OTP to the user's email
                 messages.success(request, "Verification code sent to your email address.")
                 return redirect('verification')
             except IntegrityError:
                 messages.error(request, 'User already exists!')
+
+
 
     return render(request, 'public/user/register.html')
 
@@ -190,38 +200,67 @@ def signout(request):
     request.session.clear()
     return redirect('signin')
 
-@login_required(login_url='signin')
+
 def verification(request):
-    
-    user = request.user
-    if not user.is_verified:
-        if request.method == 'POST':
-            otp_secret = request.POST['otp']
-            
-            if otp_verification.verify_token(otp_secret):
-                try:
-                    user = Account.objects.get(email=user.email)
-                  
-                    user.is_verified = True
-                    user.save()
-                    # Update only is_verified in session (optional)
-                    user.is_verified = True
-                    # Update only relevant field
-                    return redirect('signin')
-                except Account.DoesNotExist:
-                    
-                    messages.error(request, 'User not found!')
-            else:
-                messages.error(request, 'Invalid OTP')
+    if 'user' in request.session:
+        user_data = request.session['user']
+        first_name = user_data['first_name']
+        last_name = user_data['last_name']
+        email = user_data['email']
+        username = user_data['username']
+        password = user_data['password']
+    elif request.user.id:
+        if request.user.is_verified:
+            return redirect('home')
+        user = request.user
+        email = user.email
+    else:
+        return redirect('signin')
 
-            
-        context={
-            'email':user.email
-        }         
-        return render(request, 'public/user/verification.html', context)
-    return redirect('signin')
+    if request.method == 'POST':
+        otp_secret = request.POST.get('otp')
+      
+        if otp_verification.verify_token(otp_secret):
+            try:
+                if 'user' in request.session:
+                    user = Account.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
+                    messages.success(request, "User has been successfully created!")
+                    user = auth.authenticate(email=email, password=password)
+                    if user:
+                        assign_cart_to_user(user, request)
+                        auth.login(request, user)
+                        create_wallet(user)
+                        del request.session['user']
+                        del request.session['firstname']
+                        del request.session['lastname']
+                        del request.session['email']
+                else:
+                    user = Account.objects.filter(email=email).first()
+                    if not user:
+                        raise Account.DoesNotExist
 
+                user.is_verified = True
+                user.save()
+                return redirect('signin')
+            except IntegrityError:
+                messages.error(request, 'User already exists!')
+            except Account.DoesNotExist:
+                messages.error(request, 'User not found!')
+        else:
+            messages.error(request, 'Invalid OTP')
 
+    context = {'email': email}
+    return render(request, 'public/user/verification.html', context)
+
+def assign_cart_to_user(user, request):
+    try:
+        cart = Cart.objects.get(cart_id=cart_id(request))
+        cart_items = CartItem.objects.filter(cart=cart)
+        for item in cart_items:
+            item.user = user
+            item.save()
+    except Cart.DoesNotExist:
+        pass
 
 
 def verify(request):

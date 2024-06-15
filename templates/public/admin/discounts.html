@@ -1,0 +1,144 @@
+{% extends "public/admin/base.html" %}
+
+{% block title %}Carts{% endblock title %}
+
+{% block content %}
+{% include "components/admin/aside.html" %}
+<!-- Layout container -->
+<div class="layout-page">
+
+    {% include "components/admin/searchbar.html" %}
+    <!-- Content wrapper -->
+    <div class="content-wrapper">
+        <!-- Content -->
+
+        <style>
+            .btx:hover{
+                color: #80B500;
+            }
+        </style>
+
+        <div class="container-xxl flex-grow-1 container-p-y">
+            <h4 class="fw-bold py-3 mb-4">
+                <span class="text-muted fw-light">Discount Management /</span> Discounts
+            </h4>
+
+            <div class="row">
+                <div class="col-md-12">
+                    {% include "components/admin/discount_manage_button.html" %}
+                    <div class="card">
+                        <!-- Notifications -->
+                        {% include "components/admin/modal-delete-order.html" %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-borderless border-bottom">
+                                <thead>
+                                    <tr>
+                                        <th class="text-nowrap">Discount</th>
+                                        <th class="text-nowrap text-center">Description</th>
+                                        <th class="text-nowrap text-center">Type</th>
+                                        <th class="text-nowrap text-center">Amount</th>
+                                        <th class="text-nowrap text-center">Start Date</th>
+                                        <th class="text-nowrap text-center">End Date</th>
+                                        <th class="text-nowrap text-center">Status</th>
+                                        <th class="text-nowrap text-center">Manage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for discount in discounts %}
+                                        <tr>
+                                            <td class="text-nowrap">{{discount.name}}</td>
+                                            <td>
+                                                <p style="text-align: center;">{{discount.description}}</p>
+                                            </td>
+                                            <td>
+                                                <p style="text-align: center;">{{discount.type}}</p>
+                                            </td>
+                                            <td>
+                                                <p style="text-align: center;">{{discount.discount}}</p>
+                                            </td>
+                                            <td>
+                                                <p style="text-align: center;">{{discount.start_date}}</p>
+                                            </td>
+                                            <td>
+                                                <p style="text-align: center;">{{discount.end_date}}</p>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                {% if discount.status == True %}
+                                                <i class='bx bxs-check-circle' style="color: #80B500;"></i>
+                                                {% endif %}
+    
+                                                {% if discount.status == False %}
+                                                <i class='bx bxs-x-circle' style="color: #FF6161;"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <ul style="display: inline-flex; list-style-type: none; padding: 0;">
+                                                    <li><a href="/root/discounts/edit/{{order.id}}">
+                                                        <i class="btn btx bx bx-pencil"></i>
+                                                    </a></li>
+
+                                                    <li onclick="handle_delete(`{{order.id}}`)"><a href="#" title="Wishlist" data-toggle="modal" data-target="#liton_wishlist_modal">
+                                                        <i class="btn btx bx bx-trash"></i>
+                                                    </a></li>
+                                                </ul>        
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /Notifications -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- / Content -->
+
+
+            <div class="pagination-container">
+                <nav aria-label="Page navigation" class="d-flex justify-content-center">
+                    <ul class="pagination">
+
+                        {% if discounts.has_previous %}
+                        <li class="page-item{% if not items.has_previous %} disabled{% endif %}">
+                            <a class="page-link" href="?page=1"><i class="tf-icon bx bx-chevrons-left"></i></a>
+                        </li>
+                        <li class="page-item{% if not items.has_previous %} disabled{% endif %}">
+                            <a class="page-link" href="?page={{ discounts.previous_page_number }}"><i class="tf-icon bx bx-chevron-left"></i></a>
+                        </li>
+                        {% endif %}
+                        {% for page_num in discounts.paginator.page_range %}
+                            <li class="page-item{% if page_num == discounts.number %} active{% endif %}">
+                                <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if discounts.has_next %}
+                        <li class="page-item{% if not discounts.has_next %} disabled{% endif %}">
+                            <a class="page-link" href="?page={{ discounts.next_page_number }}"><i class="tf-icon bx bx-chevron-right"></i></a>
+                        </li>
+                        <li class="page-item{% if not discounts.has_next %} disabled{% endif %}">
+                            <a class="page-link" href="?page={{ discounts.paginator.num_pages }}"><i class="tf-icon bx bx-chevrons-right"></i></a>
+                        </li>
+                        {% endif %}
+
+                    </ul>
+                </nav>
+            </div>
+
+
+
+        {% include "components/admin/footer.html" %}
+
+        <div class="content-backdrop fade"></div>
+    </div>
+    <!-- Content wrapper -->
+</div>
+<!-- / Layout page -->
+
+<script>
+    const handle_delete = (id)=>{
+        const url = window.location.origin
+        $('#formAccountDeactivation').attr('action',url+'/root/discounts/delete/'+id);
+    }
+</script>
+{% endblock content %}

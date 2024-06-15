@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-###4b46s%dhpgd0y96-@!809(z#sdpqeb8gr0obm@7s8k27(to
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    
+]
 
 PAYPAL_CLIENT_ID = "Abdh1FLUse82UfYoSfm3AmKWzYOpqbf46UW2E9y9bkW1LHraKhj2WKJoWhrHU7VMMZ3nGm4OsU1ai9O-"
 PAYPAL_CLIENT_SECRET = "EBURDNztUHjMcqiTukkZIPMkVnvf6f7gdZlzjifACW3mrye185tQqDFOTslpG5qFbCE63khmjRCvQBmt"
@@ -76,9 +78,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'cart.context_processors.CartCounter',
-                'cart.context_processors.WishlistCounter',
-                'cart.context_processors.WalletProcessor',
+                'broccoli.context_processors.CartCounter',
+                'broccoli.context_processors.WishlistCounter',
+                'broccoli.context_processors.WalletProcessor',
+                'broccoli.context_processors.bannerProcessor',
             ],
             'libraries':{
                 'custom_filters': 'broccoli.templatetags.custom_filters',

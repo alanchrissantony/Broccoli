@@ -4,7 +4,7 @@
     <div class="ltn__slide-one-active slick-slide-arrow-1 slick-slide-dots-1 arrow-white">
         <!-- ltn__slide-item -->
         <div class="ltn__slide-item ltn__slide-item-2 ltn__slide-item-3 text-color-white bg-image"
-            data-bg="{% static "img/slider/11.jpg" %}">
+            data-bg="{{slides.first.image.url}}">
             <div class="ltn__slide-item-inner">
                 <div class="container">
                     <div class="row">
@@ -35,7 +35,7 @@
         </div>
         <!-- ltn__slide-item -->
         <div class="ltn__slide-item ltn__slide-item-2 ltn__slide-item-3 text-color-white bg-image"
-            data-bg="{% static "img/slider/11.jpg" %}">
+            data-bg="{{slides.last.image.url}}">
             <div class="ltn__slide-item-inner  text-right">
                 <div class="container">
                     <div class="row">
@@ -46,7 +46,8 @@
                                         Fuel Your Body Right</h6>
                                     <h1 class="slide-title animated ">Explore Fresh Flavors,<br> Taste the Difference Today!</h1>
                                     <div class="slide-brief animated">
-                                        <p>Embark on a flavor-filled journey with our handpicked selection of delicious meals and fresh ingredients. Shop now for doorstep delivery and savor culinary bliss!</p>
+                                        <p>Explore a world of flavors with our curated selection of delicious meals, fresh ingredients, and gourmet delights.
+                                            Shop now and get your favorites delivered right to your doorstep!</p>
                                     </div>
                                     <div class="btn-wrapper animated">
                                         <a href="/products" class="theme-btn-1 btn btn-effect-1 text-uppercase">Explore

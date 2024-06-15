@@ -50,8 +50,8 @@ def cart_id(request):
         cart = request.session.create()
     return cart
 
-@login_required(login_url='signin')
-def add(request, product_id, quantity, wallet=None, wallet_pay=0, coupon=None, total=0, discount=0, vat=0, shipping=0, cart_items=None, cart=None):
+
+def add(request, product_id, quantity, wallet=None, wallet_pay=0, coupon=None, total=0, discount=0, vat=0, shipping=0, cart_items=None, cart=None, message=None, tag=None):
 
 
     product = Product.objects.get(id=product_id)
@@ -66,22 +66,33 @@ def add(request, product_id, quantity, wallet=None, wallet_pay=0, coupon=None, t
         if request.user.id:
             user = Account.objects.get(email=request.user.email)
             cart_item = CartItem.objects.get(product_id=product, user=user)
+            wallet = Wallet.objects.filter(user=request.user).first()
         else:
-            cart_item = CartItem.objects.get(product_id=product, cart_id=cart)
-        wallet = Wallet.objects.filter(user=request.user).first()
+            cart_item = CartItem.objects.get(product_id=product_id, cart_id=cart)
 
-        if cart_item.product.stock >= quantity:
+
+        if cart_item.product.stock >= quantity and cart_item.quantity < 5 and cart_item.product.stock > cart_item.quantity:
             cart_item.quantity += quantity
             cart_item.save()
+        elif cart_item.quantity > 5:
+            message = "Sorry, you can't add more of this item. You've reached the cart limit."
+            tag = 'warning'
         else:
-            messages.error(request, "This item is currently out of stock. We apologize for any inconvenience.")
+            message = "This item is currently out of stock. We apologize for any inconvenience."
+            tag = 'error'      
 
     except CartItem.DoesNotExist:
-        cart_item = CartItem.objects.create(product=product, quantity=quantity, cart=cart, user=request.user)
+        
+        if request.user.id:
+            cart_item = CartItem.objects.create(product=product, quantity=quantity, cart=cart, user=request.user)
+        else:
+            cart_item = CartItem.objects.create(product=product, quantity=quantity, cart=cart)
+        
         if cart_item.product.stock >= quantity:
             cart_item.save()
         else:
-            messages.error(request, "This item is currently out of stock. We apologize for any inconvenience.")
+            message = "This item is currently out of stock. We apologize for any inconvenience."
+            tag = 'error' 
 
     try:
         if request.user:
@@ -114,7 +125,7 @@ def add(request, product_id, quantity, wallet=None, wallet_pay=0, coupon=None, t
             wallet_pay = price          
         else:
             wallet_pay = wallet.balance
-
+    
     context={
         'total':total,
         'quantity':quantity,
@@ -122,12 +133,14 @@ def add(request, product_id, quantity, wallet=None, wallet_pay=0, coupon=None, t
         'shipping':shipping,
         'vat':vat,
         'price': price,
-        'wallet': wallet_pay
+        'wallet': wallet_pay,
+        'message':message,
+        'tag':tag
 
     }
     return JsonResponse(context)
     
-@login_required(login_url='signin')
+
 def remove(request, product_id, wallet=None, wallet_pay=0, coupon=None, coupon_discount=None, total=0, discount=0, vat=0, shipping=0, cart_items=None, cart=None):
 
     product = get_object_or_404(Product, id=product_id)
@@ -191,7 +204,7 @@ def remove(request, product_id, wallet=None, wallet_pay=0, coupon=None, coupon_d
     }
     return JsonResponse(context)
 
-@login_required(login_url='signin')
+
 def delete(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
@@ -205,16 +218,17 @@ def delete(request, product_id):
     cart_item.delete()
     return redirect('cart')
 
-@login_required(login_url='signin')
-def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None, coupon=None):
+
+def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None, coupon=None, wallet=None, price=0):
     
     try:
-        if request.user:
+        if request.user.id:
             cart_items = CartItem.objects.filter(user=request.user, is_active=True) 
             wallet = Wallet.objects.filter(user=request.user).first()
         else: 
             cart = Cart.objects.get(cart_id=cart_id(request))
             cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+            
         for cart_item in cart_items:
             total += (cart_item.product.price * cart_item.quantity)
             discount += discount_calculator(cart_item.product, cart_item.quantity)

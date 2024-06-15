@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from core.models import image_upload_path
 from django.conf import settings
+from django.core.paginator import Paginator
 import os
 
 # Create your views here.
@@ -15,10 +16,14 @@ class Categories:
     def category(request):
         
         categories = Category.objects.all()
+        items_per_page = 10
+        paginator = Paginator(categories, items_per_page)
+        page = request.GET.get('page')
+        obj = paginator.get_page(page)
         admin = request.user
         context = {
             'admin':admin,
-            'categories':categories
+            'categories':obj
         }
         return render(request, 'public/admin/category.html', context)
 
