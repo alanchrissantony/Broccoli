@@ -84,3 +84,11 @@ def in_wishlist(product, user):  # Include user as an argument
 @register.filter(name='custom_range')
 def custom_range(end):
     return range(1, end + 1)
+
+@register.filter(name='custom_conventer')
+def custom_conventer(val):
+    return round(val/1000, 2)
+
+@register.filter(name='get_item')
+def get_item(dict, key):
+    return dict[key]

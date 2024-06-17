@@ -16,69 +16,58 @@
 
         <div class="container-xxl flex-grow-1 container-p-y">
             <h4 class="fw-bold py-3 mb-4">
-                <span class="text-muted fw-light">Product Management /</span>Add Product
+                <span class="text-muted fw-light">Discount Management /</span>Edit Discount
             </h4>
 
             <div class="row">
                 <div class="col-md-12">
-                    {% include "components/admin/product_manage_button.html" %}
+                    {% include "components/admin/discount_manage_button.html" %}
                     <div class="card mb-4">
-                        <h5 class="card-header">Product Details</h5>
+                        <h5 class="card-header">Discount Details</h5>
                         <!-- Account -->
-                        <form id="formAccountSettings" method="POST" enctype="multipart/form-data">
+                        <form id="formAccountSettings" method="POST">
                             {% csrf_token %}
                             {% for message in messages %}
                                 <p style="text-align: center;" class="{{message.tags}}-message">{{message}}</p>
                             {% endfor %}
                         <div class="card-body">
-                            <div class="d-flex align-items-start align-items-sm-center gap-4">
-                                <img src="" alt="Product Image" class="d-block rounded" height="100" width="100" id="uploadedAvatar"/>
-                                <div class="button-wrapper">
-                                    <label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0">
-                                        <span class="d-none d-sm-block">Upload new photo</span>
-                                        <i class="bx bx-upload d-block d-sm-none"></i>
-                                        <input type="file" id="upload" class="account-file-input" hidden accept="image/png, image/jpeg" name="image" multiple required/>
-                                    </label>
-                                    <button type="button" class="btn btn-outline-secondary account-image-reset mb-4">
-                                        <i class="bx bx-reset d-block d-sm-none"></i>
-                                        <span class="d-none d-sm-block">Reset</span>
-                                    </button>
-
-                                    <p class="text-muted mb-0">Allowed JPG, GIF or PNG. Max size of 800K</p>
-                                </div>
-                            </div>
-                        </div>
-                        <hr class="my-0" />
-                        <div class="card-body">
                                 <div class="row">
                                     <div class="mb-3 col-md-6">
-                                        <label for="firstName" class="form-label">Name</label>
-                                        <input class="form-control" type="text" id="firstName" name="name" autofocus required/>
+                                        <label for="name" class="form-label">Name</label>
+                                        <input class="form-control" value="{{discount.name}}" type="text" id="firstName" name="name" autofocus required/>
                                     </div>
                                     <div class="mb-3 col-md-6">
-                                        <label for="lastName" class="form-label">Price</label>
-                                        <input class="form-control" type="number" value="0" min="0" max="10000" name="price" id="lastName" step="any" required/>
-                                    </div>
-                                    <div class="mb-3 col-md-6">
-                                        <label class="form-label" for="country">Category</label>
-                                        <select id="country" class="select2 form-select" name="category" required>
+                                        <label for="type" class="form-label">Type</label>
+                                        <select id="country" class="select2 form-select" name="type" required>
                                             <option value="">Select</option>
-                                            {% for category in categories %}
-                                                <option value="{{category.name}}">{{category.name}}</option>
+                                            {% for type, value in types %}
+                                                <option {% if discount.type == type %}selected{% endif %} value="{{type}}">{{type}}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
                                     <div class="mb-3 col-md-6">
-                                        <label for="organization" class="form-label">Quantity</label>
-                                        <input type="number" class="form-control" id="organization" name="stock" required/>
+                                        <label class="form-label" for="country">Discount</label>
+                                        <input class="form-control" type="number" value="{{discount.discount}}" min="0" max="10000" name="discount" id="lastName" step="any" required/>
                                     </div>
-                                    <div class="mb-6 col-md-12">
+                                    <div class="mb-3 col-md-6">
                                         <label for="address" class="form-label">Description</label>
-                                        <textarea type="text" class="form-control" id="address" name="description" placeholder="Description"></textarea>
+                                        <input type="text" class="form-control" value="{{discount.description}}" id="organization" name="description" required/>
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label for="organization" class="form-label">Start Date</label>
+                                        <input type="date" class="form-control" id="organization" value="{{discount.start_date}}" name="start" required/>
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label for="organization" class="form-label">End Date</label>
+                                        <input type="date" class="form-control" id="organization" value="{{discount.end_date}}" name="end" required/>
+                                    </div>
+                                    <div class="mt-2">
+                                        <input class="form-check-input" type="checkbox" id="defaultCheck1" {% if discount.status %}checked{% endif %} value="True" name="status" />
+                                        <label for="address" class="form-label">Status</label>
                                     </div>
                                     <div class="mt-2">
                                         <button type="submit" class="btn btn-primary me-2">Save</button>
-                                        <a href="/root/products" class="btn btn-outline-secondary">Cancel</a>
+                                        <a href="/root/discounts" class="btn btn-outline-secondary">Cancel</a>
                                     </div>
                         </div>
                     </form>

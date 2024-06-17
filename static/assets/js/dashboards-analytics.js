@@ -420,6 +420,15 @@
 
   // Order Statistics Chart
   // --------------------------------------------------------------------
+  let key=document.getElementById('order_keys').value
+  let value = document.getElementById('order_values').value;
+  value = JSON.parse(value)
+  let dp = [];
+
+  length = value.length;
+  for (let i = 0; i < length; i++)
+    dp.push(parseInt(value[i]));
+    
   const chartOrderStatistics = document.querySelector('#orderStatisticsChart'),
     orderChartConfig = {
       chart: {
@@ -427,8 +436,8 @@
         width: 130,
         type: 'donut'
       },
-      labels: ['Electronic', 'Sports', 'Decor', 'Fashion'],
-      series: [85, 15, 50, 50],
+      labels: key,
+      series: dp,
       colors: [config.colors.primary, config.colors.secondary, config.colors.info, config.colors.success],
       stroke: {
         width: 5,

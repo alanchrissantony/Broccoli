@@ -1,6 +1,6 @@
 {% extends "public/admin/base.html" %}
 
-{% block title %}Carts{% endblock title %}
+{% block title %}Wallet{% endblock title %}
 
 {% block content %}
 {% include "components/admin/aside.html" %}
@@ -21,7 +21,7 @@
         <div class="container-xxl flex-grow-1 container-p-y">
             <h4 class="fw-bold py-3 mb-4">
                 <span class="text-muted fw-light">Wallet Management /</span> 
-                Wallet
+                Wallet /</span> {{user.first_name}} {{user.last_name}}
             </h4>
 
             <div class="row">
@@ -35,35 +35,23 @@
                                 <thead>
                                     <tr>
                                         <th class="text-nowrap">Date</th>
-                                        <th class="text-nowrap text-center">Name</th>
-                                        <th class="text-nowrap text-center">Email</th>
-                                        <th class="text-nowrap text-center">Username</th>
+                                        <th class="text-nowrap text-center">Transaction</th>
                                         <th class="text-nowrap text-center">Balance</th>
-                                        <th class="text-nowrap text-center">View</th>
+                                        <th class="text-nowrap text-center">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for wallet in wallets %}
                                         <tr>
-                                            <td class="text-nowrap">{{wallet.user.date_joined}}</td>
+                                            <td class="text-nowrap">{{wallet.created_at}}</td>
                                             <td>
-                                                <p style="text-align: center;">{{wallet.user.first_name}} {{wallet.user.last_name}}</p>
+                                                <p style="text-align: center;">{{wallet.transaction}}</p>
                                             </td>
                                             <td>
-                                                <p style="text-align: center;">{{wallet.user.email}}</p>
+                                                <p style="text-align: center;">${{wallet.balance}}</p>
                                             </td>
                                             <td>
-                                                <p style="text-align: center;">{{wallet.user.username}}</p>
-                                            </td>
-                                            <td>
-                                                <p style="text-align: center;">{{wallet.balance}}</p>
-                                            </td>
-                                            <td style="text-align: center;">
-                                                <ul style="display: inline-flex; list-style-type: none; padding: 0;">
-                                                    <li><a href="/root/wallets/{{wallet.id}}">
-                                                        <i class='bx bx-right-top-arrow-circle'></i>
-                                                    </a></li>
-                                                </ul>        
+                                                <p class="text-{% if wallet.status == 'Credit' %}success{% else %}danger{% endif %}" style="text-align: center;">${{wallet.amount}}</p>
                                             </td>
                                         </tr>
                                     {% endfor %}

@@ -1332,6 +1332,7 @@
                                 
                         $('#toast-message').text("This item is currently out of stock. We apologize for any inconvenience.");
                         $('#toast-tag').text('warning'.toString().toUpperCase())
+                        console.log(12345);
                         
                         toastPlacementExample.classList.add('bg-secondary');
                         toastPlacementExample.classList.add('top-0', 'end-0');

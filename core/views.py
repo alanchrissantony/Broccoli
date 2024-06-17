@@ -82,7 +82,8 @@ def coupon(request, wallet=None, wallet_pay=0, coupon=None, total=0, quantity=0,
             wallet_pay = wallet.balance
 
     if coupon_code:
-        coupon = Coupon.objects.filter(code=coupon_code).first()
+        Coupon.auto_delete_expired()
+        coupon = Coupon.objects.filter(code=coupon_code, status=True).first()
         if coupon and price >= coupon.minimum_price:
             request.session['coupon']=coupon.code
             
@@ -163,7 +164,7 @@ def wallet(request, wallet_pay=0, coupon_code=None, coupon=None, total=0, quanti
         pass
 
     if coupon_code:
-        coupon = Coupon.objects.filter(code=coupon_code).first()
+        coupon = Coupon.objects.filter(code=coupon_code, status=True).first()
         if coupon and price >= coupon.minimum_price:
             
             coupon_type = coupon.type
@@ -240,7 +241,7 @@ def checkout(request):
         return redirect('cart')
 
     if 'coupon' in request.session:
-        coupon = Coupon.objects.filter(code=request.session.get('coupon')).first()
+        coupon = Coupon.objects.filter(code=request.session.get('coupon'), status=True).first()
         
         if coupon and price >= coupon.minimum_price:
             coupon_type = coupon.type

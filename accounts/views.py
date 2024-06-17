@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from product.models import Product, Image
 from category.models import Category
 from promotion.models import Discount, Promotion, PromotionCategory, Coupon
-from cart.models import CartItem
 from accounts.validator import Validator
 from django.contrib import messages, auth
 from accounts.tests import JsonEncoder
@@ -16,20 +15,58 @@ from django.conf import settings
 from django.core.paginator import Paginator
 from wallet.models import Wallet, Transaction
 import json, os, uuid, decimal
+from collections import defaultdict
+from django.db.models import Sum, Count, F
 
 
 
 # Create your views here.
 
 @login_required(login_url='root_signin')
-def root(request, sales=0):
+def root(request):
     orders = Order.objects.all().order_by('-created_at')
+    products = OrderProduct.objects.all().select_related('product__category').order_by('-created_at')
+
+    # Initialize dictionaries with defaultdict
+    dp = defaultdict(decimal.Decimal)
+    product_obj = {}
+    order_obj = {}
+    count = defaultdict(int)
+    sales = 0
+    revenue = 0
+
+    # Iterate through products and populate dictionaries
+    for product in products:
+        category = product.product.category
+        dp[category] += product.price
+        product_obj[category] = product.product.name
+        count[category.name] += 1
+
+    # Calculate total sales and revenue
     for order in orders:
-        sales+=order.price
-    sales = round(sales)
-    context={
-        'orders':orders,
-        'sales':sales
+        revenue += order.price
+        sales += 1
+
+        if(order.statuses.last().name in order_obj):
+            order_obj[order.statuses.last().name]+=1
+        else:
+            order_obj[order.statuses.last().name]=1
+
+    # Convert count dictionary to keys and values lists
+    keys = list(count.keys())
+    values = list(count.values())
+    total = sum(values)
+
+
+    context = {
+        'orders': orders,
+        'sales': sales,
+        'revenue': round(revenue),
+        'order_category': dp,
+        'order_products': product_obj,
+        'keys': keys,
+        'values': values,
+        'order_obj':order_obj,
     }
     return render(request, 'public/admin/dashboard.html', context)
 
@@ -358,17 +395,19 @@ class Orders:
             order = Order.objects.get(id=id)
             products = OrderProduct.objects.filter(order=order)
             if order.payment.status == 'Paid':
-                wallet = Wallet.objects.get(user=request.user)
-                Transaction.objects.create(
-                    transaction = uuid.uuid4(),
-                    user = wallet.user,
-                    amount = order.price,
-                    balance = float(wallet.balance) + order.price,
-                    status = 'Credit'
-                )
-                wallet.balance += decimal.Decimal(order.price)
-                wallet.save()
+                wallet = Wallet.objects.filter(user=request.user).first()
+                if wallet:
+                    Transaction.objects.create(
+                        transaction = uuid.uuid4(),
+                        user = wallet.user,
+                        amount = order.price,
+                        balance = float(wallet.balance) + order.price,
+                        status = 'Credit'
+                    )
+                    wallet.balance += decimal.Decimal(order.price)
+                    wallet.save()
             cancel = OrderCancel.objects.create(order=order)
+            
             for product in products:
                 product.product.stock += product.quantity
                 product.product.save()
@@ -391,9 +430,13 @@ class Orders:
     
     def delete(request, id):
         try:
-            order = OrderProduct.objects.get(order=id)
-            order.product.stock += order.quantity
-            order.product.save()
+            order = Order.objects.get(id=id)
+            products = OrderProduct.objects.filter(order=order)
+            for product in products:
+                
+                product.product.stock += product.quantity
+                product.product.save()
+            print(order)
             order.delete()
         except:
             pass
@@ -412,6 +455,8 @@ class Orders:
         return render(request, 'public/admin/cancellation.html', context)
     
 
+    
+
 class UserWallet:
 
     def user_wallet(request):
@@ -426,12 +471,33 @@ class UserWallet:
         }
         return render(request, 'public/admin/wallets.html', context)
     
+
+    def view(request, id, wallet=None):
+        user = Wallet.objects.filter(id=id).first()
+        
+        if user:
+            wallet = Transaction.objects.filter(user=user.user).order_by('-created_at')
+            user=user.user
+        print(wallet, id)
+        items_per_page = 10
+        paginator = Paginator(wallet, items_per_page)
+        page = request.GET.get('page')
+        obj = paginator.get_page(page)
+
+        context={
+            'wallets':obj,
+            'user':user
+        }
+        return render(request, 'public/admin/user_wallets.html', context)
+    
+
 class ProductPromotion:
 
     class ProductDiscount:
 
         def product_discount(request):
-            discounts = Discount.objects.all()
+            Discount.auto_delete_expired()
+            discounts = Discount.objects.filter()
             items_per_page = 10
             paginator = Paginator(discounts, items_per_page)
             page = request.GET.get('page')
@@ -442,15 +508,85 @@ class ProductPromotion:
             return render(request, 'public/admin/discounts.html', context)
         
         def add(request):
+            if request.method == 'POST':
+                name = request.POST.get('name').strip(' ')
+                type = request.POST.get('type').strip(' ')
+                discount = request.POST.get('discount').strip(' ')
+                description = request.POST.get('description').strip(' ')
+                start = request.POST.get('start').strip(' ')
+                end = request.POST.get('end').strip(' ')
+
+                try:
+                    Discount.objects.create(
+                        name = name,
+                        type = type,
+                        discount = discount,
+                        description = description,
+                        start_date = start,
+                        end_date = end,
+                    )
+                    Discount.auto_delete_expired()
+                    return redirect('root_discounts')
+                except:   
+                    messages.error(request, 'Unable to create discount!')
             context = {
-                
-                }
+                'types':Coupon.TYPE
+            }
             return render(request, 'public/admin/add_discount.html', context)
+        
+        def edit(request, id):
+            Discount.auto_delete_expired()
+            discount = Discount.objects.filter(id=id).first()
+
+            if request.method == 'POST':
+                name = request.POST.get('name').strip(' ')
+                status = request.POST.get('status')
+                type = request.POST.get('type').strip(' ')
+                _discount = request.POST.get('discount').strip(' ')
+                description = request.POST.get('description').strip(' ')
+                start = request.POST.get('start').strip(' ')
+                end = request.POST.get('end').strip(' ')
+        
+                try:
+                    discount.name = name
+                    discount.type = type
+                    discount.discount = _discount
+                    discount.description = description
+                    discount.start_date = start
+                    discount.end_date = end
+                    if status:
+                        discount.status = True
+                    else:
+                        discount.status = False
+
+                    discount.save()
+                    Discount.auto_delete_expired()
+                    return redirect('root_discounts')
+                except:
+                    messages.error(request, 'Unable to modify')
+                    
+            context = {
+                'types':Coupon.TYPE,
+                'discount':discount
+                }
+            return render(request, 'public/admin/edit_discount.html', context)
+        
+        def delete(request, id):
+            discount = Discount.objects.filter(id=id).first()
+
+            if discount.status:
+                discount.status = False
+            else:
+                discount.status = True
+            discount.save()
+            Discount.auto_delete_expired()
+            return redirect('root_discounts')
         
 
     class ProductCoupon:
         
         def product_coupon(request):
+            Coupon.auto_delete_expired()
             coupons = Coupon.objects.all()
             items_per_page = 10
             paginator = Paginator(coupons, items_per_page)
@@ -462,10 +598,83 @@ class ProductPromotion:
             return render(request, 'public/admin/coupons.html', context)
         
         def add(request):
+            if request.method == 'POST':
+                code = request.POST.get('code').strip(' ')
+                type = request.POST.get('type').strip(' ')
+                discount = request.POST.get('discount').strip(' ')
+                minimum_price = request.POST.get('minimum').strip(' ')
+                maximum_redeem = request.POST.get('maximum').strip(' ')
+                expiry = request.POST.get('end').strip(' ')
+
+                try:
+                    Coupon.objects.create(
+                        code = code,
+                        type = type,
+                        discount = discount,
+                        minimum_price = minimum_price,
+                        maximum_redeem = maximum_redeem,
+                        expiry = expiry,
+                    )
+                    Coupon.auto_delete_expired()
+                    messages.success(request, 'Coupon has been successfully created!')
+                    return redirect('root_coupons')
+                except:   
+                    messages.error(request, 'Unable to create coupon!')
             context = {
-                
-                }
+                'types':Coupon.TYPE
+            }
             return render(request, 'public/admin/add_coupon.html', context)
+        
+        def edit(request, id):
+            Coupon.auto_delete_expired()
+            coupons = Coupon.objects.filter(id=id).first()
+
+            if request.method == 'POST':
+                code = request.POST.get('code').strip(' ')
+                type = request.POST.get('type').strip(' ')
+                discount = request.POST.get('discount').strip(' ')
+                minimum_price = request.POST.get('minimum').strip(' ')
+                maximum_redeem = request.POST.get('maximum').strip(' ')
+                expiry = request.POST.get('end').strip(' ')
+                status = request.POST.get('status')
+
+                try:
+                    coupons.code = code
+                    coupons.type = type
+                    coupons.discount = discount
+                    coupons.minimum_price = minimum_price
+                    coupons.maximum_redeem = maximum_redeem
+                    coupons.expiry = expiry
+                    if status:
+                        coupons.status = True
+                    else:
+                        coupons.status = False
+
+                    coupons.save()
+                    Coupon.auto_delete_expired()
+                    messages.success(request, 'Coupon has been successfully updated!')
+                    return redirect('root_coupons')
+                except:
+                    messages.error(request, 'Unable to modify')
+
+            context = {
+                'coupons':coupons,
+                'types':Coupon.TYPE
+                }
+            return render(request, 'public/admin/edit_coupon.html', context)
+        
+
+        def delete(request, id):
+            coupon = Coupon.objects.filter(id=id).first()
+
+            if coupon.status:
+                coupon.status = False
+            else:
+                coupon.status = True
+            coupon.save()
+            Coupon.auto_delete_expired()
+            messages.success(request, 'Coupon has been successfully deleted!')
+            return redirect('root_coupons')
         
     
     class ProductPromotion:
@@ -480,6 +689,78 @@ class ProductPromotion:
                 'promotions':obj
                 }
             return render(request, 'public/admin/product_promotions.html', context)
+        
+        def add(request):
+            products = Product.objects.filter(is_available=True)
+            discounts = Discount.objects.filter(status=True)
+
+            if request.method == 'POST':
+                productId = request.POST.get('product')
+                discountId = request.POST.get('discount')
+
+                product = Product.objects.filter(id=productId).first()
+                discount = Discount.objects.filter(id=discountId).first()
+
+                try:
+                    Promotion.objects.create(
+                        product = product,
+                        discount = discount
+                    )
+                    messages.success(request, 'Product promotion has been successfully created!')
+                    return redirect('root_product_promotions')
+                except:
+                    messages.error(request, 'Unable to create product promotion!')
+
+            context = {
+                'products':products,
+                'discounts':discounts
+                }
+            return render(request, 'public/admin/add_product_promotion.html', context)
+        
+        def edit(request, id):
+            products = Product.objects.filter(is_available=True)
+            discounts = Discount.objects.filter(status=True)
+            promotion = Promotion.objects.filter(id=id).first()
+
+            if request.method == 'POST':
+                productId = request.POST.get('product')
+                discountId = request.POST.get('discount')
+                status = request.POST.get('status')
+
+                product = Product.objects.filter(id=productId).first()
+                discount = Discount.objects.filter(id=discountId).first()
+
+                try:
+                    promotion.product = product
+                    promotion.discount = discount
+                    if status:
+                        promotion.status = True
+                    else:
+                        promotion.status = False
+                    promotion.save()
+                    messages.success(request, 'Product promotion has been successfully updated!')
+                    return redirect('root_product_promotions')
+                except:
+                    messages.error(request, 'Unable to modify product promotion!')
+
+            context = {
+                'products':products,
+                'discounts':discounts,
+                'promotion':promotion
+                }
+            return render(request, 'public/admin/edit_product_promotion.html', context)
+        
+        def delete(request, id):
+            promotion = Promotion.objects.filter(id=id).first()
+
+            if promotion.status:
+                promotion.status = False
+            else:
+                promotion.status = True
+            promotion.save()
+            messages.success(request, 'Promotion has been successfully deleted!')
+            return redirect('root_product_promotions')
+
 
 
     class CategoryPromotion:
@@ -494,4 +775,77 @@ class ProductPromotion:
                 'promotions':obj
                 }
             return render(request, 'public/admin/category_promotions.html', context)
+        
+        def add(request):
+            categories = Category.objects.filter(is_available=True)
+            discounts = Discount.objects.filter(status=True)
 
+            if request.method == 'POST':
+                categoryId = request.POST.get('category')
+                discountId = request.POST.get('discount')
+
+                
+
+                category = Category.objects.filter(id=categoryId).first()
+                discount = Discount.objects.filter(id=discountId).first()
+                
+                try:
+                    PromotionCategory.objects.create(
+                        category = category,
+                        discount = discount
+                    )
+                    messages.success(request, 'Category promotion has been successfully created!')
+                    return redirect('root_category_promotions')
+                except:
+                    messages.error(request, 'Unable to create category promotion!')
+
+            context = {
+                'categories':categories,
+                'discounts':discounts
+                }
+            return render(request, 'public/admin/add_category_promotion.html', context)
+        
+        def edit(request, id):
+            categories = Category.objects.filter(is_available=True)
+            discounts = Discount.objects.filter(status=True)
+            promotion = PromotionCategory.objects.filter(id=id).first()
+
+            if request.method == 'POST':
+                categoryId = request.POST.get('category')
+                discountId = request.POST.get('discount')
+                status = request.POST.get('status')
+
+                category = Category.objects.filter(id=categoryId).first()
+                discount = Discount.objects.filter(id=discountId).first()
+
+                try:
+                    promotion.category = category
+                    promotion.discount = discount
+                    if status:
+                        promotion.status = True
+                    else:
+                        promotion.status = False
+                    promotion.save()
+                    messages.success(request, 'Category promotion has been successfully updated!')
+                    return redirect('root_category_promotions')
+                except:
+                    messages.error(request, 'Unable to modify category promotion!')
+
+            context = {
+                'categories':categories,
+                'discounts':discounts,
+                'promotion':promotion
+                }
+            return render(request, 'public/admin/edit_category_promotion.html', context)
+
+
+        def delete(request, id):
+            promotion = PromotionCategory.objects.filter(id=id).first()
+
+            if promotion.status:
+                promotion.status = False
+            else:
+                promotion.status = True
+            promotion.save()
+            messages.success(request, 'Promotion has been successfully deleted!')
+            return redirect('root_category_promotions')

@@ -1,7 +1,7 @@
 from django.db import models
 from product.models import Product
 from category.models import Category
-from datetime import date
+from django.utils.timezone import now
 
 
 # Create your models here.
@@ -25,14 +25,12 @@ class Discount(models.Model):
         return self.name
     
     def is_active(self):
-        today = date.today()
-        return self.start_date <= today <= self.end_date
+        return self.expiry >= now() and self.status
 
     @classmethod
     def auto_delete_expired(cls):
-        today = date.today()
-        expired_discounts = cls.objects.filter(end_date__lt=today)
-        expired_discounts.delete()
+        expired_discounts = cls.objects.filter(models.Q(end_date__lt=now()) | models.Q(start_date__gt=now()), status=True)
+        expired_discounts.update(status=False)
 
 
 class Coupon(models.Model):
@@ -55,16 +53,20 @@ class Coupon(models.Model):
     def __str__(self):
         return self.code
     
-    
     def is_active(self):
-        today = date.today()
-        return self.expiry >= today and self.status  # Check both expiry and active status
+        return self.expiry >= now() and self.status
 
     @classmethod
     def auto_delete_expired(cls):
-        today = date.today()
-        expired_coupons = cls.objects.filter(expiry__lt=today)
-        expired_coupons.delete()
+        expired_coupons = cls.objects.filter(expiry__lt=now(), status=True)
+        expired_coupons.update(status=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['code']),
+            models.Index(fields=['expiry']),
+        ]
+
 
 
 class Promotion(models.Model):

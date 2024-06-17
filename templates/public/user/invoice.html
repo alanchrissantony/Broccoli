@@ -12,6 +12,11 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css" integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous" />
 
+<!-- Include html2canvas from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- Include jsPDF from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
     body{
         background-color:#eee;
@@ -32,11 +37,11 @@
     }
 </style>
 
-<div class="container">
+<div class="container" id="order-invoice">
 <div class="row">
         <div class="col-lg-12">
             <div class="card" style="margin-top: 10rem; margin-bottom: 2rem;">
-                <div class="card-body">
+                <div class="card-body" id="order-invoice">
                     <div class="invoice-title">
                         <h4 class="float-end font-size-15">Invoice #{{order.payment.payment_id}} <span class="badge bg-{% if order.payment.status == "Paid" %}success{% else %}danger{% endif %} font-size-12 ms-2">{{order.payment.status}}</span></h4>
                         <div class="mb-4">
@@ -156,7 +161,7 @@
                         </div><!-- end table responsive -->
                         <div class="d-print-none mt-4">
                             <div class="float-end">
-                                <a href="javascript:window.print()" class="theme-btn-1 btn btn-effect-1"><i class="fa fa-print"></i></a>
+                                <button id="download-pdf" class="theme-btn-1 btn btn-effect-1"><i class="fa fa-print"></i></button>
                                 <a href="/orders/{{order.id}}" class="theme-btn-2 btn btn-effect-2">My Orders</a>
                             </div>
                         </div>
@@ -169,5 +174,21 @@
 
 {% include "components/user/feature.html" %}
 {% include "components/user/footer.html" %}
+
+<script>
+    document.getElementById('download-pdf').addEventListener('click', function() {
+        const element = document.getElementById('order-invoice'); // Get the HTML element to be converted to PDF
+        html2canvas(element).then(canvas => {
+            const imgData = canvas.toDataURL('image/png'); // Convert canvas to image data
+            const pdf = new jspdf.jsPDF(); // Initialize jsPDF
+
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight); // Add image to PDF
+            pdf.save('{{order.order_number}}.pdf'); // Save PDF
+        });
+    });
+</script>
 
 {% endblock content %}

@@ -118,7 +118,7 @@ def add(request, product_id, quantity, wallet=None, wallet_pay=0, coupon=None, t
     price = round(float(total+vat+shipping) - discount, 2)
 
     if 'coupon' in request.session:
-        coupon = Coupon.objects.filter(code=request.session.get('coupon')).first()
+        coupon = Coupon.objects.filter(code=request.session.get('coupon'), status=True).first()
 
     if wallet:
         if wallet.balance > price: 
@@ -180,7 +180,7 @@ def remove(request, product_id, wallet=None, wallet_pay=0, coupon=None, coupon_d
     price = round(float(total+vat+shipping) - discount, 2)
 
     if 'coupon' in request.session:
-        coupon = Coupon.objects.filter(code=request.session.get('coupon')).first()
+        coupon = Coupon.objects.filter(code=request.session.get('coupon'), status=True).first()
         if coupon:
             coupon_discount=coupon.discount
             if coupon.minimum_price > price:
@@ -228,7 +228,7 @@ def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items
         else: 
             cart = Cart.objects.get(cart_id=cart_id(request))
             cart_items = CartItem.objects.filter(cart=cart, is_active=True)
-            
+
         for cart_item in cart_items:
             total += (cart_item.product.price * cart_item.quantity)
             discount += discount_calculator(cart_item.product, cart_item.quantity)
@@ -242,7 +242,7 @@ def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items
         pass
 
     if 'coupon' in request.session:
-        coupon = Coupon.objects.filter(code=request.session.get('coupon')).first()
+        coupon = Coupon.objects.filter(code=request.session.get('coupon'), status=True).first()
 
         if coupon.minimum_price > price:
             del request.session['coupon']
