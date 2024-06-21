@@ -47,10 +47,10 @@ def root(request):
         revenue += order.price
         sales += 1
 
-        if(order.statuses.last().name in order_obj):
-            order_obj[order.statuses.last().name]+=1
+        if(order.statuses.last() in order_obj):
+            order_obj[order.statuses.last()]+=1
         else:
-            order_obj[order.statuses.last().name]=1
+            order_obj[order.statuses.last()]=1
 
     # Convert count dictionary to keys and values lists
     keys = list(count.keys())
@@ -209,7 +209,7 @@ class Products:
             category_name = request.POST.get('category').strip(' ')
             stock = request.POST.get('stock').strip(' ')
             description = request.POST.get('description').strip(' ')
-            is_available = bool(request.POST.get('isAvailable')).strip(' ')  # Convert to boolean
+            is_available = bool(request.POST.get('isAvailable')) # Convert to boolean
 
             if Validator.validate_data(name):
                 messages.error(request, 'Please enter a valid name.')
@@ -733,7 +733,8 @@ class ProductPromotion:
                 try:
                     promotion.product = product
                     promotion.discount = discount
-                    if status:
+                   
+                    if status and discount.status:
                         promotion.status = True
                     else:
                         promotion.status = False
@@ -752,12 +753,12 @@ class ProductPromotion:
         
         def delete(request, id):
             promotion = Promotion.objects.filter(id=id).first()
-
-            if promotion.status:
-                promotion.status = False
-            else:
-                promotion.status = True
-            promotion.save()
+            if promotion.discount.status:
+                if promotion.status:
+                    promotion.status = False
+                else:
+                    promotion.status = True
+                promotion.save()
             messages.success(request, 'Promotion has been successfully deleted!')
             return redirect('root_product_promotions')
 
@@ -821,7 +822,8 @@ class ProductPromotion:
                 try:
                     promotion.category = category
                     promotion.discount = discount
-                    if status:
+                  
+                    if status and discount.status:
                         promotion.status = True
                     else:
                         promotion.status = False
@@ -841,11 +843,11 @@ class ProductPromotion:
 
         def delete(request, id):
             promotion = PromotionCategory.objects.filter(id=id).first()
-
-            if promotion.status:
-                promotion.status = False
-            else:
-                promotion.status = True
+            if promotion.discount.status:
+                if promotion.status:
+                    promotion.status = False
+                else:
+                    promotion.status = True
             promotion.save()
             messages.success(request, 'Promotion has been successfully deleted!')
             return redirect('root_category_promotions')

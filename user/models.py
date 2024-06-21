@@ -1,6 +1,8 @@
 from django.db import models
 from accounts.models import Account
 from phonenumber_field.modelfields import PhoneNumberField
+from functools import partial
+from core.models import image_upload_path
 
 
 # Create your models here.
@@ -69,3 +71,7 @@ class UserAddress(models.Model):
         verbose_name = 'User Address'
         verbose_name_plural = 'User Addresses'
 
+
+class Avatar(models.Model):
+
+    image = models.ImageField(upload_to=partial(image_upload_path, folder='avatars'), blank=True)

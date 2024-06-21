@@ -14,6 +14,8 @@ def product(request):
 
     if search:
         products = Product.objects.filter(name__icontains=search, is_available=True)
+    elif category and sort_by:
+        products = Product.objects.filter(category=category, is_available=True).order_by(sort_by)
     elif sort_by:
         products = Product.objects.filter(is_available=True).order_by(sort_by)
     elif category:

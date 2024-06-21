@@ -1,6 +1,7 @@
 from django.db import models
 from product.models import Product
 from category.models import Category
+from accounts.models import Account
 from django.utils.timezone import now
 
 
@@ -77,6 +78,7 @@ class Promotion(models.Model):
 
     def __str__(self):
         return self.product.name
+    
 
 class PromotionCategory(models.Model):
     
@@ -90,3 +92,10 @@ class PromotionCategory(models.Model):
 
     def __str__(self):
         return self.category.name
+    
+
+class UsedCoupon(models.Model):
+
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)

@@ -211,7 +211,7 @@
                                                 <li>
                                                     <div class="ltn__comment-item clearfix">
                                                         <div class="ltn__commenter-img">
-                                                            <img src="{% static "img/icons/user.png" %}" alt="Image">
+                                                            <img {% if review.user.avatar != "False" %} src="{{review.user.avatar}}" {% else %}src="{% static "img/icons/user.png" %}"{% endif %} alt="Image">
                                                         </div>
                                                         <div class="ltn__commenter-comment">
                                                             <h6><a href="#">{{review.user.first_name}} {{review.user.last_name}}</a></h6>

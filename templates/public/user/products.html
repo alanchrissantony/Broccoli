@@ -39,6 +39,9 @@
                                             <option value="price" {% if request.GET.sort_by == 'price' %}selected{% endif %}>Sort by price: low to high</option>
                                             <option value="-price" {% if request.GET.sort_by == 'ratings' %}selected{% endif %}>Sort by price: high to low</option>
                                         </select>
+                                        <input type="hidden" {% if request.GET.category %} name="category" value="{{ request.GET.category }}" {% endif %}>
+                                        <input type="hidden" {% if request.GET.search %} name="search" value="{{ request.GET.search }}" {% endif %}>
+                                        <input type="hidden" {% if request.GET.page %} name="page" value="{{ request.GET.page }}" {% endif %}>
                                     </form>
                                 </div>
                             </li>
@@ -279,7 +282,25 @@
 
     <script>
         function submitForm() {
-            document.getElementById("sortForm").submit();
+            const form = document.getElementById('sortForm');
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+            const sortByValue = document.getElementById('sortSelect').value;
+            if (sortByValue) {
+                params.set('sort_by', sortByValue);
+            } else {
+                params.delete('sort_by');
+            }
+            form.querySelectorAll('input[type="hidden"]').forEach(input => {
+                if (input.value) {
+                    params.set(input.name, input.value);
+                } else {
+                    params.delete(input.name);
+                }
+            });
+            const newUrl = `${url.pathname}?${params.toString()}`;
+            form.action = newUrl;
+            form.submit();
         }
 
         const addCart = async (proId, name, image, stock) => {

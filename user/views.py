@@ -4,7 +4,7 @@ from accounts.models import Account
 from accounts.validator import Validator
 from cart.models import Cart, CartItem
 from cart.views import cart_id
-from user.models import Address, UserAddress, Country, State, City
+from user.models import Address, UserAddress, Country, State, City, Avatar
 from accounts.utils import send_otp
 from accounts.otp import TOTPVerification
 from django.db import IntegrityError
@@ -14,7 +14,7 @@ from wallet.views import create_wallet
 from order.models import Order
 from wallet.models import Transaction
 from datetime import datetime
-
+from user.utils import get_random_avatar_url
 
 # Create your views here.
 otp_verification = TOTPVerification()
@@ -50,42 +50,51 @@ def account(request):
         currentpassword = request.POST.get('currentpassword')
         newpassword = request.POST.get('newpassword')
         confirmpassword = request.POST.get('confirmpassword')
+        image = request.POST.get('avatar')
+        
 
         user = Account.objects.get(username__exact=request.user.username)
-        success=user.check_password(currentpassword)
 
-        if success:
-            if firstname:
-                if Validator.validate_name(firstname):
-                    messages.error(request, 'Please enter a valid first name.')
-                else:
-                    user.first_name = firstname
-            if lastname:
-                if Validator.validate_name(lastname):
-                    messages.error(request, 'Please enter a valid last name.')
-                else:
-                    user.last_name = lastname
-            if newpassword:
-                if newpassword != confirmpassword:
-                    messages.error(request, "The passwords provided do not match!")
-                elif Validator.validate_password(newpassword):
-                    messages.error(request, 'The password must contain at least 8 characters, including at least one letter, one digit, and one special character (@$!%*?&).')
-                else:
-                    user.set_password(newpassword)
-                    messages.success(request, "Password has been updated!")
-            user.save()
-        else:
-            messages.error(request, "Invalid credentials!")
+        if firstname:
+            if Validator.validate_name(firstname):
+                messages.error(request, 'Please enter a valid first name.')
+            else:
+                user.first_name = firstname
+        if lastname:
+            if Validator.validate_name(lastname):
+                messages.error(request, 'Please enter a valid last name.')
+            else:
+                user.last_name = lastname
+        if image:
+            user.avatar = image
+            messages.success(request, 'Avatar has been updated successfully.')
+        
+        if newpassword:
+            success=user.check_password(currentpassword)
+            if success:
+                if newpassword:
+                    if newpassword != confirmpassword:
+                        messages.error(request, "The passwords provided do not match!")
+                    elif Validator.validate_password(newpassword):
+                        messages.error(request, 'The password must contain at least 8 characters, including at least one letter, one digit, and one special character (@$!%*?&).')
+                    else:
+                        user.set_password(newpassword)
+                        messages.success(request, "Password has been updated!")
+            else:
+                messages.error(request, "Invalid credentials!")
+        user.save()
         return redirect('account')
 
     address = UserAddress.objects.filter(user_id=request.user)
     orders = Order.objects.filter(user=request.user, is_ordered=True)
     transactions = Transaction.objects.filter(user=request.user).order_by('-created_at')
+    avatars = Avatar.objects.all()
     current_date = datetime.now()
     formatted_date = current_date.strftime("%m/%y")
     context={
         'addresses':address,
         'orders':orders,
+        'avatars':avatars,
         'transactions':transactions,
         'current_date':formatted_date
     }
@@ -223,7 +232,11 @@ def verification(request):
         if otp_verification.verify_token(otp_secret):
             try:
                 if 'user' in request.session:
+                    avatar = get_random_avatar_url()
+                    print(avatar)
                     user = Account.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
+                    user.avatar = avatar
+                    user.save()
                     messages.success(request, "User has been successfully created!")
                     user = auth.authenticate(email=email, password=password)
                     if user:

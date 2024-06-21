@@ -2,7 +2,6 @@
 from django import template
 from promotion.models import Promotion, PromotionCategory
 from wishlists.models import Wishlist
-from order.models import Review
 
 register = template.Library()
 
@@ -13,8 +12,8 @@ def calculate_discounted_price(product):
     reduction = 0
 
     # Get active product and category promotions (handle potential absence)
-    product_promotion = Promotion.objects.filter(product=product).first()
-    category_promotion = PromotionCategory.objects.filter(category=product.category).first()
+    product_promotion = Promotion.objects.filter(product=product, status=True).first()
+    category_promotion = PromotionCategory.objects.filter(category=product.category, status=True).first()
     
     # Calculate discount based on promotion type if existing
     if product_promotion:

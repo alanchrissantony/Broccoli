@@ -10,7 +10,7 @@ from user.models import Address, UserAddress, Country, State, City
 from cart.views import discount_calculator, cart_id
 from cart.models import CartItem, Cart
 from order.models import Order, Payment, OrderProduct, OrderStatus
-from promotion.models import Coupon
+from promotion.models import Coupon, UsedCoupon
 from user.views import verification_required
 import datetime, paypalrestsdk
 from django.db import transaction
@@ -54,11 +54,12 @@ def order_product(request, cart_items, order, user, payment):
 def about(request):
     return render(request, 'public/user/about.html')
 
+
 def coupon(request, wallet=None, wallet_pay=0, coupon=None, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None, coupon_code=None):
     coupon_code = request.GET.get('coupon')
 
     try:
-        if request.user:
+        if request.user.id:
             wallet = Wallet.objects.filter(user=request.user).first()
             cart_items = CartItem.objects.filter(user=request.user, is_active=True) 
         else: 
@@ -80,10 +81,11 @@ def coupon(request, wallet=None, wallet_pay=0, coupon=None, total=0, quantity=0,
             wallet_pay = price          
         else:
             wallet_pay = wallet.balance
-
+    
     if coupon_code:
         Coupon.auto_delete_expired()
         coupon = Coupon.objects.filter(code=coupon_code, status=True).first()
+    
         if coupon and price >= coupon.minimum_price:
             request.session['coupon']=coupon.code
             
