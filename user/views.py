@@ -15,6 +15,7 @@ from order.models import Order
 from wallet.models import Transaction
 from datetime import datetime
 from user.utils import get_random_avatar_url
+from django.views.decorators.cache import cache_control
 
 # Create your views here.
 otp_verification = TOTPVerification()
@@ -40,8 +41,10 @@ def send(request):
     messages.success(request, "Verification code sent to your email address.")
     return True
 
+
 @login_required(login_url='signin')
 @verification_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def account(request):
 
     if request.method=='POST':
@@ -204,6 +207,8 @@ def register(request):
 
     return render(request, 'public/user/register.html')
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def signout(request):
     auth.logout(request)
     request.session.clear()
@@ -359,6 +364,7 @@ class AddressUser:
     
     def edit(request, id):
         user = request.user
+        url = request.GET.get('next')
         if request.method == 'POST':
             form_data = request.POST
 
@@ -385,7 +391,8 @@ class AddressUser:
             else:
                 address_instance = Address.objects.create(**address_data)
                 user_address = UserAddress.objects.create(user_id=user, address_id=address_instance)
-
+            if url:
+                return redirect(url)
             return redirect('checkout')
         try:
             address = Address.objects.get(id=id)

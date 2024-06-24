@@ -326,9 +326,9 @@
                         class="fas fa-file-alt"></i></a>
                     <a id="#liton_tab_1_3" data-toggle="tab" href="#liton_tab_1_3">Wallet <i
                         class="fas fa-credit-card"></i></a>
-                    <a data-toggle="tab" href="#liton_tab_1_4">address <i class="fas fa-map-marker-alt"></i></a>
+                    <a data-toggle="tab" href="#liton_tab_1_4">Address <i class="fas fa-map-marker-alt"></i></a>
                     <a data-toggle="tab" href="#liton_tab_1_5">Account Details <i class="fas fa-user"></i></a>
-                    <a href="/user/signout">Logout <i class="fas fa-sign-out-alt"></i></a>
+                    <a href="#" data-toggle="modal" data-target="#liton_signout_modal">Logout <i class="fas fa-sign-out-alt"></i></a>
                   </div>
                 </div>
               </div>
@@ -343,7 +343,7 @@
                       {% endif %}
 
                       <p>Hello <strong>{{request.user.first_name}} {{request.user.last_name}}</strong> (not
-                        <strong>{{request.user.first_name}}</strong>? <small><a href="/user/signout">Log out</a></small>
+                        <strong>{{request.user.first_name}}</strong>? <small><a href="#" data-toggle="modal" data-target="#liton_signout_modal">Log out</a></small>
                         )
                       </p>
                       <p>From your account dashboard you can view your <span>recent orders</span>, manage your
@@ -843,7 +843,7 @@
                         {% for address in addresses %}
                         <div class="col-md-6 col-12 learts-mb-30">
                           <h4>{% if address.is_default %}Default Address{% else %}Address{% endif %} <small><a
-                                href="/user/address/edit/{{address.address_id.id}}">edit</a></small>&nbsp;&nbsp;&nbsp;<small><a
+                                href="/user/address/edit/{{address.address_id.id}}?next=/user/account/">edit</a></small>&nbsp;&nbsp;&nbsp;<small><a
                                 href="/user/address/delete/{{address.address_id.id}}">delete</a></small></h4>
                           <address>
                             <p><strong>{{address.address_id.first_name}} {{address.address_id.last_name}}</strong></p>
@@ -1069,7 +1069,5 @@
     }
   }
 </script>
-  
-
 
 {% endblock content %}

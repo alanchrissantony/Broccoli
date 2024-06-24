@@ -161,21 +161,24 @@ class Products:
             elif Validator.validate_price(price):
                 messages.error(request, 'Please enter a valid price.')
             else:
+                try:
                 # Create the product object
-                product = Product.objects.create(
-                    name=name,
-                    category=category,
-                    price=price,
-                    stock=stock,
-                    description=description,
-                    slug=slug
-                )
-                # Associate uploaded images with the product
-                for image_path in image_paths:
-                    img = Image.objects.create(image=image_path)
-                    product.images.add(img)
+                    product = Product.objects.create(
+                        name=name,
+                        category=category,
+                        price=price,
+                        stock=stock,
+                        description=description,
+                        slug=slug
+                    )
+                    # Associate uploaded images with the product
+                    for image_path in image_paths:
+                        img = Image.objects.create(image=image_path)
+                        product.images.add(img)
 
-                messages.success(request, "Product has been successfully added!")
+                    messages.success(request, "Product has been successfully added!")
+                except:
+                    messages.error(request, "Product already exists!")
                 return redirect('root_products')
 
         # If the request method is not POST, render the add product form
@@ -213,9 +216,9 @@ class Products:
 
             if Validator.validate_data(name):
                 messages.error(request, 'Please enter a valid name.')
-            elif Validator.validate_stock(stock):
+            elif Validator.validate_stock(stock) == True:
                 messages.error(request, 'Please enter a valid stock.')
-            elif Validator.validate_price(price):
+            elif Validator.validate_price(price) == True:
                 messages.error(request, 'Please enter a valid price.')
             else:
                 try:
@@ -395,7 +398,7 @@ class Orders:
             order = Order.objects.get(id=id)
             products = OrderProduct.objects.filter(order=order)
             if order.payment.status == 'Paid':
-                wallet = Wallet.objects.filter(user=request.user).first()
+                wallet = Wallet.objects.filter(user=order.user).first()
                 if wallet:
                     Transaction.objects.create(
                         transaction = uuid.uuid4(),

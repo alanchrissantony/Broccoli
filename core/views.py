@@ -20,6 +20,7 @@ from wallet.models import Wallet, Transaction
 from uuid import uuid4
 from decimal import Decimal
 from layout.models import Slide
+from django.views.decorators.cache import cache_control
 
 # Create your views here.
 
@@ -204,6 +205,7 @@ def wallet(request, wallet_pay=0, coupon_code=None, coupon=None, total=0, quanti
 @login_required(login_url='signin')
 @verification_required
 @transaction.atomic
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def checkout(request):
     user = request.user
     cart = None

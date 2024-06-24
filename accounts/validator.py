@@ -30,13 +30,16 @@ class Validator:
     
     @staticmethod
     def validate_stock(value):
-        pattern = re.compile(r'^[A-Z0-9.-]+$')
-        return bool(pattern.match(value))
+        try:
+            value = int(value)
+            return value < 0
+        except:
+            return False
     
     @staticmethod
     def validate_price(price):
         try:
             float_price = float(price)
-            return float_price >= 0  # Stock price should not be negative
+            return float_price <= 0  # Stock price should not be negative
         except ValueError:
             return False

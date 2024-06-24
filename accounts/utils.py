@@ -1,10 +1,10 @@
 from email.message import EmailMessage
 import smtplib
 from datetime import datetime
-        
+from decouple import config
 
-from_mail = 'info.broccoli.smtp@gmail.com'
-pass_key = 'dlop lbuy hwnz asvu'
+from_mail = config('from_mail')
+pass_key = config('pass_key')
 
 
 def send_otp(email, otp):

@@ -1,0 +1,86 @@
+<!-- MODAL AREA START (Wishlist Modal) -->
+<style>
+    .close-button {
+	 width: 150px;
+	 height: 150px;
+	 box-shadow: 0px 10 10px 10px rgba(0,0,0,0.25);
+	 border-radius: 10px;
+	 background: #efefef;
+	 left: 50%;
+	 top: 50%;
+	 margin-top: -75px;
+	 margin-left: -75px;
+	 position: absolute;
+	 display: block;
+	 z-index: 200;
+	 text-indent: -9999px;
+}
+ .close-button:before, .close-button:after {
+	 content: '';
+	 width: 55%;
+	 height: 2px;
+	 background: gray;
+	 position: absolute;
+	 top: 48%;
+	 left: 22%;
+	 -webkit-transform: rotate(-45deg);
+	 -moz-transform: rotate(-45deg);
+	 -ms-transform: rotate(-45deg);
+	 -o-transform: rotate(-45deg);
+	 transform: rotate(-45deg);
+	 -webkit-transition: all 0.3s ease-out;
+	 -moz-transition: all 0.3s ease-out;
+	 -ms-transition: all 0.3s ease-out;
+	 -o-transition: all 0.3s ease-out;
+	 transition: all 0.3s ease-out;
+}
+ .close-button:after {
+	 -webkit-transform: rotate(45deg);
+	 -moz-transform: rotate(45deg);
+	 -ms-transform: rotate(45deg);
+	 -o-transform: rotate(45deg);
+	 transform: rotate(45deg);
+	 -webkit-transition: all 0.3s ease-out;
+	 -moz-transition: all 0.3s ease-out;
+	 -ms-transition: all 0.3s ease-out;
+	 -o-transition: all 0.3s ease-out;
+	 transition: all 0.3s ease-out;
+}
+ .close-button:hover:before, .close-button:hover:after {
+	 -webkit-transform: rotate(180deg);
+	 -moz-transform: rotate(180deg);
+	 -ms-transform: rotate(180deg);
+	 -o-transform: rotate(180deg);
+	 transform: rotate(180deg);
+}
+ 
+</style>
+<div class="ltn__modal-area ltn__add-to-cart-modal-area">
+    <div class="modal fade" id="liton_signout_modal" tabindex="-1">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a type="button" class="close-button close" data-dismiss="modal" aria-label="Close"></a>
+                </div>
+                <div class="modal-body">
+                     <div class="ltn__quick-view-modal-inner">
+                         <div class="modal-product-item">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3 col-12 mb-0">
+                                        <div class="alert">
+                                            <h6 class="alert-heading fw-bold mb-1">Do you really want to sign out?</h6>
+                                            <small class="mb-0">Any unsaved changes will be lost. Make sure you have saved all your work before proceeding.</small>
+                                        </div>
+                                    </div>
+                                    <a href="/user/signout"><button type="submit" class="btn theme-btn-3 btn-effect-1 text-uppercase">Sign out</button></a>
+                                </div>
+                            </div>
+                         </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODAL AREA END -->

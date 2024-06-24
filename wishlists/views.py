@@ -4,11 +4,13 @@ from product.models import Product
 from wishlists.models import Wishlist
 from django.contrib.auth.decorators import login_required
 from user.views import verification_required
+from django.views.decorators.cache import cache_control
 
 # Create your views here.
 
 @login_required(login_url='signin')
 @verification_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def wishlist(request):
     wishlists = Wishlist.objects.filter(user=request.user)
     context={
