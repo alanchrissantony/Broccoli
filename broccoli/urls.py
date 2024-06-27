@@ -22,5 +22,6 @@ from broccoli import views
 
 urlpatterns = [
     path('', include('core.urls')),
-    path('admin/', admin.site.urls),
+    path('admin/', include('admin_honeypot.urls', namespace='admin_honeypot')),
+    path('securelogin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

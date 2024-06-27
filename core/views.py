@@ -56,6 +56,7 @@ def about(request):
     return render(request, 'public/user/about.html')
 
 
+
 def coupon(request, wallet=None, wallet_pay=0, coupon=None, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None, coupon_code=None):
     coupon_code = request.GET.get('coupon')
 

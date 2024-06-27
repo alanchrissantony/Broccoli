@@ -2,6 +2,7 @@
 
 {% block title %}Wishlist{% endblock title %}
 {% load static %}
+{% load custom_filters %}
 
 {% block content %}
     
@@ -25,10 +26,10 @@
                                     <tr>
                                         <td class="cart-product-remove">{{forloop.counter}}</td>
                                         <td class="cart-product-image">
-                                            <a href="product-details.html"><img src="{{wishlist.product.images.first.image.url}}" alt="#"></a>
+                                            <a href="/products/{{wishlist.product.id}}"><img src="{{wishlist.product.images.first.image.url}}" alt="#"></a>
                                         </td>
                                         <td class="cart-product-info col-md-2">
-                                            <h4><a href="product-details.html">{{wishlist.product.name}}</a></h4>
+                                            <h4><a href="/products/{{wishlist.product.id}}">{{wishlist.product.name}}</a></h4>
                                         </td>
                                         <td class="cart-product-price">${{wishlist.product.price}}</td>
                                         <td class="cart-product-stock">
@@ -41,7 +42,21 @@
                                             {% endif %}
                                         </td>
                                         <td class="cart-product-add-cart">
-                                            <a class="theme-btn-1 btn btn-effect-1" href="#" title="Add to Cart" data-toggle="modal" data-target="#add_to_cart_modal">Add to Cart</a>
+                                            <div class="product-ratting">
+                                                <ul class="star-rating">
+                                                    {% for rating in 5|custom_range %}
+                                                    {% with rating|add:"-0.5" as half_rating %}
+                                                        {% if wishlist.product.rating >= rating %}
+                                                        <a><li><i class="fas fa-star"></i></li></a>
+                                                        {% elif product.rating >= half_rating %}
+                                                        <a><li><i class="fas fa-star-half-alt"></i></li></a>
+                                                        {% else %}
+                                                        <a><li><i class="far fa-star"></i></li></a>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
                                         </td>
                                         <td class="cart-product-remove-cart">
                                             <a href="/wishlists/remove/{{wishlist.product.id}}">
