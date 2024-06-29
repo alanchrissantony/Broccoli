@@ -275,6 +275,22 @@
         }
     </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = [
+            {% for message in messages %}
+            {
+                'message': '{{ message.message|escapejs }}',
+                'tags': '{{ message.tags }}'
+            },
+            {% endfor %}
+        ];
+        messages.forEach(function(message) {
+            showToaster_ltn(message.tags.charAt(0).toUpperCase() + message.tags.slice(1), message.message);
+        });
+    });
+</script>
+
 {% endblock content %}
 
 

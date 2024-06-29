@@ -4,7 +4,7 @@
 
 {% block content %}
     
-
+{% include "components/user/toast.html" %}  
     <!-- 404 area start -->
     <div class="ltn__coming-soon-area ltn__primary-bg text-color-white bg-image bg-overlay-theme-black-70" data-bg="img/slider/11.jpg">
         <div class="container">
@@ -35,5 +35,20 @@
     </div>
     <!-- 404 area end -->
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = [
+                {% for message in messages %}
+                {
+                    'message': '{{ message.message|escapejs }}',
+                    'tags': '{{ message.tags }}'
+                },
+                {% endfor %}
+            ];
+            messages.forEach(function(message) {
+                showToaster_ltn(message.tags.charAt(0).toUpperCase() + message.tags.slice(1), message.message);
+            });
+        });
+    </script>
 {% endblock content %}
 

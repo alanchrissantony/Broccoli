@@ -5,6 +5,8 @@
 
 {% block content %}
 
+
+    {% include "components/user/toast.html" %}  
     {% include "components/user/header.html" %}
     {% include "components/user/slider.html" %}
     {% include "components/user/banner.html" %}
@@ -134,6 +136,22 @@
 
     {% include "components/user/feature.html" %}
     {% include "components/user/footer.html" %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = [
+                {% for message in messages %}
+                {
+                    'message': '{{ message.message|escapejs }}',
+                    'tags': '{{ message.tags }}'
+                },
+                {% endfor %}
+            ];
+            messages.forEach(function(message) {
+                showToaster_ltn(message.tags.charAt(0).toUpperCase() + message.tags.slice(1), message.message);
+            });
+        });
+    </script>
 
 {% endblock content %}
 
