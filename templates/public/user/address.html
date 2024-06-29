@@ -52,7 +52,7 @@
                                                 <select class="nice-select" name="country" required>
                                                     <option value="" selected disabled>Select Country</option>
                                                     {% for country in countries %}
-                                                        <option value="{{ country.name }}" {% if address.country == country.name %} selected {% endif %}>{{ country.name }}</option>
+                                                        <option value="{{ country.name }}" {% if address.country.name == country.name %} selected {% endif %}>{{ country.name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
@@ -78,7 +78,7 @@
                                                 <select class="nice-select" name="city" required>
                                                     <option value="" selected disabled>Select City</option>
                                                     {% for city in cities %}
-                                                        <option value="{{ city.name }}" {% if address.city == city.name %} selected {% endif %}>{{ city.name }}</option>
+                                                        <option value="{{ city.name }}" {% if address.city.name == city.name %} selected {% endif %}>{{ city.name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
@@ -89,7 +89,7 @@
                                                 <select class="nice-select" name="state" required>
                                                     <option value="" selected disabled>Select City</option>
                                                     {% for state in states %}
-                                                        <option value="{{ state.name }}" {% if address.state == state.name %} selected {% endif %}>{{ state.name }}</option>
+                                                        <option value="{{ state.name }}" {% if address.state.name == state.name %} selected {% endif %}>{{ state.name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
