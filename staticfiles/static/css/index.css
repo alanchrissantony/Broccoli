@@ -1,0 +1,24 @@
+.error-message{
+    color: #FF0000; /* Red color for error text */
+    background-color: #F8D7DA; /* Light red background color */
+    padding: 10px; /* Add padding for spacing */
+    border-radius: 5px; /* Optional: Add rounded corners */
+  }
+
+.success-message {
+  color: #155724; /* Dark green color for success text */
+  background-color: #D4EDDA; /* Light green background color */
+  padding: 10px; /* Add padding for spacing */
+  border-radius: 5px; /* Optional: Add rounded corners */
+}
+
+.btn-verification-otp{
+    border: none;
+    cursor: pointer; 
+    cursor: hand;
+}
+
+.btx:hover{
+    color: #80B500;
+}
+
