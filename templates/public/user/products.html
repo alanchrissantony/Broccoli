@@ -33,11 +33,11 @@
                                 <div class="short-by text-center">
                                     <form id="sortForm" method="get">
                                         <select id="sortSelect" name="sort_by" class="nice-select" onchange="submitForm()">
-                                            <option value="" {% if request.GET.sort_by != 'rating' %}selected{% endif %}>Default sorting</option>
-                                            <option value="-rating" {% if request.GET.sort_by == 'rating' %}selected{% endif %}>Sort by popularity</option>
-                                            <option value="-created_at" {% if request.GET.sort_by == 'created_at' %}selected{% endif %}>Sort by new arrivals</option>
+                                            <option value="">Default sorting</option>
+                                            <option value="-rating" {% if request.GET.sort_by == '-rating' %}selected{% endif %}>Sort by popularity</option>
+                                            <option value="-created_at" {% if request.GET.sort_by == '-created_at' %}selected{% endif %}>Sort by new arrivals</option>
                                             <option value="price" {% if request.GET.sort_by == 'price' %}selected{% endif %}>Sort by price: low to high</option>
-                                            <option value="-price" {% if request.GET.sort_by == 'ratings' %}selected{% endif %}>Sort by price: high to low</option>
+                                            <option value="-price" {% if request.GET.sort_by == '-price' %}selected{% endif %}>Sort by price: high to low</option>
                                         </select>
                                         <input type="hidden" {% if request.GET.category %} name="category" value="{{ request.GET.category }}" {% endif %}>
                                         <input type="hidden" {% if request.GET.search %} name="search" value="{{ request.GET.search }}" {% endif %}>
