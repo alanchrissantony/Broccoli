@@ -97,7 +97,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'broccoli.wsgi.application'
+
+WSGI_APPLICATION = 'broccoli.wsgi.app'
 
 AUTH_USER_MODEL = 'accounts.Account'
 
