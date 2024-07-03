@@ -45,8 +45,8 @@ class Account(AbstractBaseUser):
     
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    username = models.CharField(max_length=50, unique=True)
-    email = models.EmailField(max_length=100, unique=True)
+    username = models.CharField(max_length=50, unique=True, db_index=True)
+    email = models.EmailField(max_length=100, unique=True, db_index=True)
     avatar = models.CharField(max_length=255, null=True, default=False)
     # required
     date_joined = models.DateTimeField(auto_now_add=True)

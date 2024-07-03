@@ -1292,7 +1292,7 @@
                         error: function(jqXHR, textStatus, errorThrown) {
                             // Handle error
                             console.error(textStatus, errorThrown);
-                            window.showToaster_ltn('error', errorThrown);
+                            // window.showToaster_ltn('error', errorThrown);
                         }
                     });
                     subtotalElement.text("$" + (price * newVal).toFixed(2));
@@ -1334,7 +1334,7 @@
                         error: function(jqXHR, textStatus, errorThrown) {
                             // Handle error
                             console.error(textStatus, errorThrown);
-                            window.showToaster_ltn('error', errorThrown);
+                            // window.showToaster_ltn('error', errorThrown);
                             // Display an error message to the user
                         }
                     });

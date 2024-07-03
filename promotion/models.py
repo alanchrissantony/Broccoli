@@ -13,7 +13,7 @@ class Discount(models.Model):
         ('Payment Discount', 'Payment Discount')
     )
     
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, db_index=True)
     description = models.CharField(max_length=255, blank=True)
     type = models.CharField(max_length=50, choices=TYPE)
     discount = models.FloatField()
@@ -41,7 +41,7 @@ class Coupon(models.Model):
         ('Payment Discount', 'Payment Discount')
     )
     
-    code = models.CharField(max_length=25, unique=True)
+    code = models.CharField(max_length=25, unique=True, db_index=True)
     type = models.CharField(max_length=50, choices=TYPE)
     minimum_price = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.FloatField()

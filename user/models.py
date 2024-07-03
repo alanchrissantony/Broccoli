@@ -8,7 +8,7 @@ from core.models import image_upload_path
 # Create your models here.
 class Country(models.Model):
     
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=True, db_index=True)
 
     class Meta:
         verbose_name = 'Country'
@@ -20,7 +20,7 @@ class Country(models.Model):
 
 class State(models.Model):
     
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=True, db_index=True)
 
     class Meta:
         ordering = ('name',)
@@ -30,7 +30,7 @@ class State(models.Model):
 
 class City(models.Model):
     
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=True, db_index=True)
 
     class Meta:
         verbose_name = 'City'
@@ -44,7 +44,7 @@ class Address(models.Model):
     
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    email = models.EmailField(max_length=50)
+    email = models.EmailField(max_length=50, db_index=True)
     address = models.CharField(max_length=255, blank=True)
     additional = models.CharField(max_length=255, blank=True)
     phone_number = PhoneNumberField(null=False, blank=False)

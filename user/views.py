@@ -131,8 +131,16 @@ def signin(request):
                     cart_item = CartItem.objects.filter(cart=cart)
 
                     for item in cart_item:
-                        item.user = user
-                        item.save()
+                        user_cart = CartItem.objects.filter(user=user, product=item.product).exists()
+                        if user_cart:
+                            user_cart_item = CartItem.objects.get(user=user, product=item.product)
+                            if user_cart_item.quantity + item.quantity <= item.product.stock:
+                                user_cart_item.quantity += item.quantity
+
+                                user_cart_item.save()
+                        else:
+                            item.user = user
+                            item.save()
             except:
                 pass
             auth.login(request, user)

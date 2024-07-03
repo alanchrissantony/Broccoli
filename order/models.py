@@ -10,7 +10,7 @@ from promotion.models import Coupon
 class Payment(models.Model):
     
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
-    payment_id = models.CharField(max_length=255, null=True)
+    payment_id = models.CharField(max_length=255, null=True, db_index=True)
     payment_method = models.CharField(max_length=255, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=255, null=True)
@@ -41,7 +41,7 @@ class Order(models.Model):
     
     user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
-    order_number = models.CharField(max_length=50)
+    order_number = models.CharField(max_length=50, db_index=True)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)

@@ -268,12 +268,12 @@
                             <tbody>
                                 <tr>
                                     <td class="cart-product-image" style="border: none;">
-                                        <a href="product-details.html">
+                                        <a href="product/details/{{product.product.id}}">
                                             <img src="{{ product.product.images.first.image.url }}" alt="">
                                         </a>
                                     </td>
                                     <td class="cart-product-info" style="border: none;">
-                                        <h4><a href="product/details">{{ product.product.name }}</a></h4>
+                                        <h4><a href="product/details/{{product.product.id}}">{{ product.product.name }}</a></h4>
                                         <h6 class="cart-product-price">
                                             Quantity: <span style="font-weight: normal; float: right;">{{ product.quantity }}</span>
                                         </h6>
