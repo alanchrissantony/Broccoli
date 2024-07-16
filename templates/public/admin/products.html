@@ -69,7 +69,7 @@
                                         </td>
                                         <td style="text-align: center;">
                                             <ul style="display: inline-flex; list-style-type: none; padding: 0;">
-                                                <li><a href="/root/products/edit/{{product.id}}">
+                                                <li><a href="/accounts/products/edit/{{product.id}}">
                                                     <i class="btn btx bx bx-pencil"></i>
                                                 </a></li>
 
@@ -130,7 +130,7 @@
 <script>
     const handle_delete = (id)=>{
         const url = window.location.origin
-        $('#formAccountDeactivation').attr('action',url+'/root/products/delete/'+id);
+        $('#formAccountDeactivation').attr('action',url+'/accounts/products/delete/'+id);
     }
 </script>
 {% endblock content %}

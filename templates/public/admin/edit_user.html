@@ -1,6 +1,6 @@
 {% extends "public/admin/base.html" %}
 
-{% block title %}Products{% endblock title %}
+{% block title %}Users{% endblock title %}
 
 {% load static %}
 
@@ -99,7 +99,7 @@
                                         back. Please be certain.</p>
                                 </div>
                             </div>
-                            <form id="formAccountDeactivation" action="/root/users/delete/{{user.id}}">
+                            <form id="formAccountDeactivation" action="/accounts/users/delete/{{user.id}}">
                                 
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox"

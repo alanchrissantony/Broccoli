@@ -1,4 +1,7 @@
 from django.shortcuts import render, redirect
+from datetime import datetime, timedelta
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
 from accounts.models import Account
 from user.models import UserAddress
 from order.models import OrderProduct, OrderStatus, Order, OrderCancel
@@ -16,25 +19,186 @@ from django.core.paginator import Paginator
 from wallet.models import Wallet, Transaction
 import json, os, uuid, decimal
 from collections import defaultdict
-from django.db.models import Sum, Count, F
-
+from django.urls import reverse
+from django.http import JsonResponse
+from django.db.models import Count
+from django.db.models.functions import Extract
+from collections import defaultdict
+from layout.models import Slide, Banner
 
 
 # Create your views here.
+def chart(request):
+    dx=[]
+    dy=[]
+    print(1234)
+    filter_by = request.GET.get('filter')
+    current_date = datetime.now()
+    current_year = datetime.now().year
+    today = timezone.now().date()
+    
+    if filter_by == 'daily':
+        for i in range(6):
+            date = current_date - timedelta(days=i)
+            dx.append(date.strftime("%a"))
+        last_6_days = today - timedelta(days=6)
+        orders = Order.objects.filter(
+            created_at__gte=last_6_days,
+            created_at__lt=today,
+            is_ordered=True
+        )
+        day_counts = (
+            orders.annotate(day=Extract('created_at', 'day'))
+            .annotate(month=Extract('created_at', 'month'))
+            .annotate(year=Extract('created_at', 'year'))
+            .values('year', 'month', 'day')
+            .annotate(count=Count('id'))
+            .order_by('year', 'month', 'day')
+        )
 
-@login_required(login_url='root_signin')
+        all_days = [
+            (today.year, today.month, day) if day <= today.day else (today.year, today.month - 1, day)
+            for day in range(today.day - 5, today.day + 1)
+        ]
+
+        day_counts_dict = {(entry['year'], entry['month'], entry['day']): entry['count'] for entry in day_counts}
+        for year, month, day in all_days:
+            if (year, month, day) not in day_counts_dict:
+                day_counts_dict[(year, month, day)] = 0
+        
+        final_counts = [
+            {'year': year, 'month': month, 'day': day, 'count': day_counts_dict[(year, month, day)]}
+            for year, month, day in sorted(day_counts_dict.keys())
+        ]
+
+        dy = [entry['count'] for entry in final_counts]
+
+    elif filter_by == 'monthly':
+        for i in range(6):
+            date = current_date - relativedelta(months=i)
+            dx.append(date.strftime("%b"))
+        last_6_months = today - timedelta(days=30 * 6)
+        orders = Order.objects.filter(
+        created_at__gte=last_6_months,
+        created_at__lt=today,
+        is_ordered=True
+    )
+        month_counts = (
+        orders.annotate(month=Extract('created_at', 'month'))
+        .annotate(year=Extract('created_at', 'year'))
+        .values('year', 'month')
+        .annotate(count=Count('id'))
+        .order_by('year', 'month')
+    )
+        all_months = [
+        (today.year, month) if month <= today.month else (today.year - 1, month)
+        for month in range(today.month - 5, today.month + 1)
+    ]
+
+        month_counts_dict = {(entry['year'], entry['month']): entry['count'] for entry in month_counts}
+        for year, month in all_months:
+            if (year, month) not in month_counts_dict:
+                month_counts_dict[(year, month)] = 0
+
+        final_counts = [
+        {'year': year, 'month': month, 'count': month_counts_dict[(year, month)]}
+        for year, month in sorted(month_counts_dict.keys())
+    ]
+        
+        dy = [entry['count'] for entry in final_counts]
+    else:
+        dx=[current_year - i for i in range(6)]
+        last_6_years = today - timedelta(days=365 * 6)
+        orders = Order.objects.filter(
+            created_at__gte=last_6_years,
+            created_at__lt=today,
+            is_ordered=True
+        )
+        year_counts = (
+            orders.annotate(year=Extract('created_at', 'year'))
+            .values('year')
+            .annotate(count=Count('id'))
+            .order_by('year')
+        )
+
+        all_years = [
+            today.year - i for i in range(6)
+        ]
+
+        year_counts_dict = {entry['year']: entry['count'] for entry in year_counts}
+        for year in all_years:
+            if year not in year_counts_dict:
+                year_counts_dict[year] = 0
+
+        final_counts = [
+            {'year': year, 'count': year_counts_dict[year]}
+            for year in sorted(year_counts_dict.keys())
+        ]
+        dy = [entry['count'] for entry in final_counts]
+
+    dx.reverse()
+
+    context={
+        'dx':dx,
+        'dy':dy,
+    }
+    return JsonResponse(context)
+
+def superuser_required(view_func):
+    def _wrapped_view_func(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(reverse('root_signin'))
+        elif not request.user.is_superuser:
+            return redirect(reverse('root_signin'))
+        return view_func(request, *args, **kwargs)
+    return login_required(_wrapped_view_func)
+
+
+@superuser_required
 def root(request):
     orders = Order.objects.all().order_by('-created_at')
     products = OrderProduct.objects.all().select_related('product__category').order_by('-created_at')
 
     # Initialize dictionaries with defaultdict
     dp = defaultdict(decimal.Decimal)
+    dx=[]
+    dy=[]
     product_obj = {}
     order_obj = {}
     count = defaultdict(int)
     sales = 0
     revenue = 0
 
+    current_year = datetime.now().year
+    today = datetime.now().date()
+
+    dx=[current_year - i for i in range(6)]
+    last_6_years = today - timedelta(days=365 * 6)
+    orders = Order.objects.filter(
+        created_at__gte=last_6_years,
+        created_at__lt=today,
+        is_ordered=True
+    )
+    year_counts = (
+        orders.annotate(year=Extract('created_at', 'year'))
+        .values('year')
+        .annotate(count=Count('id'))
+        .order_by('year')
+    )
+    all_years = [
+        today.year - i for i in range(6)
+    ]
+    year_counts_dict = {entry['year']: entry['count'] for entry in year_counts}
+    for year in all_years:
+        if year not in year_counts_dict:
+            year_counts_dict[year] = 0
+    final_counts = [
+        {'year': year, 'count': year_counts_dict[year]}
+        for year in sorted(year_counts_dict.keys())
+    ]
+    dy = [entry['count'] for entry in final_counts]
+    dx.reverse()
+    
     # Iterate through products and populate dictionaries
     for product in products:
         category = product.product.category
@@ -52,12 +216,12 @@ def root(request):
         else:
             order_obj[order.statuses.last()]=1
 
+    
+
     # Convert count dictionary to keys and values lists
     keys = list(count.keys())
     values = list(count.values())
-    total = sum(values)
-
-
+    
     context = {
         'orders': orders,
         'sales': sales,
@@ -67,6 +231,8 @@ def root(request):
         'keys': keys,
         'values': values,
         'order_obj':order_obj,
+        'dx':dx,
+        'dy':dy
     }
     return render(request, 'public/admin/dashboard.html', context)
 
@@ -74,7 +240,7 @@ def root(request):
 class Authentication:
 
     def signin(request):
-        if 'admin' in request.session:
+        if request.user.is_superuser:
             return redirect('root')
         if request.method == 'POST':
             email = request.POST["email"]
@@ -93,7 +259,7 @@ class Authentication:
         return render(request, 'public/admin/signin.html')
     
     def signup(request):
-        if 'admin' in request.session:
+        if request.user.is_superuser:
             return redirect('root')
         return render(request, 'public/admin/signup.html')
     
@@ -106,10 +272,13 @@ class Authentication:
 
 class Products:
 
-    @login_required(login_url='root_signin')
+    @superuser_required
     def products(request):
-        
-        products = Product.objects.all()
+        search = request.GET.get('search')
+        if search:
+            products = Product.objects.filter(name__icontains=search)
+        else:
+            products = Product.objects.all()
         items_per_page = 10
         paginator = Paginator(products, items_per_page)
         page = request.GET.get('page')
@@ -121,7 +290,7 @@ class Products:
         }
         return render(request, 'public/admin/products.html', context)
 
-    @login_required(login_url='root_signin')
+    @superuser_required
     def add(request):
         
         if request.method == 'POST':
@@ -149,7 +318,7 @@ class Products:
                 category = Category.objects.get(name=request.POST['category'])
             except Category.DoesNotExist:
                 messages.error(request, 'Please select a valid category.')
-                return redirect('root/products/add')
+                return redirect('account/products/add')
             stock = request.POST['stock'].strip(' ')
             description = request.POST['description'].strip(' ')
             slug = name.lower().replace(" ", "_")
@@ -191,7 +360,7 @@ class Products:
         return render(request, 'public/admin/add_product.html', context)
     
 
-    @login_required(login_url='root_signin')
+    @superuser_required
     def edit(request, id):
 
         if request.method == 'POST':
@@ -235,7 +404,7 @@ class Products:
                     product.save()
                 except:
                     messages.error(request, 'Please select a valid category.')
-                    return redirect('/root/products/edit/{{id}}')
+                    return redirect('/account/products/edit/{{id}}')
                 
         
             return redirect('root_products')
@@ -251,14 +420,14 @@ class Products:
         }
         return render(request, 'public/admin/edit_product.html', context)
     
-    @login_required(login_url='root_signin')
+    @superuser_required
     def delete(request, id):
         
         product = Product.objects.get(id=id)
         product.delete()
         return redirect('root_products')
     
-    @login_required(login_url='root_signin')
+    @superuser_required
     def delete_image(request, id):
         
         image = Image.objects.get(id=id)
@@ -266,9 +435,13 @@ class Products:
     
 class Users:
 
-    @login_required(login_url='root_signin')
+    @superuser_required
     def users(request):
-        users = Account.objects.all().filter(is_admin=False)
+        search = request.GET.get('search')
+        if search:
+            users = Account.objects.filter(username__icontains=search, is_admin=False)
+        else:
+            users = Account.objects.all().filter(is_admin=False)
         items_per_page = 10
         paginator = Paginator(users, items_per_page)
         page = request.GET.get('page')
@@ -280,7 +453,7 @@ class Users:
         }
         return render(request, 'public/admin/users.html', context)
 
-    @login_required(login_url='root_signin')
+    @superuser_required
     def add(request):
         
         if request.method == 'POST':
@@ -312,7 +485,7 @@ class Users:
                 messages.error(request, "The passwords provided do not match!")
         return render(request, 'public/admin/add_user.html')
 
-    @login_required(login_url='root_signin')
+    @superuser_required
     def edit(request, id):
 
         
@@ -349,18 +522,22 @@ class Users:
         return render(request, 'public/admin/edit_user.html', context)
     
 
-    @login_required(login_url='root_signin')
+    @superuser_required
     def delete(request, id):
         
         user = Account.objects.get(id=id)
         user.delete()
-        return redirect('/root/users')
+        return redirect('/account/users')
 
     
 class Orders:
-    @login_required(login_url='root_signin')
+    @superuser_required
     def orders(request):
-        order = Order.objects.all()
+        search = request.GET.get('search')
+        if search:
+            order = Order.objects.filter(user__username__icontains=search)
+        else:
+            order = Order.objects.all()
         items_per_page = 10
         paginator = Paginator(order, items_per_page)
         page = request.GET.get('page')
@@ -371,7 +548,7 @@ class Orders:
         }
         return render(request, 'public/admin/orders.html', context)
     
-    @login_required(login_url='root_signin')
+    @superuser_required
     def edit(request, id):
         order = Order.objects.get(id=id)
         products = OrderProduct.objects.filter(order=order)
@@ -393,6 +570,7 @@ class Orders:
         }
         return render(request, 'public/admin/edit_order.html', context)
     
+    @superuser_required
     def cancel(request, id):
         try:
             order = Order.objects.get(id=id)
@@ -431,6 +609,7 @@ class Orders:
             pass
         return redirect('root_orders')
     
+    @superuser_required
     def delete(request, id):
         try:
             order = Order.objects.get(id=id)
@@ -447,7 +626,11 @@ class Orders:
 
 
     def cancellation(request):
-        orders = OrderCancel.objects.all().order_by('-created_at')
+        search = request.GET.get('search')
+        if search:
+            orders = OrderCancel.objects.filter(order__user__username__icontains=search)
+        else:
+            orders = OrderCancel.objects.all().order_by('-created_at')
         items_per_page = 10
         paginator = Paginator(orders, items_per_page)
         page = request.GET.get('page')
@@ -461,9 +644,13 @@ class Orders:
     
 
 class UserWallet:
-
+    @superuser_required
     def user_wallet(request):
-        wallet = Wallet.objects.all()
+        search = request.GET.get('search')
+        if search:
+            wallet = Wallet.objects.filter(user__username__icontains=search)
+        else:
+            wallet = Wallet.objects.all()
         items_per_page = 10
         paginator = Paginator(wallet, items_per_page)
         page = request.GET.get('page')
@@ -474,7 +661,7 @@ class UserWallet:
         }
         return render(request, 'public/admin/wallets.html', context)
     
-
+    @superuser_required
     def view(request, id, wallet=None):
         user = Wallet.objects.filter(id=id).first()
         
@@ -498,9 +685,14 @@ class ProductPromotion:
 
     class ProductDiscount:
 
+        @superuser_required
         def product_discount(request):
             Discount.auto_delete_expired()
-            discounts = Discount.objects.filter()
+            search = request.GET.get('search')
+            if search:
+                discounts = Discount.objects.filter(name__icontains=search)
+            else:
+                discounts = Discount.objects.filter()
             items_per_page = 10
             paginator = Paginator(discounts, items_per_page)
             page = request.GET.get('page')
@@ -510,6 +702,7 @@ class ProductPromotion:
                 }
             return render(request, 'public/admin/discounts.html', context)
         
+        @superuser_required
         def add(request):
             if request.method == 'POST':
                 name = request.POST.get('name').strip(' ')
@@ -537,6 +730,7 @@ class ProductPromotion:
             }
             return render(request, 'public/admin/add_discount.html', context)
         
+        @superuser_required
         def edit(request, id):
             Discount.auto_delete_expired()
             discount = Discount.objects.filter(id=id).first()
@@ -574,6 +768,7 @@ class ProductPromotion:
                 }
             return render(request, 'public/admin/edit_discount.html', context)
         
+        @superuser_required
         def delete(request, id):
             discount = Discount.objects.filter(id=id).first()
 
@@ -587,10 +782,15 @@ class ProductPromotion:
         
 
     class ProductCoupon:
-        
+
+        @superuser_required
         def product_coupon(request):
             Coupon.auto_delete_expired()
-            coupons = Coupon.objects.all()
+            search = request.GET.get('search')
+            if search:
+                coupons = Coupon.objects.filter(code__icontains=search)
+            else:
+                coupons = Coupon.objects.all()
             items_per_page = 10
             paginator = Paginator(coupons, items_per_page)
             page = request.GET.get('page')
@@ -600,6 +800,7 @@ class ProductPromotion:
                 }
             return render(request, 'public/admin/coupons.html', context)
         
+        @superuser_required
         def add(request):
             if request.method == 'POST':
                 code = request.POST.get('code').strip(' ')
@@ -628,6 +829,7 @@ class ProductPromotion:
             }
             return render(request, 'public/admin/add_coupon.html', context)
         
+        @superuser_required
         def edit(request, id):
             Coupon.auto_delete_expired()
             coupons = Coupon.objects.filter(id=id).first()
@@ -666,7 +868,7 @@ class ProductPromotion:
                 }
             return render(request, 'public/admin/edit_coupon.html', context)
         
-
+        @superuser_required
         def delete(request, id):
             coupon = Coupon.objects.filter(id=id).first()
 
@@ -682,8 +884,13 @@ class ProductPromotion:
     
     class ProductPromotion:
         
+        @superuser_required
         def product_promotion(request):
-            promotions = Promotion.objects.all()
+            search = request.GET.get('search')
+            if search:
+                promotions = Promotion.objects.filter(product__name__icontains=search)
+            else:
+                promotions = Promotion.objects.all()
             items_per_page = 10
             paginator = Paginator(promotions, items_per_page)
             page = request.GET.get('page')
@@ -693,6 +900,7 @@ class ProductPromotion:
                 }
             return render(request, 'public/admin/product_promotions.html', context)
         
+        @superuser_required
         def add(request):
             products = Product.objects.filter(is_available=True)
             discounts = Discount.objects.filter(status=True)
@@ -720,6 +928,7 @@ class ProductPromotion:
                 }
             return render(request, 'public/admin/add_product_promotion.html', context)
         
+        @superuser_required
         def edit(request, id):
             products = Product.objects.filter(is_available=True)
             discounts = Discount.objects.filter(status=True)
@@ -754,6 +963,7 @@ class ProductPromotion:
                 }
             return render(request, 'public/admin/edit_product_promotion.html', context)
         
+        @superuser_required
         def delete(request, id):
             promotion = Promotion.objects.filter(id=id).first()
             if promotion.discount.status:
@@ -769,8 +979,13 @@ class ProductPromotion:
 
     class CategoryPromotion:
         
+        @superuser_required
         def category_promotion(request):
-            promotions = PromotionCategory.objects.all()
+            search = request.GET.get('search')
+            if search:
+                promotions = PromotionCategory.objects.filter(category__name__icontains=search)
+            else:
+                promotions = PromotionCategory.objects.all()
             items_per_page = 10
             paginator = Paginator(promotions, items_per_page)
             page = request.GET.get('page')
@@ -780,6 +995,7 @@ class ProductPromotion:
                 }
             return render(request, 'public/admin/category_promotions.html', context)
         
+        @superuser_required
         def add(request):
             categories = Category.objects.filter(is_available=True)
             discounts = Discount.objects.filter(status=True)
@@ -809,6 +1025,7 @@ class ProductPromotion:
                 }
             return render(request, 'public/admin/add_category_promotion.html', context)
         
+        @superuser_required
         def edit(request, id):
             categories = Category.objects.filter(is_available=True)
             discounts = Discount.objects.filter(status=True)
@@ -843,7 +1060,7 @@ class ProductPromotion:
                 }
             return render(request, 'public/admin/edit_category_promotion.html', context)
 
-
+        @superuser_required
         def delete(request, id):
             promotion = PromotionCategory.objects.filter(id=id).first()
             if promotion.discount.status:
@@ -854,3 +1071,42 @@ class ProductPromotion:
             promotion.save()
             messages.success(request, 'Promotion has been successfully deleted!')
             return redirect('root_category_promotions')
+
+
+def layout(request):
+
+    if request.method == 'POST':
+
+        if 'slide_1' in request.FILES:
+            slide_1=request.FILES['slide_1']
+            slide = Slide.objects.filter().first()
+            if slide:
+                slide.image=slide_1
+            else:
+                slide = Slide.objects.create(image=slide_1) 
+            slide.save()
+        
+        if 'slide_2' in request.FILES:
+            slide_2=request.FILES['slide_2']
+            slide = Slide.objects.filter().first()
+            if slide:
+                slide.image=slide_2
+            else:
+                slide = Slide.objects.create(image=slide_2) 
+            slide.save()
+        
+        if 'banner' in request.FILES:
+            banner=request.FILES['banner']
+            crnt_banner = Banner.objects.filter().first()
+            if crnt_banner:
+                crnt_banner.image=banner
+            else:
+                crnt_banner = Banner.objects.create(image=banner) 
+            crnt_banner.save()
+    slides = Slide.objects.all()
+    banner = Banner.objects.all()
+    context = {
+        'banner':banner,
+        'slides':slides
+    }
+    return render(request, 'public/admin/layouts.html', context)

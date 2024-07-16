@@ -1,5 +1,7 @@
 {% extends "public/user/base.html" %}
 
+{% load cache %}
+
 {% block title %}Products{% endblock title %}
 
 {% block content %}
@@ -53,6 +55,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
+                        {% cache 900 products_list %}
                         <div class="tab-pane fade active show" id="liton_product_grid">
                             <div class="ltn__product-tab-content-inner ltn__product-grid-view">
                                 <div class="row">
@@ -182,6 +185,7 @@
                                 </div>
                             </div>
                         </div>
+                        {% endcache %}
                     </div>
                     <div class="ltn__pagination-area text-center">
                         <div class="ltn__pagination">

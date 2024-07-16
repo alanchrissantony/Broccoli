@@ -1,6 +1,6 @@
 {% extends "public/admin/base.html" %}
 
-{% block title %}Products{% endblock title %}
+{% block title %}Orders{% endblock title %}
 
 {% load static %}
 
@@ -111,7 +111,7 @@
                                     <input type="hidden" value="{{order.statuses.last}}" name="status">
                                     <button type="submit"
                                         class="btn btn-primary me-2 {% if order.statuses.last.name == 'Delivered' %}disabled{% elif order.statuses.last.name == 'Cancelled' %}{% endif %}">{{order.statuses.last}}</button>
-                                    <a href="/root/orders/cancel/{{order.id}}" class="btn btn-outline-secondary">Cancel</a>
+                                    <a href="/accounts/orders/cancel/{{order.id}}" class="btn btn-outline-secondary">Cancel</a>
                                 </div>
                             </div>
                         </form>
@@ -128,7 +128,7 @@
                                         Please be certain.</p>
                                 </div>
                             </div>
-                            <form id="formAccountDeactivation" action="/root/orders/delete/{{order.id}}">
+                            <form id="formAccountDeactivation" action="/accounts/orders/delete/{{order.id}}">
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox" name="accountActivation"
                                         id="accountActivation" required />

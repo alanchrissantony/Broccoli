@@ -3,6 +3,7 @@ from cart.views import cart_id
 from wallet.models import Wallet
 from wishlists.models import Wishlist
 from layout.models import Banner
+from core.models import Crop
 
 
 
@@ -58,5 +59,12 @@ def bannerProcessor(request):
     banner_image = Banner.objects.filter().last()
     context={
         'banner_image':banner_image
+    }
+    return context
+
+def cropApiProcessor(request):
+    crop_api_code = Crop.objects.filter().last()
+    context={
+        'crop_api_code':crop_api_code
     }
     return context

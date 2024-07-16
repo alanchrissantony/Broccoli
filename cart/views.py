@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.cache import cache_page, cache_control
 from product.models import Product
 from cart.models import Cart, CartItem
 from promotion.models import Promotion, PromotionCategory, Coupon
-from django.contrib.auth.decorators import login_required
 from wallet.models import Wallet
-from django.contrib import messages
 from django.http import JsonResponse
 from accounts.models import Account
+from django.core.cache import cache
 
 
 
@@ -63,7 +63,7 @@ def add(request, product_id, quantity, wallet=None, wallet_pay=0, coupon=None, t
             cart.save()
 
     try:
-        if request.user.id:
+        if request.user.is_authenticated:
             user = Account.objects.get(email=request.user.email)
             cart_item = CartItem.objects.get(product_id=product, user=user)
             wallet = Wallet.objects.filter(user=request.user).first()
@@ -83,7 +83,7 @@ def add(request, product_id, quantity, wallet=None, wallet_pay=0, coupon=None, t
 
     except CartItem.DoesNotExist:
         
-        if request.user.id:
+        if request.user.is_authenticated:
             cart_item = CartItem.objects.create(product=product, quantity=quantity, cart=cart, user=request.user)
         else:
             cart_item = CartItem.objects.create(product=product, quantity=quantity, cart=cart)
@@ -117,8 +117,8 @@ def add(request, product_id, quantity, wallet=None, wallet_pay=0, coupon=None, t
     shipping = 15
     price = round(float(total+vat+shipping) - discount, 2)
 
-    if 'coupon' in request.session:
-        coupon = Coupon.objects.filter(code=request.session.get('coupon'), status=True).first()
+    #if 'coupon' in request.session:
+        #coupon = Coupon.objects.filter(code=request.session.get('coupon'), status=True).first()
 
     if wallet:
         if wallet.balance > price: 
@@ -144,7 +144,7 @@ def add(request, product_id, quantity, wallet=None, wallet_pay=0, coupon=None, t
 def remove(request, product_id, wallet=None, wallet_pay=0, coupon=None, coupon_discount=None, total=0, discount=0, vat=0, shipping=0, cart_items=None, cart=None):
 
     product = get_object_or_404(Product, id=product_id)
-    if request.user.id:
+    if request.user.is_authenticated:
         cart_item = CartItem.objects.get(product=product, user=request.user)
     else:
         cart = Cart.objects.get(cart_id=cart_id(request))
@@ -208,7 +208,7 @@ def remove(request, product_id, wallet=None, wallet_pay=0, coupon=None, coupon_d
 def delete(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
-    if request.user.id:
+    if request.user.is_authenticated:
         user = Account.objects.get(email=request.user.email)
         cart_item = CartItem.objects.get(product=product, user=user)
     else:
@@ -219,10 +219,12 @@ def delete(request, product_id):
     return redirect('cart')
 
 
+@cache_page(900)
+@cache_control(max_age=900)
 def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None, coupon=None, wallet=None, price=0):
     
     try:
-        if request.user.id:
+        if request.user.is_authenticated:
             cart_items = CartItem.objects.filter(user=request.user, is_active=True) 
             wallet = Wallet.objects.filter(user=request.user).first()
         else: 

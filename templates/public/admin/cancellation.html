@@ -1,6 +1,6 @@
 {% extends "public/admin/base.html" %}
 
-{% block title %}Carts{% endblock title %}
+{% block title %}Cancellations{% endblock title %}
 
 {% block content %}
 {% include "components/admin/aside.html" %}
@@ -65,7 +65,7 @@
                                             </td>
                                             <td style="text-align: center;">
                                                 <ul style="display: inline-flex; list-style-type: none; padding: 0;">
-                                                    <li><a href="/root/orders/edit/{{order.order.id}}">
+                                                    <li><a href="/accounts/orders/edit/{{order.order.id}}">
                                                         <i class="btn btx bx bx-pencil"></i>
                                                     </a></li>
 
@@ -130,7 +130,7 @@
 <script>
     const handle_delete = (id)=>{
         const url = window.location.origin
-        $('#formAccountDeactivation').attr('action',url+'/root/orders/delete/'+id);
+        $('#formAccountDeactivation').attr('action',url+'/accounts/orders/delete/'+id);
     }
 </script>
 {% endblock content %}

@@ -16,7 +16,7 @@
     <ul class="menu-inner py-1">
         <!-- Dashboard -->
         <li class="menu-item {% if request.resolver_match.url_name == "root" %}active{% endif %}">
-            <a href="/root" class="menu-link">
+            <a href="/accounts" class="menu-link">
                 <i class="menu-icon tf-icons bx bxs-dashboard"></i>
                 <div data-i18n="Analytics">Dashboard</div>
             </a>
@@ -24,7 +24,7 @@
 
         <!-- Cards -->
         <li class="menu-item {% if request.resolver_match.url_name == "root_categories" %}active{% endif %}">
-            <a href="/root/categories" class="menu-link">
+            <a href="/accounts/categories" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-category"></i>
                 <div data-i18n="Basic">Categories</div>
             </a>
@@ -32,7 +32,7 @@
 
         <!-- Cards -->
         <li class="menu-item {% if request.resolver_match.url_name == "root_products" %}active{% endif %}">
-            <a href="/root/products" class="menu-link">
+            <a href="/accounts/products" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-package"></i>
                 <div data-i18n="Basic">Products</div>
             </a>
@@ -40,7 +40,7 @@
 
         <!-- Cards -->
         <li class="menu-item {% if request.resolver_match.url_name == "root_discounts" %}active{% endif %}">
-            <a href="/root/discounts" class="menu-link">
+            <a href="/accounts/discounts" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-blanket"></i>
                 <div data-i18n="Basic">Discount</div>
             </a>
@@ -48,7 +48,7 @@
 
         <!-- Cards -->
         <li class="menu-item {% if request.resolver_match.url_name == "root_coupons" %}active{% endif %}">
-            <a href="/root/coupons" class="menu-link">
+            <a href="/accounts/coupons" class="menu-link">
                 <i class="menu-icon tf-icons bx bxs-discount"></i>
                 <div data-i18n="Basic">Coupons</div>
             </a>
@@ -56,7 +56,7 @@
 
         <!-- Cards -->
         <li class="menu-item {% if request.resolver_match.url_name == "root_product_promotions" %}active{% endif %}">
-            <a href="/root/promotions/products" class="menu-link">
+            <a href="/accounts/promotions/products" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-purchase-tag"></i>
                 <div data-i18n="Basic">Product Promotions</div>
             </a>
@@ -64,7 +64,7 @@
 
         <!-- Cards -->
         <li class="menu-item {% if request.resolver_match.url_name == "root_category_promotions" %}active{% endif %}">
-            <a href="/root/promotions/categories" class="menu-link">
+            <a href="/accounts/promotions/categories" class="menu-link">
                 <i class="menu-icon tf-icons bx bxs-purchase-tag"></i>
                 <div data-i18n="Basic">Category Promotions</div>
             </a>
@@ -72,7 +72,7 @@
 
         <!-- Cards -->
         <li class="menu-item {% if request.resolver_match.url_name == "root_users" %}active{% endif %}">
-            <a href="/root/users" class="menu-link">
+            <a href="/accounts/users" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-group"></i>
                 <div data-i18n="Basic">Users</div>
             </a>
@@ -80,7 +80,7 @@
 
         <!-- Cards -->
         <li class="menu-item {% if request.resolver_match.url_name == "root_wallet" %}active{% endif %}">
-            <a href="/root/wallets" class="menu-link">
+            <a href="/accounts/wallets" class="menu-link">
                 <i class='menu-icon tf-icons bx bxs-credit-card'></i>
                 <div data-i18n="Basic">Wallet</div>
             </a>
@@ -88,7 +88,7 @@
 
         <!-- Cards -->
         <li class="menu-item {% if request.resolver_match.url_name == "root_orders" %}active{% endif %}">
-            <a href="/root/orders" class="menu-link">
+            <a href="/accounts/orders" class="menu-link">
                 <i class="menu-icon tf-icons bx bxs-shopping-bag"></i>
                 <div data-i18n="Basic">Orders</div>
             </a>
@@ -96,7 +96,7 @@
 
         <!-- Cards -->
         <li class="menu-item {% if request.resolver_match.url_name == "root_cancellation_orders" %}active{% endif %}">
-            <a href="/root/orders/cancel" class="menu-link">
+            <a href="/accounts/orders/cancel" class="menu-link">
                 <i class='menu-icon tf-icons bx bxs-shopping-bag-alt' ></i>
                 <div data-i18n="Basic">Cancellation</div>
             </a>
@@ -104,7 +104,7 @@
 
         <!-- Cards -->
         <li class="menu-item {% if request.resolver_match.url_name == "root_layouts" %}active{% endif %}">
-            <a href="/root/layouts" class="menu-link">
+            <a href="/accounts/layouts" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-layout"></i>
                 <div data-i18n="Basic">Layout</div>
             </a>

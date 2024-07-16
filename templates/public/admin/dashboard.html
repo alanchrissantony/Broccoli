@@ -36,7 +36,76 @@
                         <div class="row row-bordered g-0">
                             <div class="col-md-8">
                                 <h5 class="card-header m-0 me-2 pb-3">Total Revenue</h5>
-                                <div id="totalRevenueChart" class="px-2"></div>
+                                <style>
+                                    @import url(https://fonts.googleapis.com/css?family=Roboto);
+                                    
+                                    body {
+                                        font-family: Roboto, sans-serif;
+                                    }
+                                    
+                                    #chart {
+                                        max-width: 650px;
+                                        margin: 35px auto;
+                                    }
+                                </style>
+                                <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+                                <div id="Chart" class="px-2"></div>
+                                <script>
+                                    var dy = {{ dy|safe }};
+                                    var dx = {{ dx|safe }};
+                                    
+                                    const update_chart = async (filter) => {
+                                        $('#growthReportId').text(filter);
+                                        const domain = window.location.origin;
+                                        const url = new URL(`${domain}/accounts/api/chart`);
+                                        url.searchParams.append('filter', filter);
+                                        
+                                        try {
+                                            const response = await fetch(url);
+                                            if (!response.ok) {
+                                                throw new Error('Network response was not ok');
+                                            }
+                                            const data = await response.json();
+                                            console.log(data);
+                                            dx = data.dx;
+                                            dy = data.dy;
+                                           
+                                            // Update chart data
+                                            chart.updateOptions({
+                                                series: [{
+                                                    name: 'sales',
+                                                    data: dy // Example initial data
+                                                }],
+                                                xaxis: {
+                                                    categories: dx
+                                                },
+                                            });
+                                            
+                                        } catch (error) {
+                                            console.error('Error fetching data:', error);
+                                        }
+                                    };
+                                    
+                                    var options = {
+                                        chart: {
+                                            type: 'line',
+                                            zoom: {
+                                                enabled: false,
+                                            }
+                                        },
+                                        series: [{
+                                            name: 'sales',
+                                            data: dy  // Example initial data
+                                        }],
+                                        xaxis: {
+                                            categories: dx
+                                        },
+                                        colors: ['#80B500']
+                                    };
+                                    
+                                    var chart = new ApexCharts(document.querySelector("#Chart"), options);
+                                    chart.render();
+                                </script>
                             </div>
                             <div class="col-md-4">
                                 <div class="card-body">
@@ -45,26 +114,23 @@
                                             <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button"
                                                 id="growthReportId" data-bs-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">
-                                                2022
+                                                Yearly
                                             </button>
-                                            <div class="dropdown-menu dropdown-menu-end"
-                                                aria-labelledby="growthReportId">
-                                                <a class="dropdown-item" href="javascript:void(0);">2021</a>
-                                                <a class="dropdown-item" href="javascript:void(0);">2020</a>
-                                                <a class="dropdown-item" href="javascript:void(0);">2019</a>
+                                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="growthReportId">
+                                                <a class="dropdown-item" onclick="update_chart('yearly')">Yearly</a>
+                                                <a class="dropdown-item" onclick="update_chart('monthly')">Monthly</a>
+                                                <a class="dropdown-item" onclick="update_chart('daily')">Daily</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div id="growthChart"></div>
                                 <div class="text-center fw-semibold pt-3 mb-2">62% Company Growth</div>
-
-                                <div
-                                    class="d-flex px-xxl-4 px-lg-2 p-4 gap-xxl-3 gap-lg-1 gap-3 justify-content-between">
+                                
+                                <div class="d-flex px-xxl-4 px-lg-2 p-4 gap-xxl-3 gap-lg-1 gap-3 justify-content-between">
                                     <div class="d-flex">
                                         <div class="me-2">
-                                            <span class="badge bg-label-primary p-2"><i
-                                                    class="bx bx-dollar text-primary"></i></span>
+                                            <span class="badge bg-label-primary p-2"><i class="bx bx-dollar text-primary"></i></span>
                                         </div>
                                         <div class="d-flex flex-column">
                                             <small>2022</small>
@@ -73,8 +139,7 @@
                                     </div>
                                     <div class="d-flex">
                                         <div class="me-2">
-                                            <span class="badge bg-label-info p-2"><i
-                                                    class="bx bx-wallet text-info"></i></span>
+                                            <span class="badge bg-label-info p-2"><i class="bx bx-wallet text-info"></i></span>
                                         </div>
                                         <div class="d-flex flex-column">
                                             <small>2021</small>
@@ -150,12 +215,12 @@
                                             class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
                                             <div class="card-title">
                                                 <h5 class="text-nowrap mb-2">Profile Report</h5>
-                                                <span class="badge bg-label-warning rounded-pill">Year 2021</span>
+                                                <span class="badge bg-label-warning rounded-pill">Year <script>document.write(new Date().getFullYear());</script></span>
                                             </div>
                                             <div class="mt-sm-auto">
                                                 <small class="text-success text-nowrap fw-semibold"><i
                                                         class="bx bx-chevron-up"></i> 68.2%</small>
-                                                <h3 class="mb-0">$84,686k</h3>
+                                                <h3 class="mb-0">${{revenue|custom_conventer}}k</h3>
                                             </div>
                                         </div>
                                         <div id="profileReportChart"></div>

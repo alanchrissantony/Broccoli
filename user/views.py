@@ -21,11 +21,7 @@ from django.views.decorators.cache import cache_control
 otp_verification = TOTPVerification()
 
 def verification_required(function):
-  """
-  Decorator for views that checks if a user is verified.
 
-  If the user is not verified, it redirects them to the verification page.
-  """
   def wrapper(request, *args, **kwargs):
     if not request.user.is_verified:
       return redirect(reverse('verification'))
@@ -108,7 +104,7 @@ def password(request):
 
 def signin(request):
 
-    if request.user.id:
+    if request.user.is_authenticated:
         user = request.user
         if not user.is_verified:
             return redirect('verification')
@@ -161,7 +157,7 @@ def signin(request):
 
 def register(request):
     # Check if user is already logged in and verified
-    if request.user.id:
+    if request.user.is_authenticated:
         user = request.user
         if not user.is_verified:
             return redirect('verification')
@@ -231,7 +227,7 @@ def verification(request):
         email = user_data['email']
         username = user_data['username']
         password = user_data['password']
-    elif request.user.id:
+    elif request.user.is_authenticated:
         if request.user.is_verified:
             return redirect('home')
         user = request.user

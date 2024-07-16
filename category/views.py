@@ -14,8 +14,11 @@ class Categories:
 
     @login_required(login_url='root_signin')
     def category(request):
-        
-        categories = Category.objects.all()
+        search = request.GET.get('search')
+        if search:
+            categories = Category.objects.filter(name__icontains=search)
+        else:
+            categories = Category.objects.all()
         items_per_page = 10
         paginator = Paginator(categories, items_per_page)
         page = request.GET.get('page')

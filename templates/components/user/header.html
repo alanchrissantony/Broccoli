@@ -70,7 +70,7 @@
                                 <ul>
                                     <li><a href="/user/account">My Account</a></li>
                                     <li><a href="/wishlists">Wishlist</a></li>
-                                    {% if request.user.id %}
+                                    {% if request.user.is_authenticated %}
                                       <li><a href="#" data-toggle="modal" data-target="#liton_signout_modal">Sign out</a></li>
                                     {% else %}
                                       <li><a href="/user/signin">Sign in</a></li>

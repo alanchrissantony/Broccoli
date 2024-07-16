@@ -123,7 +123,7 @@
                                     </div>
                                     <div class="ltn__product-details-menu-3">
                                         <ul>
-                                            {% if request.user.id %}
+                                            {% if request.user.is_authenticated %}
                                             <li onclick="handleWishlist(`{{product.id}}`, `{{product|in_wishlist:request.user}}`)">
                                                 <a href="#ltn__product-details-menu-3">
                                                     {% if product|in_wishlist:request.user %}<i id="wishlist-heart-icon" class="fa fa-heart" style="color: #E1306C;"></i>{% else %}<i id="wishlist-heart-icon" class="far fa-heart"></i>{% endif %}

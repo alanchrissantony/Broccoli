@@ -2,12 +2,13 @@ from django.db import models
 from functools import partial
 from core.models import image_upload_path
 from category.models import Category
-
+from django.core.cache import cache
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 # Create your models here.
 
 class Product(models.Model):
-    
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(max_length=255, unique=True)
@@ -25,12 +26,36 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
-    
 
 
 class Image(models.Model):
-    
     image = models.ImageField(upload_to=partial(image_upload_path, folder='products'), blank=True)
 
     def __str__(self):
         return f"Image {self.id}"
+
+
+# Signals for cache invalidation
+@receiver(post_save, sender=Product)
+@receiver(post_delete, sender=Product)
+def invalidate_product_cache(sender, instance, **kwargs):
+    
+    cache_key_list = [
+        f'products_{instance.id}',
+        f'product_{instance.id}',
+        f'related_products_{instance.id}',
+        'products_*',  
+        'top_rated',  
+    ]
+
+    for key in cache_key_list:
+        cache.delete_pattern(key)  
+
+    
+    cache.delete('categories')
+
+@receiver(post_save, sender=Category)
+@receiver(post_delete, sender=Category)
+def invalidate_category_cache(sender, instance, **kwargs):
+    
+    cache.delete('categories')

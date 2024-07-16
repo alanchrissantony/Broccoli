@@ -65,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_session_timeout.middleware.SessionTimeoutMiddleware',
+    'broccoli.middleware.CacheControlMiddleware',
 ]
 
 SESSION_EXPIRE_SECONDS = 3600  # 1 hour
@@ -88,6 +89,7 @@ TEMPLATES = [
                 'broccoli.context_processors.WishlistCounter',
                 'broccoli.context_processors.WalletProcessor',
                 'broccoli.context_processors.bannerProcessor',
+                'broccoli.context_processors.cropApiProcessor',
             ],
             'libraries':{
                 'custom_filters': 'broccoli.templatetags.custom_filters',
@@ -148,6 +150,8 @@ USE_I18N = config('USE_I18N', cast=bool)
 USE_TZ = config('USE_TZ', cast=bool)
 
 
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
@@ -167,6 +171,18 @@ MEDIA_URL = 'media/'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# Cache backend configuration
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',  # Adjust the Redis URL as needed
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

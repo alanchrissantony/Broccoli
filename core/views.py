@@ -61,7 +61,7 @@ def coupon(request, wallet=None, wallet_pay=0, coupon=None, total=0, quantity=0,
     coupon_code = request.GET.get('coupon')
 
     try:
-        if request.user.id:
+        if request.user.is_authenticated:
             wallet = Wallet.objects.filter(user=request.user).first()
             cart_items = CartItem.objects.filter(user=request.user, is_active=True) 
         else: 
