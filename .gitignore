@@ -1,6 +1,7 @@
 # Created by virtualenv automatically
 *.env
 venv
+venv/
 
 # Django static files
 staticfiles/
