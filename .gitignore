@@ -3,7 +3,7 @@
 venv
 
 # Django static files
-staticfiles
+staticfiles/
 
 # Ignore database files if you use SQLite
 *.sqlite3

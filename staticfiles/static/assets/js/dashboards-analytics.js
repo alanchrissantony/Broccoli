@@ -19,12 +19,8 @@
       series: [
         {
           name: '2021',
-          data: [18, 7, 15, 29, 18, 12, 9]
+          data: [18, 7, 15, 29, 18, 12, 100]
         },
-        {
-          name: '2020',
-          data: [-13, -18, -9, -14, -5, -17, -15]
-        }
       ],
       chart: {
         height: 300,
@@ -278,7 +274,7 @@
   // --------------------------------------------------------------------
   const growthChartEl = document.querySelector('#growthChart'),
     growthChartOptions = {
-      series: [78],
+      series: [68],
       labels: ['Growth'],
       chart: {
         height: 240,
@@ -483,8 +479,8 @@
                 fontSize: '0.8125rem',
                 color: axisColor,
                 label: 'Weekly',
-                formatter: function (w) {
-                  return '38%';
+                formatter: function (val) {
+                  return '78%';
                 }
               }
             }
