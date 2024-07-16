@@ -23,6 +23,7 @@ psycopg2-binary==2.9.9
 pycparser==2.22
 pyOpenSSL==24.1.0
 pyotp==2.9.0
+python-dateutil==2.9.0.post0
 python-decouple==3.8
 python-ipware==3.0.0
 redis==5.0.7
