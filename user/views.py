@@ -242,7 +242,7 @@ def verification(request):
             try:
                 if 'user' in request.session:
                     avatar = get_random_avatar_url()
-                    print(avatar)
+                  
                     user = Account.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
                     user.avatar = avatar
                     user.save()

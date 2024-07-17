@@ -5,9 +5,8 @@ from accounts.validator import Validator
 from django.contrib import messages
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from core.models import image_upload_path
-from django.conf import settings
+import cloudinary.uploader
 from django.core.paginator import Paginator
-import os
 
 # Create your views here.
 class Categories:
@@ -41,13 +40,9 @@ class Categories:
 
 
                 if image and isinstance(image, InMemoryUploadedFile):
-                    image_path = image_upload_path(None, image.name, 'categories')
-                    absolute_image_path = os.path.join(settings.MEDIA_ROOT, image_path)
+                    image_path = image_upload_path()
+                    cloudinary.uploader.upload(image, public_id=image_path)
 
-
-                    with open(absolute_image_path, 'wb') as destination:
-                        for chunk in image.chunks():
-                            destination.write(chunk)
 
             name = request.POST['name']
             description = request.POST['description']
@@ -80,15 +75,9 @@ class Categories:
                 image = request.FILES['image']
 
                 if image and isinstance(image, InMemoryUploadedFile):
-                    image_path = image_upload_path(None, image.name, 'categories')
-                    absolute_image_path = os.path.join(settings.MEDIA_ROOT, image_path)
-
-
-                    with open(absolute_image_path, 'wb') as destination:
-                        for chunk in image.chunks():
-                            
-                            destination.write(chunk)
-                            category.image = image_path
+                    image_path = image_upload_path()
+                    cloudinary.uploader.upload(image, public_id=image_path)
+                    category.image = image_path
 
             # Handle other form fields
             name = request.POST.get('name')

@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from decouple import config
 import os, dj_database_url
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -54,6 +57,7 @@ INSTALLED_APPS = [
     'layout',
     'wallet',
     'admin_honeypot',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -173,3 +177,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Configuration       
+cloudinary.config( 
+    cloud_name = "dkxnd0q4k", 
+    api_key = "877393646341448", 
+    api_secret = "vdkVlHBj24Ptxd_Jp-9uNUDNyC8", # Click 'View Credentials' below to copy your API secret
+    secure=True
+)

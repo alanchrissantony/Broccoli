@@ -1,16 +1,16 @@
 from django.db import models
-from functools import partial
-from core.models import image_upload_path 
+from cloudinary.models import CloudinaryField
 
 
 # Create your models here.
 class Banner(models.Model): 
-    image = models.ImageField(upload_to=partial(image_upload_path, folder='banner'), blank=True)
+    image = CloudinaryField('image', blank=True)
+
+    def __str__(self):
+        return f"Image {self.id}"
 
 class Slide(models.Model):
-    image = models.ImageField(upload_to=partial(image_upload_path, folder='slides'), blank=True)
-
-
+    image = CloudinaryField('image', blank=True)
 
     def __str__(self):
         return f"Image {self.id}"

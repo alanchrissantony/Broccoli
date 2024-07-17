@@ -24,7 +24,7 @@ class TOTPVerification:
     def generate_token(self):
         totp = self.totp_obj()
         otp = str(totp.token()).zfill(self.number_of_digits)
-        print(otp)
+  
         return otp
 
     def verify_token(self, token, tolerance=0):

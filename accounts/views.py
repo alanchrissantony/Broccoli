@@ -24,14 +24,15 @@ from django.http import JsonResponse
 from django.db.models import Count
 from django.db.models.functions import Extract
 from collections import defaultdict
-from layout.models import Slide, Banner
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
 
 
 # Create your views here.
 def chart(request):
     dx=[]
     dy=[]
-    print(1234)
+
     filter_by = request.GET.get('filter')
     current_date = datetime.now()
     current_year = datetime.now().year
@@ -302,12 +303,8 @@ class Products:
             # Process each uploaded image
             for image in images:
                 # Save the image to the media directory
-                image_path = image_upload_path(None, image.name, 'products')
-                absolute_image_path = os.path.join(settings.MEDIA_ROOT, image_path)
-
-                with open(absolute_image_path, 'wb') as destination:
-                    for chunk in image.chunks():
-                        destination.write(chunk)
+                image_path = image_upload_path()
+                cloudinary.uploader.upload(image, public_id=image_path)
 
                 # Add the image path to the list
                 image_paths.append(image_path)
@@ -370,8 +367,11 @@ class Products:
             # Handle images
             images = request.FILES.getlist('image')  # Get list of uploaded images
             for image in images:
+
+                image_path = image_upload_path()
+                cloudinary.uploader.upload(image, public_id=image_path)
                 # Create a new Image object for each uploaded image
-                img = Image.objects.create(image=image)
+                img = Image.objects.create(image=image_path)
                 # Add the image to the product's images
                 product.images.add(img)
 
@@ -404,7 +404,7 @@ class Products:
                     product.save()
                 except:
                     messages.error(request, 'Please select a valid category.')
-                    return redirect('/account/products/edit/{{id}}')
+                    return redirect(f'/accounts/products/edit/{id}')
                 
         
             return redirect('root_products')
@@ -618,7 +618,7 @@ class Orders:
                 
                 product.product.stock += product.quantity
                 product.product.save()
-            print(order)
+      
             order.delete()
         except:
             pass
@@ -668,7 +668,7 @@ class UserWallet:
         if user:
             wallet = Transaction.objects.filter(user=user.user).order_by('-created_at')
             user=user.user
-        print(wallet, id)
+      
         items_per_page = 10
         paginator = Paginator(wallet, items_per_page)
         page = request.GET.get('page')
@@ -1071,42 +1071,3 @@ class ProductPromotion:
             promotion.save()
             messages.success(request, 'Promotion has been successfully deleted!')
             return redirect('root_category_promotions')
-
-
-def layout(request):
-
-    if request.method == 'POST':
-
-        if 'slide_1' in request.FILES:
-            slide_1=request.FILES['slide_1']
-            slide = Slide.objects.filter().first()
-            if slide:
-                slide.image=slide_1
-            else:
-                slide = Slide.objects.create(image=slide_1) 
-            slide.save()
-        
-        if 'slide_2' in request.FILES:
-            slide_2=request.FILES['slide_2']
-            slide = Slide.objects.filter().first()
-            if slide:
-                slide.image=slide_2
-            else:
-                slide = Slide.objects.create(image=slide_2) 
-            slide.save()
-        
-        if 'banner' in request.FILES:
-            banner=request.FILES['banner']
-            crnt_banner = Banner.objects.filter().first()
-            if crnt_banner:
-                crnt_banner.image=banner
-            else:
-                crnt_banner = Banner.objects.create(image=banner) 
-            crnt_banner.save()
-    slides = Slide.objects.all()
-    banner = Banner.objects.all()
-    context = {
-        'banner':banner,
-        'slides':slides
-    }
-    return render(request, 'public/admin/layouts.html', context)
