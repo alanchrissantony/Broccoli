@@ -38,7 +38,7 @@ def send(request):
     return True
 
 
-@login_required(login_url='signin/')
+@login_required(login_url='/user/signin/')
 @verification_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def account(request):

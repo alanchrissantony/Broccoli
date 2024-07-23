@@ -9,7 +9,7 @@ from django.core.cache import cache
 
 # Create your views here.
 
-@login_required(login_url='signin/')
+@login_required(login_url='/user/signin/')
 @verification_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def wishlist(request):
@@ -19,7 +19,7 @@ def wishlist(request):
     }
     return render(request, 'public/user/wishlist.html', context)
 
-@login_required(login_url='signin/')
+@login_required(login_url='/user/signin/')
 @verification_required
 def add(request, id):
     try:
@@ -34,7 +34,7 @@ def add(request, id):
 
     return redirect('wishlists')
 
-@login_required(login_url='signin/')
+@login_required(login_url='/user/signin/')
 @verification_required
 def remove(request, id):
     try:
