@@ -124,19 +124,23 @@
                                     <div class="ltn__product-details-menu-3">
                                         <ul>
                                             {% if request.user.is_authenticated %}
-                                            <li onclick="handleWishlist(`{{product.id}}`, `{{product|in_wishlist:request.user}}`)">
-                                                <a href="#ltn__product-details-menu-3">
-                                                    {% if product|in_wishlist:request.user %}<i id="wishlist-heart-icon" class="fa fa-heart" style="color: #E1306C;"></i>{% else %}<i id="wishlist-heart-icon" class="far fa-heart"></i>{% endif %}
-                                                    <span>Add to Wishlist</span>
-                                                </a>
-                                            </li>
+                                                <li onclick="handleWishlist('{{ product.id }}', '{{ product|in_wishlist:request.user }}')">
+                                                    <a href="javascript:void(0);">
+                                                        {% if product|in_wishlist:request.user %}
+                                                            <i id="wishlist-heart-icon-{{ product.id }}" class="fa fa-heart" style="color: #E1306C;"></i>
+                                                        {% else %}
+                                                            <i id="wishlist-heart-icon-{{ product.id }}" class="far fa-heart"></i>
+                                                        {% endif %}
+                                                        <span>Add to Wishlist</span>
+                                                    </a>
+                                                </li>
                                             {% else %}
-                                            <li>
-                                                <a href="/user/signin">
-                                                    <i id="wishlist-heart-icon" class="far fa-heart"></i>
-                                                    <span>Add to Wishlist</span>
-                                                </a>
-                                            </li>
+                                                <li>
+                                                    <a href="/user/signin">
+                                                        <i class="far fa-heart"></i>
+                                                        <span>Add to Wishlist</span>
+                                                    </a>
+                                                </li>
                                             {% endif %}
                                             <li onclick="quickView(`{{product.id}}`, `{{product.name}}`, `{{product.images.first.image.url}}`, `{{product.category}}`, `{{product.price}}`, `{{product.rating}}`)">
                                                 <a href="#" class="" title="Compare" data-toggle="modal" data-target="#quick_view_modal">
@@ -403,23 +407,23 @@
 
         const addToWishlist = async(proId, name, image)=>{
             const url = window.location.origin
-            const response = await fetch(url+'/wishlists/add/'+proId)
+            const response = await fetch(`${url}/wishlists/add/${proId}`)
             $('#modal-wishlist-product-name').html(name);
             $('#modal-wishlist-product-image').attr('src',image);
         }
-        const handleWishlist = async(proId, flag)=>{
-            
-            const url = window.location.origin
-            
-            if(flag=='True'){
-                const response = await fetch(url+'/wishlists/remove/'+proId)
-                window.location.reload()
+        const handleWishlist = async (proId, flag) => {
+            const url = window.location.origin;
+        
+            try {
+                if (flag === 'True') {
+                    await fetch(`${url}/wishlists/remove/${proId}`);
+                } else {
+                    await fetch(`${url}/wishlists/add/${proId}`);
+                }
+            } catch (error) {
+                console.error('Error updating wishlist:', error);
             }
-            else{
-                const response = await fetch(url+'/wishlists/add/'+proId)
-                window.location.reload()
-            }
-        }
+        };
 
         const quickView = async(proId, name, image, category, price, rating)=>{
 

@@ -73,12 +73,9 @@ def page_number_end(queryset):
     return queryset*9
 
 @register.filter
-def in_wishlist(product, user):  # Include user as an argument
-    wishlist = Wishlist.objects.filter(product=product, user=user).first()
+def in_wishlist(product, user):
+    return Wishlist.objects.filter(product=product, user=user).exists()
 
-    if wishlist:
-        return True
-    return False
 
 @register.filter(name='custom_range')
 def custom_range(end):

@@ -5,6 +5,7 @@ from wishlists.models import Wishlist
 from django.contrib.auth.decorators import login_required
 from user.views import verification_required
 from django.views.decorators.cache import cache_control
+from django.core.cache import cache
 
 # Create your views here.
 
@@ -28,6 +29,8 @@ def add(request, id):
         product = Product.objects.get(id=id)
         wishlist = Wishlist.objects.create(user=user, product=product)
         wishlist.save()
+    cache.delete(f'product_{id}')
+    cache.delete(f'related_products_{id}')
 
     return redirect('wishlists')
 
@@ -39,5 +42,6 @@ def remove(request, id):
         wishlist.delete()
     except:
         pass
-
+    cache.delete(f'product_{id}')
+    cache.delete(f'related_products_{id}')
     return redirect('wishlists')

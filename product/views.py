@@ -1,6 +1,4 @@
 from django.shortcuts import render
-from django.views.decorators.cache import cache_control
-from django.views.decorators.cache import cache_page
 from django.core.cache import cache
 from product.models import Product
 from category.models import Category
@@ -58,7 +56,11 @@ def productDetails(request, id):
         return JsonResponse(response_data)
 
 
-    product = Product.objects.get(id=id)
+    cache_key = f'product_{id}'
+    product = cache.get(cache_key)
+    if not product:
+        product = Product.objects.get(id=id)
+        cache.set(cache_key, product, timeout=60*15)  # Cache for 15 minutes
 
     related_products = cache.get(f'related_products_{id}')
     if not related_products:
