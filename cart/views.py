@@ -219,8 +219,6 @@ def delete(request, product_id):
     return redirect('cart')
 
 
-@cache_page(900)
-@cache_control(max_age=900)
 def cart(request, total=0, quantity=0, discount=0, vat=0, shipping=0, cart_items=None, coupon=None, wallet=None, price=0):
     
     try:

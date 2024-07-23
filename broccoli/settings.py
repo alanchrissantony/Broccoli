@@ -69,7 +69,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_session_timeout.middleware.SessionTimeoutMiddleware',
-    'broccoli.middleware.CacheControlMiddleware',
 ]
 
 SESSION_EXPIRE_SECONDS = 3600  # 1 hour

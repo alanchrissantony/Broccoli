@@ -9,33 +9,27 @@ from django.core.paginator import Paginator
 from order.models import Review
 
 # View-Level Caching
-@cache_page(60 * 15)  # Cache for 15 minutes
-@cache_control(max_age=60 * 15)
 def product(request):
     items_per_page = 9
     sort_by = request.GET.get('sort_by')
     search = request.GET.get('search')
     category = request.GET.get('category')
 
-    cache_key = f'products_{sort_by}_{search}_{category}_{request.GET.get("page", 1)}'
-    products = cache.get(cache_key)
 
-    if not products:
-        if search:
-            products = Product.objects.filter(name__icontains=search, is_available=True)
-        elif category and sort_by:
-            products = Product.objects.filter(category=category, is_available=True).order_by(sort_by)
-        elif sort_by:
-            products = Product.objects.filter(is_available=True).order_by(sort_by)
-        elif category:
-            products = Product.objects.filter(category=category, is_available=True)
-        else:
-            products = Product.objects.all().exclude(is_available=False)
+    if search:
+        products = Product.objects.filter(name__icontains=search, is_available=True)
+    elif category and sort_by:
+        products = Product.objects.filter(category=category, is_available=True).order_by(sort_by)
+    elif sort_by:
+        products = Product.objects.filter(is_available=True).order_by(sort_by)
+    elif category:
+        products = Product.objects.filter(category=category, is_available=True)
+    else:
+        products = Product.objects.all().exclude(is_available=False)
 
-        paginator = Paginator(products, items_per_page)
-        page = request.GET.get('page')
-        products = paginator.get_page(page)
-        cache.set(cache_key, products, timeout=60*15)  # Cache for 15 minutes
+    paginator = Paginator(products, items_per_page)
+    page = request.GET.get('page')
+    products = paginator.get_page(page)
 
     top_rated = cache.get('top_rated')
     if not top_rated:
@@ -57,18 +51,14 @@ def product(request):
     }
     return render(request, 'public/user/products.html', context)
 
-@cache_page(60 * 15)  # Cache for 15 minutes
-@cache_control(max_age=900)
+
 def productDetails(request, id):
     if request.method == 'POST':
         response_data = {'message': 'Product added to cart successfully!'}
         return JsonResponse(response_data)
 
-    cache_key = f'product_{id}'
-    product = cache.get(cache_key)
-    if not product:
-        product = Product.objects.get(id=id)
-        cache.set(cache_key, product, timeout=60*15)  # Cache for 15 minutes
+
+    product = Product.objects.get(id=id)
 
     related_products = cache.get(f'related_products_{id}')
     if not related_products:
