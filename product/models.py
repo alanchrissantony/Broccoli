@@ -34,27 +34,26 @@ class Image(models.Model):
         return f"Image {self.id}"
 
 
-# Signals for cache invalidation
+PRODUCT_CACHE_KEYS = [
+    'products_{id}',
+    'product_{id}',
+    'related_products_{id}',
+    'top_rated'
+]
+
+CATEGORY_CACHE_KEY = 'categories'
+
 @receiver(post_save, sender=Product)
 @receiver(post_delete, sender=Product)
 def invalidate_product_cache(sender, instance, **kwargs):
-    
-    cache_key_list = [
-        f'products_{instance.id}',
-        f'product_{instance.id}',
-        f'related_products_{instance.id}',
-        'products_*',  
-        'top_rated',  
-    ]
+    cache_key_list = [key.format(id=instance.id) for key in PRODUCT_CACHE_KEYS]
 
     for key in cache_key_list:
-        cache.delete_pattern(key)  
+        cache.delete(key)
 
-    
-    cache.delete('categories')
+    cache.delete(CATEGORY_CACHE_KEY)
 
 @receiver(post_save, sender=Category)
 @receiver(post_delete, sender=Category)
 def invalidate_category_cache(sender, instance, **kwargs):
-    
-    cache.delete('categories')
+    cache.delete(CATEGORY_CACHE_KEY)
