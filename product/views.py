@@ -29,15 +29,9 @@ def product(request):
     page = request.GET.get('page')
     products = paginator.get_page(page)
 
-    top_rated = cache.get('top_rated')
-    if not top_rated:
-        top_rated = Product.objects.all().exclude(is_available=False).order_by('-rating')[:5]
-        cache.set('top_rated', top_rated, timeout=60*15)  # Cache for 15 minutes
 
-    categories = cache.get('categories')
-    if not categories:
-        categories = Category.objects.all().exclude(is_available=False)
-        cache.set('categories', categories, timeout=60*15)  # Cache for 15 minutes
+    top_rated = Product.objects.all().exclude(is_available=False).order_by('-rating')[:5]
+    categories = Category.objects.all().exclude(is_available=False)
 
     context = {
         'products': products,
@@ -56,26 +50,10 @@ def productDetails(request, id):
         return JsonResponse(response_data)
 
 
-    cache_key = f'product_{id}'
-    product = cache.get(cache_key)
-    if not product:
-        product = Product.objects.get(id=id)
-        cache.set(cache_key, product, timeout=60*15)  # Cache for 15 minutes
-
-    related_products = cache.get(f'related_products_{id}')
-    if not related_products:
-        related_products = Product.objects.filter(category=product.category, is_available=True).exclude(id=product.id)
-        cache.set(f'related_products_{id}', related_products, timeout=60*15)  # Cache for 15 minutes
-
-    top_rated = cache.get('top_rated')
-    if not top_rated:
-        top_rated = Product.objects.all().exclude(is_available=False).order_by('-rating')[:5]
-        cache.set('top_rated', top_rated, timeout=60*15)  # Cache for 15 minutes
-
-    reviews = cache.get(f'reviews_{id}')
-    if not reviews:
-        reviews = Review.objects.filter(product=product)
-        cache.set(f'reviews_{id}', reviews, timeout=60*15)  # Cache for 15 minutes
+    product = Product.objects.get(id=id)
+    related_products = Product.objects.filter(category=product.category, is_available=True).exclude(id=product.id)
+    top_rated = Product.objects.all().exclude(is_available=False).order_by('-rating')[:5]
+    reviews = Review.objects.filter(product=product)
 
     context = {
         'product': product,

@@ -310,7 +310,7 @@
         const addCart = async (proId, name, image, stock) => {
         if(stock > 0){
             const url = window.location.origin
-            const response = await fetch(url+'/cart/add/'+proId+'/'+1)
+            const response = await fetch(`${url}/cart/add/${proId}/${1}`)
             $('#modal-product-status').html('<i class="fa fa-check-circle"></i> Successfully added to your Cart.');
             document.getElementById('view_cart_modal_btn').classList.remove('disabled')
             document.getElementById('checkout_cart_modal_btn').classList.remove('disabled')
@@ -327,7 +327,7 @@
 
         const addToWishlist = async(proId, name, image)=>{
             const url = window.location.origin
-            const response = await fetch(url+'/wishlists/add/'+proId)
+            const response = await fetch(`${url}/wishlists/add/${proId}`)
             $('#modal-wishlist-product-name').html(name);
             $('#modal-wishlist-product-image').attr('src',image);
         }

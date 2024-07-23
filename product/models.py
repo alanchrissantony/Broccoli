@@ -1,9 +1,6 @@
 from django.db import models
 from cloudinary.models import CloudinaryField
 from category.models import Category
-from django.core.cache import cache
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
 
 # Create your models here.
 
@@ -33,27 +30,3 @@ class Image(models.Model):
     def __str__(self):
         return f"Image {self.id}"
 
-
-PRODUCT_CACHE_KEYS = [
-    'products_{id}',
-    'product_{id}',
-    'related_products_{id}',
-    'top_rated'
-]
-
-CATEGORY_CACHE_KEY = 'categories'
-
-@receiver(post_save, sender=Product)
-@receiver(post_delete, sender=Product)
-def invalidate_product_cache(sender, instance, **kwargs):
-    cache_key_list = [key.format(id=instance.id) for key in PRODUCT_CACHE_KEYS]
-
-    for key in cache_key_list:
-        cache.delete(key)
-
-    cache.delete(CATEGORY_CACHE_KEY)
-
-@receiver(post_save, sender=Category)
-@receiver(post_delete, sender=Category)
-def invalidate_category_cache(sender, instance, **kwargs):
-    cache.delete(CATEGORY_CACHE_KEY)
