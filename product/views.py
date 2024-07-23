@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.core.cache import cache
 from product.models import Product
 from category.models import Category
 from django.http import JsonResponse
