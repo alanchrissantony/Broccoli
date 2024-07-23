@@ -11,7 +11,7 @@ from decimal import Decimal
 from django.contrib import messages
 
 # Create your views here.
-@login_required(login_url='signin')
+@login_required(login_url='signin/')
 @verification_required
 def order(request, id):
 
@@ -94,7 +94,7 @@ def delete(request, id):
         pass
     return redirect('account')
 
-@login_required(login_url='signin')
+@login_required(login_url='signin/')
 @verification_required
 def tracking(request):
     if request.method == "POST":
@@ -113,7 +113,7 @@ def tracking(request):
         
     return render(request, 'public/user/order-tracking.html')
 
-@login_required(login_url='signin')
+@login_required(login_url='signin/')
 @verification_required
 def invoice(request, id):
     order = Order.objects.filter(id=id).first()

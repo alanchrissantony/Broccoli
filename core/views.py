@@ -203,7 +203,7 @@ def wallet(request, wallet_pay=0, coupon_code=None, coupon=None, total=0, quanti
     return JsonResponse(context)
 
 
-@login_required(login_url='signin')
+@login_required(login_url='signin/')
 @verification_required
 @transaction.atomic
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
