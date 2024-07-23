@@ -420,6 +420,7 @@
                 } else {
                     await fetch(`${url}/wishlists/add/${proId}`);
                 }
+                window.location.reload()
             } catch (error) {
                 console.error('Error updating wishlist:', error);
             }
