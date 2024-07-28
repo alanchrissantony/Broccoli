@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const email = document.getElementById('email').value;
     const domain = window.location.origin;
     const url = `${domain}/user/verification/resend`;
-    console.log(email);
+
     $.ajax({
       url: url,
       type: "GET",
