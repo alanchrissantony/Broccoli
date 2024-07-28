@@ -116,19 +116,20 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const email = document.getElementById('email').value;
     const domain = window.location.origin;
     const url = `${domain}/user/verification/resend`;
-
+    console.log(email);
     $.ajax({
       url: url,
       type: "GET",
       data: { email: email },
       success: function(response) {
+        window.showToaster_ltn('Success', 'Verification code sent to your email address.');
         resetTimer();
         // Update the page content here using the response data
       },
       error: function(jqXHR, textStatus, errorThrown) {
         console.error(textStatus, errorThrown);
         // Display an error message to the user (more specific based on error)
-        resetTimer();
+        window.showToaster_ltn('Warning', errorThrown);
       }
     });
   };

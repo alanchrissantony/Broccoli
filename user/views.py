@@ -16,6 +16,8 @@ from wallet.models import Transaction
 from datetime import datetime
 from user.utils import get_random_avatar_url
 from django.views.decorators.cache import cache_control
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 
 # Create your views here.
 otp_verification = TOTPVerification()
@@ -28,14 +30,17 @@ def verification_required(function):
     return function(request, *args, **kwargs)
   return wrapper
 
+@require_GET
 def send(request):
     email = request.GET.get('email')
+    print(email)
     if email is None:
         email = request.user.email
+
     otp = otp_verification.generate_token()
     send_otp(email, otp)
-    messages.success(request, "Verification code sent to your email address.")
-    return True
+
+    return JsonResponse({'success': True, 'message': 'Verification code sent to your email address.'})
 
 
 @login_required(login_url='/user/signin/')
