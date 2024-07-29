@@ -33,9 +33,8 @@ def verification_required(function):
 @require_GET
 def send(request):
     email = request.GET.get('email')
-    print(email)
     if email is None:
-        email = request.user.email
+        email = request.session['email']
 
     otp = otp_verification.generate_token()
     send_otp(email, otp)

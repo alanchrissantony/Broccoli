@@ -26,7 +26,7 @@
                                 <input type="email" id="email" name="email" placeholder="Email*">
                                 <button id="resend-button" onclick="send()" class="theme-btn-1 btn verification-button" type="button" type="button">
                                   <i id="resend-icon" class="fas fa-arrow-right"></i>
-                                  <span id="timer">05:00</span>
+                                  <span id="timer">01:00</span>
                                 </button>
                               </div>
                             <input type="password" name="otp" placeholder="OTP*">
@@ -72,87 +72,107 @@
         </div>
     </div>
     <!-- LOGIN AREA END -->
-<script>
-
-document.addEventListener('DOMContentLoaded', (event) => {
-  let timeLeft = 300; // 5 minutes in seconds
-  const timerElement = document.getElementById('timer');
-  const resendButton = document.getElementById('resend-button');
-  const resendIcon = document.getElementById('resend-icon');
-  let countdown;
-
-  const formatTime = (seconds) => {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
-    };
-
-  const startCountdown = () => {
-    countdown = setInterval(() => {
-      if (timeLeft <= 0) {
-        clearInterval(countdown);
-        timerElement.textContent = '00:00';
-        timerElement.classList.remove('active'); // Enable button
-        resendButton.classList.remove('disabled'); // Enable button
-        resendIcon.style.display = 'inline'; // Show icon
-      } else {
-        timerElement.textContent = formatTime(timeLeft);
-        timeLeft--;
-      }
-    }, 1000);
-  };
-
-  const resetTimer = () => {
-    clearInterval(countdown);
-    timeLeft = 300;
-    timerElement.textContent = formatTime(timeLeft);
-    timerElement.classList.add('active');
-    resendButton.classList.add('disabled'); // Disable button
-    resendIcon.style.display = 'none'; // Hide icon
-    startCountdown();
-  };
-
-  window.send = () => {
-    const email = document.getElementById('email').value;
-    const domain = window.location.origin;
-    const url = `${domain}/user/verification/resend`;
-
-    $.ajax({
-      url: url,
-      type: "GET",
-      data: { email: email },
-      success: function(response) {
-        window.showToaster_ltn('Success', 'Verification code sent to your email address.');
-        resetTimer();
-        // Update the page content here using the response data
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        console.error(textStatus, errorThrown);
-        // Display an error message to the user (more specific based on error)
-        window.showToaster_ltn('Warning', errorThrown);
-      }
-    });
-  };
-
-  startCountdown(); // Start the countdown on page load
-});
-
-</script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-      const messages = [
-          {% for message in messages %}
-          {
-              'message': '{{ message.message|escapejs }}',
-              'tags': '{{ message.tags }}'
-          },
-          {% endfor %}
-      ];
-      messages.forEach(function(message) {
-          showToaster_ltn(message.tags.charAt(0).toUpperCase() + message.tags.slice(1), message.message);
+    <script>
+      document.addEventListener('DOMContentLoaded', (event) => {
+        let timeLeft = 60; // 1 minutes in seconds
+        const timerElement = document.getElementById('timer');
+        const resendButton = document.getElementById('resend-button');
+        const resendIcon = document.getElementById('resend-icon');
+        let countdown;
+      
+        const formatTime = (seconds) => {
+          const minutes = Math.floor(seconds / 60);
+          const remainingSeconds = seconds % 60;
+          return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        };
+      
+        const startCountdown = (seconds) => {
+          clearInterval(countdown);
+          timeLeft = seconds;
+          timerElement.textContent = formatTime(timeLeft);
+          timerElement.classList.add('active');
+          resendButton.classList.add('disabled'); // Disable button
+          resendIcon.style.display = 'none'; // Hide icon
+      
+          countdown = setInterval(() => {
+            if (timeLeft <= 0) {
+              clearInterval(countdown);
+              timerElement.textContent = '00:00';
+              timerElement.classList.remove('active'); // Enable button
+              resendButton.classList.remove('disabled'); // Enable button
+              resendIcon.style.display = 'inline'; // Show icon
+            } else {
+              timerElement.textContent = formatTime(timeLeft);
+              timeLeft--;
+            }
+          }, 1000);
+        };
+      
+        const getLastOtpRequestTime = () => {
+          const lastRequest = localStorage.getItem('lastOtpRequestTime');
+          return lastRequest ? new Date(lastRequest) : null;
+        };
+      
+        const setLastOtpRequestTime = () => {
+          localStorage.setItem('lastOtpRequestTime', new Date().toISOString());
+        };
+      
+        window.send = () => {
+          const email = document.getElementById('email').value;
+          const domain = window.location.origin;
+          const url = `${domain}/user/verification/resend`;
+      
+          const lastOtpRequestTime = getLastOtpRequestTime();
+          const currentTime = new Date();
+          const cooldownPeriod = 1 * 60 * 1000; // 1 minutes in milliseconds
+      
+          if (lastOtpRequestTime && (currentTime - lastOtpRequestTime) < cooldownPeriod) {
+            const remainingTime = cooldownPeriod - (currentTime - lastOtpRequestTime);
+            startCountdown(Math.floor(remainingTime / 1000));
+            return;
+          }
+      
+          $.ajax({
+            url: url,
+            type: "GET",
+            data: { email: email },
+            success: function(response) {
+              window.showToaster_ltn('Success', 'Verification code sent to your email address.');
+              setLastOtpRequestTime();
+              startCountdown(60); // Start a new 1-minute countdown
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+              console.error(textStatus, errorThrown);
+              window.showToaster_ltn('Warning', errorThrown);
+            }
+          });
+        };
+      
+        const lastOtpRequestTime = getLastOtpRequestTime();
+        const currentTime = new Date();
+        if (lastOtpRequestTime && (currentTime - lastOtpRequestTime) < 1 * 60 * 1000) {
+          const remainingTime = 1 * 60 * 1000 - (currentTime - lastOtpRequestTime);
+          startCountdown(Math.floor(remainingTime / 1000));
+        }
+      
       });
-  });
-</script>
+      
+      </script>
+      
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = [
+                {% for message in messages %}
+                {
+                    'message': '{{ message.message|escapejs }}',
+                    'tags': '{{ message.tags }}'
+                },
+                {% endfor %}
+            ];
+            messages.forEach(function(message) {
+                showToaster_ltn(message.tags.charAt(0).toUpperCase() + message.tags.slice(1), message.message);
+            });
+        });
+      </script>
 {% endblock content %}
 

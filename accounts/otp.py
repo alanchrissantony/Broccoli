@@ -5,7 +5,7 @@ import time
 
 class TOTPVerification:
 
-    def __init__(self, key=None, number_of_digits=6, token_validity_period=300):  # 5 minutes in seconds
+    def __init__(self, key=None, number_of_digits=6, token_validity_period=60):  # 1 minutes in seconds
         self.key = key or bytes(random_hex(20).encode('utf-8'))
         self.last_verified_counter = -1
         self.verified = False
