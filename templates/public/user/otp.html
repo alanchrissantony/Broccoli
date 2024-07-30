@@ -23,13 +23,13 @@
                             {% csrf_token %}
                 
                             <div id="resend" class="searchbox-wrap email-verification-form" style="display: flex;">
-                                <input type="email" id="email" name="email" placeholder="Email*">
+                                <input required type="email" id="email" name="email" placeholder="Email*">
                                 <button id="resend-button" onclick="send()" class="theme-btn-1 btn verification-button" type="button" type="button">
                                   <i id="resend-icon" class="fas fa-arrow-right"></i>
                                   <span id="timer">01:00</span>
                                 </button>
                               </div>
-                            <input type="password" name="otp" placeholder="OTP*">
+                            <input required type="password" name="otp" placeholder="OTP*">
                             <div class="btn-wrapper mt-0">
                                 <button class="theme-btn-1 btn btn-block" type="submit">VERIFY</button>
                             </div>
