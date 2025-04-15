@@ -30,7 +30,7 @@ A basic set of functionalities allowing users to interact with the platform.
   Redis caching for product listings and homepage, ensuring fast page loads.
 
 - **Security Best Practices**  
-  CSRF protection, PBKDF2 password hashing, HTTPS enforcement, and JWT for API endpoints.
+  CSRF protection, PBKDF2 password hashing and HTTPS enforcement.
 
 
 ## Diagram DB
