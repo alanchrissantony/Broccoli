@@ -80,13 +80,43 @@ $ python manage.py migrate
 $ python manage.py runserver
 ```
 
-### If you want the api to send messages to mail
+### Environment Variables
 
-Then you MUST create and config `.env`.
+You MUST create and config `.env`.
 
 For example I create `.env`
 
-All these files are in [.env](.env)
+```.env
+# Django settings
+ALLOWED_HOSTS=
+DEBUG=
+TIME_ZONE=
+USE_I18N=
+USE_TZ=
+LANGUAGE_CODE=
+
+# Django secret key
+SECRET_KEY=
+
+# Database URL
+DB_URL=
+
+# Cloudinary
+CLOUD_API_KEY=
+CLOUD_API_SECRET=
+CLOUD_NAME=
+CLOUD_SECURE=
+
+# Mail
+FROM_MAIL=
+PASS_KEY=
+
+# PayPal
+PAYPAL_CLIENT_ID=
+PAYPAL_CLIENT_SECRET=
+```
+
+All these environment variables are in [.env](.env)
 
 You can now access the API in your browser at http://localhost:8000/.
 
