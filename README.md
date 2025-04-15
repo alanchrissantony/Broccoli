@@ -6,7 +6,7 @@ A basic set of functionalities allowing users to interact with the platform.
 ![Broccoli landing](https://raw.githubusercontent.com/alanchrissantony/Broccoli/main/assets/landing.png)
 ![Broccoli products](https://raw.githubusercontent.com/alanchrissantony/Broccoli/main/assets/products.png)
 
-### Features
+## Features
 
 - **User Authentication**  
   Secure sign-up, login, and password reset powered by Django Allauth.
@@ -33,7 +33,7 @@ A basic set of functionalities allowing users to interact with the platform.
   CSRF protection, PBKDF2 password hashing, HTTPS enforcement, and JWT for API endpoints.
 
 
-### Diagram DB
+## Diagram DB
 
 ![Broccoli diagram DB](https://raw.githubusercontent.com/alanchrissantony/Broccoli/main/assets/db.svg)
 
